@@ -95,6 +95,15 @@ def iter_wordlist(wordlist='multi', lang=None):
     return results
 
 
+def get_wordlists():
+    c = CONN.cursor()
+    results = c.execute(
+        "SELECT wordlist, lang, count(*) from words GROUP BY wordlist, lang"
+    )
+    for wordlist, lang, count in results:
+        yield {'wordlist': wordlist, 'lang': lang, 'count': count}
+
+
 METANL_CONSTANT = 50291582140.06433
 def metanl_word_frequency(word, lang, default=0.):
     """

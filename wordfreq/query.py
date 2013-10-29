@@ -37,7 +37,40 @@ def word_frequency(word, lang, wordlist='multi', default=0.):
         return row[0]
 
 
-def iter_wordlist(wordlist, lang=None):
+def wordlist_size(wordlist, lang=None):
+    """
+    Get the number of words in a wordlist.
+    """
+    c = CONN.cursor()
+    if lang is None:
+        c.execute(
+            "SELECT count(*) from words where wordlist=?",
+            (wordlist,)
+        )
+    else:
+        c.execute(
+            "SELECT count(*) from words where wordlist=? and lang=?",
+            (wordlist, lang)
+        )
+    return c.fetchone()[0]
+
+
+def average_frequency(wordlist, lang):
+    """
+    A kind of slow function to get the average frequency for words in a
+    wordlist.
+
+    If, for example, you're smoothing over word frequencies by adding the
+    same baseline number to all of them, this can tell you what a good
+    baseline is. (For multi/en, it's 6.7e-07.)
+    """
+    c = CONN.cursor()
+    c.execute("SELECT avg(freq) from words where wordlist=? and lang=?",
+              (wordlist, lang))
+    return c.fetchone()[0]
+
+
+def iter_wordlist(wordlist='multi', lang=None):
     """
     Returns a generator, yielding (word, lang, frequency) triples from
     a wordlist in descending order of frequency.

@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 from setuptools import setup
 from distutils.core import Command
+from setuptools.command.install import install
+from setuptools.command.develop import develop
 
-# Make sure we can import stuff from here.
 import os
 import sys
+import logging
+logging.basicConfig(level=logging.INFO)
+
+# Make sure we can import stuff from here.
 current_dir = os.path.dirname(__file__)
 sys.path.insert(0, current_dir)
 
-from wordfreq.config import VERSION
+from wordfreq import config, transfer
 
 classifiers=[
     'Intended Audience :: Developers',
@@ -31,9 +36,65 @@ classifiers=[
 README_contents = open(os.path.join(current_dir, 'README.txt')).read()
 doclines = README_contents.split("\n")
 
+
+class SimpleCommand(Command):
+    """
+    Get the boilerplate out of the way for commands that take no options.
+    """
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+class BuildDatabaseCommand(SimpleCommand):
+    description = "Build the word frequency database from raw data"
+    def run(self):
+        from wordfreq.build import load_all_data
+        load_all_data()
+
+
+class DownloadDatabaseCommand(SimpleCommand):
+    description = "Download the built word frequency database"
+    user_options = []
+
+    def run(self):
+        transfer.download_db()
+
+
+class DownloadRawDataCommand(SimpleCommand):
+    description = "Download the raw wordlist data"
+    user_options = []
+
+    def run(self):
+        transfer.download_and_extract_raw_data()
+
+
+class UploadDataCommand(SimpleCommand):
+    description = "Upload the raw data and database"
+    user_options = []
+
+    def run(self):
+        transfer.upload_data()
+
+
+class CustomInstallCommand(install):
+    def run(self):
+        install.run(self)
+        self.run_command('download_db')
+
+
+class CustomDevelopCommand(develop):
+    def run(self):
+        develop.run(self)
+        self.run_command('download_db')
+
+
 setup(
     name="wordfreq",
-    version=VERSION,
+    version=config.VERSION,
     maintainer='Luminoso Technologies, Inc.',
     maintainer_email='dev@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
@@ -44,4 +105,12 @@ setup(
     long_description = "\n".join(doclines[2:]),
     packages=['wordfreq'],
     install_requires=['ftfy >= 3', 'functools32 == 3.2.3-1'],
+    cmdclass = {
+        'build_db': BuildDatabaseCommand,
+        'download_db': DownloadDatabaseCommand,
+        'download_raw': DownloadRawDataCommand,
+        'upload_data': UploadDataCommand,
+        'install': CustomInstallCommand,
+        'develop': CustomDevelopCommand
+    }
 )

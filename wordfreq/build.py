@@ -111,13 +111,14 @@ def save_wordlist_to_db(conn, listname, lang, freqs):
     conn.commit()
 
 
-def create_db(conn):
+def create_db(filename):
     """
     Create a wordlist database, at the filename specified by `wordfreq.config`.
 
     This should be safe to run (and have no effect) if the database already
     exists.
     """
+    conn = get_db_connection(filename)
     base_dir = os.path.dirname(filename)
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
@@ -143,10 +144,10 @@ def load_all_data(source_dir=None, filename=None):
     if filename is None:
         filename = config.DB_FILENAME
 
-    conn = get_db_connection(filename)
     logger.info("Creating database")
-    create_db(conn)
+    create_db(filename)
 
+    conn = get_db_connection(filename)
     logger.info("Loading Leeds internet corpus:")
     for lang in LEEDS_LANGUAGES:
         logger.info("\tLanguage: %s" % lang)

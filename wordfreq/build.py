@@ -104,7 +104,7 @@ def save_wordlist_to_db(conn, listname, lang, freqs):
     conn.commit()
 
 
-def create_db(conn, filename=config.DB_FILENAME):
+def create_db(conn, filename):
     """
     Create a wordlist database, at the filename specified by `wordfreq.config`.
 
@@ -122,26 +122,36 @@ def create_db(conn, filename=config.DB_FILENAME):
 
 
 LEEDS_LANGUAGES = ('ar', 'de', 'el', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh')
-def load_all_data(source_dir=config.RAW_DATA_DIR):
-    conn = sqlite3.connect(config.DB_FILENAME)
-    logger.info("Creating database")
-    create_db(conn)
+def load_all_data(source_dir=None, filename=None):
+    """
+    Load data from the raw data files into a SQLite database.
+    """
+    if source_dir is None:
+        source_dir = config.RAW_DATA_DIR
 
+    if filename is None:
+        filename = config.DB_FILENAME
+
+    conn = sqlite3.connect(filename)
+    logger.info("Creating database")
+    create_db(conn, filename)
+
+    logger.info("Loading Leeds internet corpus:")
     for lang in LEEDS_LANGUAGES:
-        logger.info("Loading Leeds internet corpus: %s" % lang)
+        logger.info("\tLanguage: %s" % lang)
         filename = os.path.join(
             source_dir, 'leeds', 'internet-%s-forms.num' % lang
         )
         wordlist = read_leeds_corpus(filename)
         save_wordlist_to_db(conn, 'leeds-internet', lang, wordlist)
 
-    logger.info("Loading Google Books")
+    logger.info("Loading Google Books (English).")
     google_wordlist = read_csv(
         os.path.join(source_dir, 'google', 'google-books-english.csv')
     )
     save_wordlist_to_db(conn, 'google-books', 'en', google_wordlist)
 
-    logger.info("Loading combined multilingual corpus")
+    logger.info("Loading combined multilingual corpus:")
     multi_wordlist = read_multilingual_csv(
         os.path.join(source_dir, 'luminoso', 'multilingual.csv')
     )
@@ -149,7 +159,7 @@ def load_all_data(source_dir=config.RAW_DATA_DIR):
         logger.info("\tLanguage: %s" % lang)
         save_wordlist_to_db(conn, 'multi', lang, multi_wordlist[lang])
 
-    logger.info("Loading Twitter corpus")
+    logger.info("Loading Twitter corpus.")
     twitter_wordlist = read_csv(
         os.path.join(source_dir, 'luminoso', 'twitter-52M.csv')
     )

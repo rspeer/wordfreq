@@ -1,13 +1,17 @@
 from __future__ import unicode_literals
 from nose.tools import eq_, assert_almost_equal, assert_greater
 from wordfreq.query import (word_frequency, average_frequency, wordlist_size,
-                            get_wordlists)
+                            get_wordlists, metanl_word_frequency)
 
 
 def test_freq_examples():
     assert_almost_equal(
         word_frequency('normalization', 'en', 'google-books'),
         1.767e-6, places=9
+    )
+    assert_almost_equal(
+        word_frequency('normalization', 'en', 'google-books', 1e-6),
+        2.767e-6, places=9
     )
     assert_almost_equal(
         word_frequency('normalisation', 'fr', 'leeds-internet'),
@@ -18,9 +22,14 @@ def test_freq_examples():
         word_frequency('lol', 'en', 'google-books')
     )
     eq_(
-        word_frequency('totallyfakeword', 'en', 'multi', -1),
-        -1
+        word_frequency('totallyfakeword', 'en', 'multi', .5),
+        .5
     )
+
+
+def test_compatibility():
+    eq_(metanl_word_frequency(':|en'), 1e9)
+    eq_(metanl_word_frequency(':|en', offset=1e9), 2e9)
 
 
 def _check_normalized_frequencies(wordlist, lang):

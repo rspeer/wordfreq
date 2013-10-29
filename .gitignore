@@ -6,3 +6,5 @@ dist
 pip-log.txt
 .coverage
 *~
+wordfreq_data/
+wordfreq-data.tar.gz

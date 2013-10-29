@@ -36,6 +36,32 @@ def word_frequency(word, lang, wordlist='multi', default=0.):
     else:
         return row[0]
 
+
+def iter_wordlist(wordlist, lang=None):
+    """
+    Returns a generator, yielding (word, lang, frequency) triples from
+    a wordlist in descending order of frequency.
+
+    If a `lang` is specified, the results will only contain words in that
+    language.
+    """
+    c = CONN.cursor()
+    if lang is None:
+        results = c.execute(
+            "SELECT word, lang, freq from words where wordlist=? "
+            "ORDER BY freq desc",
+            (wordlist,)
+        )
+    else:
+        results = c.execute(
+            "SELECT word, lang, freq from words where "
+            "wordlist=? and lang=? ORDER BY freq DESC",
+            (wordlist, lang)
+        )
+
+    return results
+
+
 METANL_CONSTANT = 50291582140.06433
 def metanl_word_frequency(word, lang, default=0.):
     """

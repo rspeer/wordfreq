@@ -20,21 +20,22 @@ except sqlite3.OperationalError:
 
 
 @lru_cache(maxsize=CACHE_SIZE)
-def word_frequency(word, lang, wordlist='multi', default=0.):
+def word_frequency(word, lang, wordlist='multi', offset=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
     specified `wordlist`.
 
-    If the word doesn't appear in the wordlist, return the default value.
+    The offset gets added to all values, to monotonically account for the
+    fact that we have not observed all possible words.
     """
     c = CONN.cursor()
     c.execute("SELECT freq from words where word=? and lang=? and wordlist=?",
               (word, lang, wordlist))
     row = c.fetchone()
     if row is None:
-        return default
+        return offset
     else:
-        return row[0]
+        return row[0] + offset
 
 
 def wordlist_size(wordlist, lang=None):
@@ -105,7 +106,7 @@ def get_wordlists():
 
 
 METANL_CONSTANT = 50291582140.06433
-def metanl_word_frequency(word, lang, default=0.):
+def metanl_word_frequency(wordlang, offset=0.):
     """
     Return a word's frequency in a form that matches the output of
     metanl 0.6.
@@ -120,8 +121,7 @@ def metanl_word_frequency(word, lang, default=0.):
     same output as metanl. It does this by multiplying the word frequency in
     the 'multi' list by a big ugly constant. Oh well.
     """
-    freq = word_frequency(word, lang, 'multi', default=None)
-    if freq is None:
-        return default
-    else:
-        return freq * METANL_CONSTANT
+    word, lang = wordlang.rsplit('|', 1)
+    freq = word_frequency(word, lang, 'multi',
+                          offset = offset / METANL_CONSTANT)
+    return freq * METANL_CONSTANT

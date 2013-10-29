@@ -1,8 +1,14 @@
 #!/usr/bin/env python
-
-version_str = '0.1'
-
 from setuptools import setup
+from distutils.core import Command
+
+# Make sure we can import stuff from here.
+import os
+import sys
+current_dir = os.path.dirname(__file__)
+sys.path.insert(0, current_dir)
+
+from wordfreq.config import VERSION
 
 classifiers=[
     'Intended Audience :: Developers',
@@ -22,13 +28,12 @@ classifiers=[
     'Topic :: Software Development',
     'Topic :: Text Processing :: Linguistic',]
 
-import os
-README_contents = open(os.path.join(os.path.dirname(__file__), 'README.txt')).read()
+README_contents = open(os.path.join(current_dir, 'README.txt')).read()
 doclines = README_contents.split("\n")
 
 setup(
     name="wordfreq",
-    version=version_str,
+    version=VERSION,
     maintainer='Luminoso Technologies, Inc.',
     maintainer_email='dev@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
@@ -38,6 +43,5 @@ setup(
     classifiers = classifiers,
     long_description = "\n".join(doclines[2:]),
     packages=['wordfreq'],
-    package_data = {'wordfreq': ['data/wordlists/*.txt']},
     install_requires=['ftfy >= 3', 'functools32 == 3.2.3-1'],
 )

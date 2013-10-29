@@ -94,6 +94,13 @@ def _scale_freqs(counts):
 
 
 def save_wordlist_to_db(conn, listname, lang, freqs):
+    """
+    Save a dictionary of word frequencies to a database.
+
+    The dictionary `freqs` should be properly scaled (run it through
+    `_scale_freqs`). It will be saved as language `lang` in wordlist
+    `listname`.
+    """
     rows = [(listname, lang, word, freq)
             for word, freq in freqs.items()]
     conn.executemany(
@@ -104,7 +111,7 @@ def save_wordlist_to_db(conn, listname, lang, freqs):
     conn.commit()
 
 
-def create_db(conn, filename):
+def create_db(conn):
     """
     Create a wordlist database, at the filename specified by `wordfreq.config`.
 
@@ -121,6 +128,10 @@ def create_db(conn, filename):
     conn.commit()
 
 
+def get_db_connection(filename):
+    return sqlite3.connect(filename)
+
+
 LEEDS_LANGUAGES = ('ar', 'de', 'el', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh')
 def load_all_data(source_dir=None, filename=None):
     """
@@ -132,9 +143,9 @@ def load_all_data(source_dir=None, filename=None):
     if filename is None:
         filename = config.DB_FILENAME
 
-    conn = sqlite3.connect(filename)
+    conn = get_db_connection(filename)
     logger.info("Creating database")
-    create_db(conn, filename)
+    create_db(conn)
 
     logger.info("Loading Leeds internet corpus:")
     for lang in LEEDS_LANGUAGES:

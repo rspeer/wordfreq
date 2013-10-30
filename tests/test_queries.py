@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from nose.tools import eq_, assert_almost_equal, assert_greater
 from wordfreq.query import (word_frequency, average_frequency, wordlist_size,
-                            get_wordlists, metanl_word_frequency)
+                            wordlist_info, metanl_word_frequency)
 
 
 def test_freq_examples():
@@ -40,7 +40,7 @@ def _check_normalized_frequencies(wordlist, lang):
 
 
 def test_normalized_frequencies():
-    for list_info in get_wordlists():
+    for list_info in wordlist_info():
         wordlist = list_info['wordlist']
         lang = list_info['lang']
         yield _check_normalized_frequencies, wordlist, lang

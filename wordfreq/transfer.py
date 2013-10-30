@@ -8,7 +8,6 @@ package normally; instead, they're called from commands in setup.py.
 """
 
 from wordfreq import config
-import urllib
 import os
 import sys
 import shutil
@@ -17,6 +16,11 @@ import tarfile
 import logging
 import subprocess
 logger = logging.getLogger(__name__)
+
+if sys.version_info.major == 2:
+    from urllib import urlretrieve
+else:
+    from urllib.request import urlretrieve
 
 
 class ProgressTracker(object):
@@ -59,7 +63,7 @@ def download(url, dest_filename):
         os.makedirs(base_dir)
 
     tracker = ProgressTracker(url)
-    urllib.urlretrieve(url, dest_filename, reporthook=tracker.report_progress)
+    urlretrieve(url, dest_filename, reporthook=tracker.report_progress)
     tracker.finish()
     logger.info("Saved database to %s" % dest_filename)
     return True

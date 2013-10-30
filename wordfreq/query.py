@@ -101,8 +101,18 @@ def iter_wordlist(wordlist='multi', lang=None):
     return results
 
 
-def get_wordlists():
-    c = CONN.cursor()
+def wordlist_info(connection=None):
+    """
+    Get info about all the wordlists in a database, returning their
+    list name, language, and number of words as 'wordlist', 'lang',
+    and 'count' respectively.
+
+    The database connection can be given as an argument, in order to get
+    information about a database other than the default configured one.
+    """
+    if connection is None:
+        connection = CONN
+    c = connection.cursor()
     results = c.execute(
         "SELECT wordlist, lang, count(*) from words GROUP BY wordlist, lang"
     )

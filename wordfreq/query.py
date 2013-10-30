@@ -1,6 +1,11 @@
 from wordfreq.config import DB_FILENAME, CACHE_SIZE
-from functools32 import lru_cache
 import sqlite3
+import sys
+
+if sys.version_info.major == 2:
+    from functools32 import lru_cache
+else:
+    from functools import lru_cache
 
 SQLITE_ERROR_TEXT = """
 Couldn't open the wordlist database.

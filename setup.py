@@ -92,6 +92,10 @@ class CustomDevelopCommand(develop):
         self.run_command('download_db')
 
 
+requirements = ['ftfy >= 3']
+if sys.version_info.major == 2:
+    requirements.append('functools32 == 3.2.3-1')
+
 setup(
     name="wordfreq",
     version=config.VERSION,
@@ -104,7 +108,7 @@ setup(
     classifiers = classifiers,
     long_description = "\n".join(doclines[2:]),
     packages=['wordfreq'],
-    install_requires=['ftfy >= 3', 'functools32 == 3.2.3-1'],
+    install_requires=requirements,
     cmdclass = {
         'build_db': BuildDatabaseCommand,
         'download_db': DownloadDatabaseCommand,

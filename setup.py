@@ -49,6 +49,7 @@ class SimpleCommand(Command):
     def finalize_options(self):
         pass
 
+
 class BuildDatabaseCommand(SimpleCommand):
     description = "Build the word frequency database from raw data"
     def run(self):

@@ -4,17 +4,17 @@ import codecs
 import re
 import os
 import logging
+logger = logging.getLogger(__name__)
 
 from ftfy import ftfy
 from wordfreq import config, schema
-
-logger = logging.getLogger(__name__)
+from wordfreq.util import standardize_word
 
 
 def read_csv(filename):
     """
     Load word frequencies from a file of comma-separated values, where
-    each line contains a term, a comma, and its frequency.
+    each line contains a word, a comma, and its frequency.
 
     Scale the frequencies so they add up to 1.0, and return them as a
     dictionary.
@@ -27,16 +27,21 @@ def read_multilingual_csv(filename):
     Load word frequencies from a file of comma-separated values, where
     each line is of the form:
 
-        term|lang,freq
+        word|lang,freq
 
     Scale the frequencies so they add up to 1.0 *for each language*,
     and return a dictionary from language -> (word -> freq).
     """
     unscaled = defaultdict(dict)
     raw_freqs = _read_csv_basic(filename)
-    for termlang in raw_freqs:
-        term, lang = termlang.rsplit('|', 1)
-        unscaled[lang][term] = raw_freqs[termlang]
+    for wordlang in raw_freqs:
+        word, lang = wordlang.rsplit('|', 1)
+        word = standardize_word(word)
+
+        # The CSV reader has standardized everything to uppercase.
+        # Fix that for the language codes, which should be lowercase.
+        lang = lang.lower()
+        unscaled[lang][word] = raw_freqs[wordlang]
 
     scaled = {}
     for key in unscaled:
@@ -52,7 +57,7 @@ def _read_csv_basic(filename):
         line = line.rstrip(u'\n')
         word, count = line.rsplit(u',', 1)
         count = float(count)
-        counts[word] = count
+        counts[standardize_word(word)] = count
     return counts
 
 
@@ -73,7 +78,7 @@ def read_leeds_corpus(filename):
             rank = line.split(u' ')[0]
             if NUMBER_RE.match(rank) and line.count(u' ') == 2:
                 _, freq, token = line.split(u' ')
-                token = ftfy(token).lower()
+                token = standardize_word(ftfy(token))
                 freq = float(freq)
                 counts[token] += freq
 

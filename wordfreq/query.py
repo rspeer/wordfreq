@@ -1,4 +1,5 @@
 from wordfreq.config import DB_FILENAME, CACHE_SIZE
+from wordfreq.util import standardize_word
 import sqlite3
 import sys
 
@@ -35,7 +36,7 @@ def word_frequency(word, lang, wordlist='multi', offset=0.):
     """
     c = CONN.cursor()
     c.execute("SELECT freq from words where word=? and lang=? and wordlist=?",
-              (word, lang, wordlist))
+              (standardize_word(word), lang, wordlist))
     row = c.fetchone()
     if row is None:
         return offset

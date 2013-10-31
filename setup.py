@@ -84,13 +84,15 @@ class UploadDataCommand(SimpleCommand):
 class CustomInstallCommand(install):
     def run(self):
         install.run(self)
-        self.run_command('download_db')
+        if not os.path.exists(config.DB_FILENAME):
+            self.run_command('download_db')
 
 
 class CustomDevelopCommand(develop):
     def run(self):
         develop.run(self)
-        self.run_command('download_db')
+        if not os.path.exists(config.DB_FILENAME):
+            self.run_command('download_db')
 
 
 requirements = ['ftfy >= 3']

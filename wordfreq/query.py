@@ -121,7 +121,7 @@ def wordlist_info(connection=None):
         yield {'wordlist': wordlist, 'lang': lang, 'count': count}
 
 
-METANL_CONSTANT = 38328308509.73808
+METANL_CONSTANT = 35007147100.25307
 def metanl_word_frequency(wordlang, offset=0.):
     """
     Return a word's frequency in a form that matches the output of

@@ -95,7 +95,7 @@ class CustomDevelopCommand(develop):
 
 requirements = ['ftfy >= 3']
 if sys.version_info.major == 2:
-    requirements.append('functools32 >= 3.2.3')
+    requirements.append('functools32')
 
 setup(
     name="wordfreq",

@@ -28,8 +28,8 @@ def test_freq_examples():
 
 
 def test_compatibility():
-    eq_(metanl_word_frequency('the|en'), 1e9)
-    eq_(metanl_word_frequency('the|en', offset=1e9), 2e9)
+    assert_almost_equal(metanl_word_frequency('the|en'), 1e9, places=3)
+    assert_almost_equal(metanl_word_frequency('the|en', offset=1e9), 2e9, places=3)
 
 
 def _check_normalized_frequencies(wordlist, lang):

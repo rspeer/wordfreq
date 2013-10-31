@@ -58,15 +58,11 @@ def download(url, dest_filename):
     Download the file at `url` to `dest_filename`. Show a progress bar
     while downloading.
     """
-    base_dir = os.path.dirname(dest_filename)
-    if not os.path.exists(base_dir):
-        os.makedirs(base_dir)
-
+    ensure_dir_exists(dest_filename)
     tracker = ProgressTracker(url)
     urlretrieve(url, dest_filename, reporthook=tracker.report_progress)
     tracker.finish()
     logger.info("Saved database to %s" % dest_filename)
-    return True
 
 
 def download_and_extract_raw_data(url=None, root_dir=None):

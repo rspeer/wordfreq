@@ -37,10 +37,6 @@ def read_multilingual_csv(filename):
     for wordlang in raw_freqs:
         word, lang = wordlang.rsplit('|', 1)
         word = standardize_word(word)
-
-        # The CSV reader has standardized everything to uppercase.
-        # Fix that for the language codes, which should be lowercase.
-        lang = lang.lower()
         unscaled[lang][word] = raw_freqs[wordlang]
 
     scaled = {}

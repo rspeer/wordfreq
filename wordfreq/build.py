@@ -36,6 +36,7 @@ def read_multilingual_csv(filename):
     raw_freqs = _read_csv_basic(filename)
     for wordlang in raw_freqs:
         word, lang = wordlang.rsplit('|', 1)
+        word = standardize_word(word)
         unscaled[lang][word] = raw_freqs[wordlang]
 
     scaled = {}
@@ -87,7 +88,10 @@ def _scale_freqs(counts):
     """
     freqs = {}
     total = sum(counts.values())
-    return {word: count / total for word, count in freqs.items()}
+    for word in counts:
+        freqs[word] = counts[word] / total
+
+    return freqs
 
 
 def save_wordlist_to_db(conn, listname, lang, freqs):
@@ -115,11 +119,11 @@ def create_db(filename):
     This should be safe to run (and have no effect) if the database already
     exists.
     """
+    conn = get_db_connection(filename)
     base_dir = os.path.dirname(filename)
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
 
-    conn = get_db_connection(filename)
     conn.execute(schema.SCHEMA)
     for index_definition in schema.INDICES:
         conn.execute(index_definition)

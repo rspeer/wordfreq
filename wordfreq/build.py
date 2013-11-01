@@ -3,6 +3,7 @@ import sqlite3
 import codecs
 import re
 import os
+import sys
 import logging
 logger = logging.getLogger(__name__)
 
@@ -104,8 +105,10 @@ def save_wordlist_to_db(conn, listname, lang, freqs):
     """
     rows = [(listname, lang, word, freq)
             for word, freq in freqs.items()]
+    conn.execute('DELETE FROM words where wordlist=? and lang=?',
+                 (listname, lang))
     conn.executemany(
-        "INSERT OR REPLACE INTO words (wordlist, lang, word, freq) "
+        "INSERT INTO words (wordlist, lang, word, freq) "
         "VALUES (?, ?, ?, ?)",
         rows
     )
@@ -135,10 +138,25 @@ def get_db_connection(filename):
 
 
 LEEDS_LANGUAGES = ('ar', 'de', 'el', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh')
-def load_all_data(source_dir=None, filename=None):
+def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
     """
     Load data from the raw data files into a SQLite database.
+
+    Python 3 has more complete Unicode support than Python 2, and this shows
+    up as actual differences in the set of words. For the sake of consistency,
+    we say that the data is only valid when built on Python 3.
+
+    Python 2 can still *use* wordfreq, by downloading the database that was
+    built on Python 3.
+
+    If you insist on building the Python 2 version, pass `do_it_anyway=True`.
     """
+    if sys.version_info.major == 2 and not do_it_anyway:
+        raise UnicodeError(
+            "Python 2.x has insufficient Unicode support, and will build "
+            "the wrong database. Pass `do_it_anyway=True` to do it anyway."
+        )
+
     if source_dir is None:
         source_dir = config.RAW_DATA_DIR
 

@@ -26,7 +26,7 @@ def test_build():
     tempdir = tempfile.mkdtemp('.wordfreq')
     try:
         db_file = os.path.join(tempdir, 'test.db')
-        load_all_data(config.RAW_DATA_DIR, db_file)
+        load_all_data(config.RAW_DATA_DIR, db_file, do_it_anyway=True)
         conn = sqlite3.connect(db_file)
 
         # Compare the information we got to the information in the default DB.
@@ -43,3 +43,18 @@ def test_build():
             eq_(new_info[i], old_info[i])
     finally:
         shutil.rmtree(tempdir)
+
+
+def test_python2():
+    """
+    Python 2 got to skip two tests up there, because we built a slightly
+    wrong wordlist. Now let's test that, in normal operation, it will refuse
+    to build this wordlist.
+    """
+    if PYTHON2:
+        try:
+            load_all_data(config.RAW_DATA_DIR, tempfile.mkstemp())
+            assert False, "The database should not have been built"
+        except UnicodeError:
+            # This is the correct case
+            pass

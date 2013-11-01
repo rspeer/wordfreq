@@ -17,7 +17,7 @@ CACHE_SIZE = 100000
 # Where can the data be downloaded from?
 DOWNLOAD_URL = (os.environ.get('WORDFREQ_URL')
                 or 'http://ferret.lumi/dist/wordfreq/')
-RAW_DATA_URL = os.path.join(DOWNLOAD_URL, MINOR_VERSION, 'wordfreq-data.tar.gz')
+RAW_DATA_URL = '/'.join([DOWNLOAD_URL, MINOR_VERSION, 'wordfreq-data.tar.gz'])
 DB_URL = os.path.join(DOWNLOAD_URL, MINOR_VERSION,
                       'wordfreq-%s.db' % MINOR_VERSION)
 

@@ -65,7 +65,7 @@ def download(url, dest_filename):
     tracker = ProgressTracker(url)
     urlretrieve(url, dest_filename, reporthook=tracker.report_progress)
     tracker.finish()
-    logger.info("Saved database to %s" % dest_filename)
+    logger.info("Saved database to %s", dest_filename)
     return True
 
 
@@ -83,7 +83,7 @@ def download_and_extract_raw_data(url=None, root_dir=None):
     ensure_dir_exists(dest_filename)
     download(url, dest_filename)
 
-    logger.info("Extracting %s" % dest_filename)
+    logger.info("Extracting %s", dest_filename)
     with tarfile.open(dest_filename, 'r') as tarf:
         tarf.extractall(root_dir)
 
@@ -110,33 +110,36 @@ def upload_data(upload_path=None):
     This requires that it's running in a reasonable Unix environment,
     and more notably, that it has the proper SSH keys to upload to that
     server.
+
+    It should also only be run in Python 3, because otherwise you're probably
+    uploading the wrong data. We can even ensure this by using features that
+    are specific to Python 3.
     """
+    from tempfile import TemporaryDirectory
     if upload_path is None:
         upload_path = config.UPLOAD_PATH
-    
-    build_dir = tempfile.mkdtemp('.wordfreq')
-    version_dir = os.path.join(build_dir, config.MINOR_VERSION)
-    os.makedirs(version_dir)
 
-    source_filename = os.path.join(version_dir, 'wordfreq-data.tar.gz')
-    logger.info("Creating %s" % source_filename)
-    with tarfile.open(source_filename, 'w:gz') as tarf:
-        tarf.add(config.RAW_DATA_DIR)
+    with TemporaryDirectory('.wordfreq') as build_tmp:
+        build_dir = build_tmp.name
+        version_dir = os.path.join(build_dir, config.MINOR_VERSION)
+        os.makedirs(version_dir)
 
-    logger.info("Copying database file %s" % config.DB_FILENAME)
-    subprocess.call([
-        '/bin/cp',
-        config.DB_FILENAME,
-        version_dir
-    ])
+        source_filename = os.path.join(version_dir, 'wordfreq-data.tar.gz')
+        logger.info("Creating %s", source_filename)
+        with tarfile.open(source_filename, 'w:gz') as tarf:
+            tarf.add(config.RAW_DATA_DIR)
 
-    logger.info("Uploading to %s" % upload_path)
-    subprocess.call([
-        '/usr/bin/rsync',
-        '-avz',
-        version_dir,
-        upload_path
-    ])
+        logger.info("Copying database file %s", config.DB_FILENAME)
+        subprocess.call([
+            '/bin/cp',
+            config.DB_FILENAME,
+            version_dir
+        ])
 
-    logger.info("Removing build directory %s" % build_dir)
-    shutil.rmtree(build_dir)
+        logger.info("Uploading to %s", upload_path)
+        subprocess.call([
+            '/usr/bin/rsync',
+            '-avz',
+            version_dir,
+            upload_path
+        ])

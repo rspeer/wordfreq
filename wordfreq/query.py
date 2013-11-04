@@ -120,24 +120,3 @@ def wordlist_info(connection=None):
     for wordlist, lang, count in results:
         yield {'wordlist': wordlist, 'lang': lang, 'count': count}
 
-
-METANL_CONSTANT = 35007147100.25307
-def metanl_word_frequency(wordlang, offset=0.):
-    """
-    Return a word's frequency in a form that matches the output of
-    metanl 0.6.
-    
-    In wordfreq, frequencies are proportions. They add up to 1 within a
-    wordlist and language.
-
-    In metanl, we had decided arbitrarily that common words should have a
-    frequency of a billion or so. There was no real reason.
-
-    This function provides compatibility by adapting wordfreq to give the
-    same output as metanl. It does this by multiplying the word frequency in
-    the 'multi' list by a big ugly constant. Oh well.
-    """
-    word, lang = wordlang.rsplit('|', 1)
-    freq = word_frequency(word, lang, 'multi',
-                          offset = offset / METANL_CONSTANT)
-    return freq * METANL_CONSTANT

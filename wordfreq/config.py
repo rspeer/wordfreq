@@ -16,14 +16,14 @@ CACHE_SIZE = 100000
 
 # Where can the data be downloaded from?
 DOWNLOAD_URL = (os.environ.get('WORDFREQ_URL')
-                or 'http://ferret.lumi/dist/wordfreq/')
+                or 'http://wordfreq.services.luminoso.com/')
 RAW_DATA_URL = os.path.join(DOWNLOAD_URL, MINOR_VERSION, 'wordfreq-data.tar.gz')
 DB_URL = os.path.join(DOWNLOAD_URL, MINOR_VERSION,
                       'wordfreq-%s.db' % MINOR_VERSION)
 
 # How do we actually get it there? This is the path, including hostname, to give
 # to scp to upload the file.
-UPLOAD_PATH = 'ferret.lumi:/var/lib/lumi/dist/wordfreq/'
+UPLOAD_PATH = 'baldr:/srv/wordfreq/static/'
 
 # Where should raw data go? Inside the package isn't necessary a good
 # place for it, because it might be installed in the system site-packages.

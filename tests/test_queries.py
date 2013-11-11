@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from nose.tools import eq_, assert_almost_equal, assert_greater
 from wordfreq.query import (word_frequency, average_frequency, wordlist_size,
-                            wordlist_info, metanl_word_frequency)
+                            wordlist_info)
 
 
 def test_freq_examples():
@@ -25,11 +25,6 @@ def test_freq_examples():
         word_frequency('totallyfakeword', 'en', 'multi', .5),
         .5
     )
-
-
-def test_compatibility():
-    assert_almost_equal(metanl_word_frequency('the|en'), 1e9, places=3)
-    assert_almost_equal(metanl_word_frequency('the|en', offset=1e9), 2e9, places=3)
 
 
 def _check_normalized_frequencies(wordlist, lang):

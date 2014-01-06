@@ -120,3 +120,32 @@ def wordlist_info(connection=None):
     for wordlist, lang, count in results:
         yield {'wordlist': wordlist, 'lang': lang, 'count': count}
 
+
+def random_words(nwords=4, bits_per_word=12, wordlist='google-books',
+                 lang='en'):
+    """
+    There are a few reasons you might want to see a sample of words in a
+    wordlist:
+
+    - Generating test cases
+    - Getting a feel for what a wordlist contains
+    - Generating passwords as in https://xkcd.com/936/
+
+    Parameters:
+
+    - `nwords` is the number of words to select.
+    - `bits_per_word` indicate how many bits of randomness per word you want,
+      up to log2(wordlist_size). As you increase it, the words get obscure.
+    - `wordlist` and `lang` specify the wordlist to use.
+    """
+    import random
+    limit = 2 ** bits_per_word
+    c = CONN.cursor()
+    results = c.execute(
+        "SELECT word from words where wordlist = ? and lang = ? "
+        "ORDER BY freq DESC LIMIT ?",
+        (wordlist, lang, limit)
+    )
+    words = [row[0] for row in results]
+    selected = random.sample(words, nwords)
+    return u' '.join(selected)

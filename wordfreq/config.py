@@ -5,7 +5,7 @@ DB_DIR = (os.environ.get('WORDFREQ_DATA')
           or os.path.expanduser('~/.cache/wordfreq'))
 
 # When the minor version number increments, the data may change.
-VERSION = '0.3.0'
+VERSION = '0.4.0'
 MINOR_VERSION = '.'.join(VERSION.split('.')[:2])
 
 # Put these options together to make a database filename.
@@ -23,7 +23,7 @@ DB_URL = os.path.join(DOWNLOAD_URL, MINOR_VERSION,
 
 # How do we actually get it there? This is the path, including hostname, to give
 # to scp to upload the file.
-UPLOAD_PATH = 'baldr:/srv/wordfreq/static/'
+UPLOAD_PATH = 'baldr.lumi:/srv/wordfreq/static/'
 
 # Where should raw data go? Inside the package isn't necessary a good
 # place for it, because it might be installed in the system site-packages.

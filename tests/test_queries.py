@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from nose.tools import eq_, assert_almost_equal, assert_greater
-from wordfreq.query import (word_frequency, average_frequency, wordlist_size,
+from wordfreq import word_frequency
+from wordfreq.query import (average_frequency, wordlist_size,
                             wordlist_info)
 
 

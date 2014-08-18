@@ -37,13 +37,9 @@ def read_multilingual_csv(filename):
     raw_freqs = _read_csv_basic(filename)
     for wordlang in raw_freqs:
         word, lang = wordlang.rsplit('|', 1)
-        word = standardize_word(word)
         unscaled[lang][word] = raw_freqs[wordlang]
 
-    scaled = {}
-    for key in unscaled:
-        scaled[key] = _scale_freqs(unscaled[key])
-    return scaled
+    return {key: _scale_freqs(unscaled[key]) for key in unscaled}
 
 
 def _read_csv_basic(filename):
@@ -87,12 +83,8 @@ def _scale_freqs(counts):
     Take in unscaled word counts or frequencies, and scale them so that
     they add up to 1.0.
     """
-    freqs = {}
     total = sum(counts.values())
-    for word in counts:
-        freqs[word] = counts[word] / total
-
-    return freqs
+    return {word: counts[word] / total for word in counts}
 
 
 def save_wordlist_to_db(conn, listname, lang, freqs):
@@ -122,15 +114,17 @@ def create_db(filename):
     This should be safe to run (and have no effect) if the database already
     exists.
     """
-    conn = get_db_connection(filename)
     base_dir = os.path.dirname(filename)
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
 
+    conn = get_db_connection(filename)
+    
     conn.execute(schema.SCHEMA)
     for index_definition in schema.INDICES:
         conn.execute(index_definition)
     conn.commit()
+    return conn
 
 
 def get_db_connection(filename):
@@ -164,9 +158,8 @@ def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
         filename = config.DB_FILENAME
 
     logger.info("Creating database")
-    create_db(filename)
+    conn = create_db(filename)
 
-    conn = get_db_connection(filename)
     logger.info("Loading Leeds internet corpus:")
     for lang in LEEDS_LANGUAGES:
         logger.info("\tLanguage: %s" % lang)

@@ -10,16 +10,16 @@ package normally; instead, they're called from commands in setup.py.
 from wordfreq import config
 import os
 import sys
-import shutil
-import tempfile
 import tarfile
 import logging
 import subprocess
 logger = logging.getLogger(__name__)
 
 if sys.version_info.major == 2:
+    PY2 = True
     from urllib import urlretrieve
 else:
+    PY2 = False
     from urllib.request import urlretrieve
 
 
@@ -103,36 +103,35 @@ def upload_data(upload_path=None):
     Collect the raw data and the database file, and upload them to an
     appropriate directory on the server that hosts downloads.
 
-    This requires that it's running in a reasonable Unix environment,
-    and more notably, that it has the proper SSH keys to upload to that
+    This requires that it's running in a reasonable Unix environment, on Python
+    3, and more notably, that it has the proper SSH keys to upload to that
     server.
     """
+    from tempfile import TemporaryDirectory
+
     if upload_path is None:
         upload_path = config.UPLOAD_PATH
     
-    build_dir = tempfile.mkdtemp('.wordfreq')
-    version_dir = os.path.join(build_dir, config.MINOR_VERSION)
-    os.makedirs(version_dir)
+    with TemporaryDirectory('.wordfreq') as build_dir:
+        version_dir = os.path.join(build_dir, config.MINOR_VERSION)
+        os.makedirs(version_dir)
 
-    source_filename = os.path.join(version_dir, 'wordfreq-data.tar.gz')
-    logger.info("Creating %s" % source_filename)
-    with tarfile.open(source_filename, 'w:gz') as tarf:
-        tarf.add(config.RAW_DATA_DIR)
+        source_filename = os.path.join(version_dir, 'wordfreq-data.tar.gz')
+        logger.info("Creating %s" % source_filename)
+        with tarfile.open(source_filename, 'w:gz') as tarf:
+            tarf.add(config.RAW_DATA_DIR)
 
-    logger.info("Copying database file %s" % config.DB_FILENAME)
-    subprocess.call([
-        '/bin/cp',
-        config.DB_FILENAME,
-        version_dir
-    ])
+        logger.info("Copying database file %s" % config.DB_FILENAME)
+        subprocess.call([
+            '/bin/cp',
+            config.DB_FILENAME,
+            version_dir
+        ])
 
-    logger.info("Uploading to %s" % upload_path)
-    subprocess.call([
-        '/usr/bin/rsync',
-        '-avz',
-        version_dir,
-        upload_path
-    ])
-
-    logger.info("Removing build directory %s" % build_dir)
-    shutil.rmtree(build_dir)
+        logger.info("Uploading to %s" % upload_path)
+        subprocess.call([
+            '/usr/bin/rsync',
+            '-avz',
+            version_dir,
+            upload_path
+        ])

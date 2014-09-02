@@ -16,10 +16,8 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 if sys.version_info.major == 2:
-    PY2 = True
     from urllib import urlretrieve
 else:
-    PY2 = False
     from urllib.request import urlretrieve
 
 

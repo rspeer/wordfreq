@@ -5,7 +5,7 @@ DB_DIR = (os.environ.get('WORDFREQ_DATA')
           or os.path.expanduser('~/.cache/wordfreq'))
 
 # When the minor version number increments, the data may change.
-VERSION = '0.4.0'
+VERSION = '0.4.1'
 MINOR_VERSION = '.'.join(VERSION.split('.')[:2])
 
 # Put these options together to make a database filename.
@@ -16,10 +16,10 @@ CACHE_SIZE = 100000
 
 # Where can the data be downloaded from?
 DOWNLOAD_URL = (os.environ.get('WORDFREQ_URL')
-                or 'http://wordfreq.services.luminoso.com/')
-RAW_DATA_URL = os.path.join(DOWNLOAD_URL, MINOR_VERSION, 'wordfreq-data.tar.gz')
-DB_URL = os.path.join(DOWNLOAD_URL, MINOR_VERSION,
-                      'wordfreq-%s.db' % MINOR_VERSION)
+                or 'http://wordfreq.services.luminoso.com')
+RAW_DATA_URL = '/'.join([DOWNLOAD_URL, MINOR_VERSION, 'wordfreq-data.tar.gz'])
+DB_URL = '/'.join([DOWNLOAD_URL, MINOR_VERSION,
+                   'wordfreq-%s.db' % MINOR_VERSION])
 
 # How do we actually get it there? This is the path, including hostname, to give
 # to scp to upload the file.

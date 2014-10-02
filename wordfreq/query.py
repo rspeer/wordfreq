@@ -5,8 +5,10 @@ import sys
 
 if sys.version_info.major == 2:
     from functools32 import lru_cache
+    PY2 = True
 else:
     from functools import lru_cache
+    PY2 = False
 
 SQLITE_ERROR_TEXT = """
 Couldn't open the wordlist database.
@@ -20,7 +22,10 @@ This can be configured by setting the WORDFREQ_DATA environment variable.
 """ % {'path': DB_FILENAME}
 
 try:
-    CONN = sqlite3.connect(DB_FILENAME)
+    if PY2:
+        CONN = sqlite3.connect(DB_FILENAME)
+    else:
+        CONN = sqlite3.connect(DB_FILENAME, check_same_thread=False)
 except sqlite3.OperationalError:
     raise IOError(SQLITE_ERROR_TEXT)
 

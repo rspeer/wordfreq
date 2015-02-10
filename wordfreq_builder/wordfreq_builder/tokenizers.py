@@ -1,4 +1,15 @@
+from lumi_science.text_readers.rosette_readers import RosetteReader
 import re
+
+
+ROSETTE = RosetteReader()
+
+
+def rosette_tokenizer(text):
+    analysis, lang = ROSETTE.rosette.analyze(text)
+    return [stem + '|' + lang for (stem, pos, span) in analysis]
+
+
 
 
 def treebank_tokenizer(text):

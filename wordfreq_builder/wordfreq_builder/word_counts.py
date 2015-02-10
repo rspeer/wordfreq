@@ -1,4 +1,4 @@
-from wordfreq_builder.tokenize import treebank_tokenizer
+from wordfreq_builder.tokenizers import treebank_tokenizer
 from collections import defaultdict
 from operator import itemgetter
 from pathlib import Path
@@ -17,7 +17,11 @@ class WordCountBuilder:
 
     def add_text(self, text):
         text = normalize('NFKC', text).lower()
-        tokens = self.tokenizer(text)
+        try:
+            tokens = self.tokenizer(text)
+        except Exception as e:
+            print("Couldn't tokenize due to %r: %s" % (e, text))
+            return
         if self.unique_docs:
             tokens = set(tokens)
         for tok in tokens:
@@ -37,8 +41,13 @@ class WordCountBuilder:
                         buf.append(line)
                 self.try_wiki_article(' '.join(buf))
 
-    #def count_twitter(self, path):
-    #    with path.open(encoding='utf-8') as file:
+    def count_twitter(self, path, offset, nsplit):
+        with path.open(encoding='utf-8') as file:
+            for i, line in enumerate(file):
+                if i % nsplit == offset:
+                    line = line.strip()
+                    text = line.split('\t')[-1]
+                    self.add_text(text)
 
     def try_wiki_article(self, text):
         if len(text) > 1000:
@@ -55,12 +64,3 @@ class WordCountBuilder:
                 writer.writerow([word, count])
 
 
-def count_wikipedia(pathname):
-    path = Path(pathname)
-    builder = WordCountBuilder()
-    builder.count_wikipedia(path)
-    builder.save_wordlist(path / 'counts.csv')
-
-
-if __name__ == '__main__':
-    count_wikipedia('/hd/data/wikipedia/wikipedia-extractor/fr.wikipedia.org')

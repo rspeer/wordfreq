@@ -6,6 +6,47 @@ from unicodedata import normalize
 import csv
 
 
+def read_counts(path):
+    counts = defaultdict(int)
+    with path.open(encoding='utf-8', newline='') as infile:
+        reader = csv.reader(infile)
+        for key, strval in reader:
+            val = int(strval)
+            # Use += so that, if we give the reader concatenated files with
+            # duplicates, it does the right thing
+            counts[key] += val
+    return counts
+
+
+def count_languages(counts):
+    langcounts = defaultdict(int)
+    for key, strval in counts.items():
+        val = int(strval)
+        text, lang = key.rsplit('|', 1)
+        langcounts[lang] += val
+    return langcounts
+
+
+def merge_counts(count_dicts):
+    merged = defaultdict(int)
+    for counts in count_dicts:
+        for key, val in counts.items():
+            merged[key] += val
+    return merged
+
+
+def write_counts(counts, path, cutoff=2):
+    print("Writing to %s" % path)
+    with path.open('w', encoding='utf-8', newline='') as outfile:
+        writer = csv.writer(outfile)
+        items = sorted(counts.items(), key=itemgetter(1), reverse=True)
+        for word, count in items:
+            if count < cutoff:
+                # Don't write all the terms that appeared too infrequently
+                break
+            writer.writerow([word, count])
+
+
 class WordCountBuilder:
     def __init__(self, unique_docs=True, tokenizer=None):
         self.counts = defaultdict(int)
@@ -54,13 +95,4 @@ class WordCountBuilder:
             self.add_text(text)
 
     def save_wordlist(self, path):
-        with path.open('w', encoding='utf-8', newline='') as outfile:
-            writer = csv.writer(outfile)
-            items = sorted(self.counts.items(), key=itemgetter(1), reverse=True)
-            for word, count in items:
-                if count <= 1:
-                    # Don't write all the terms that appeared only once
-                    break
-                writer.writerow([word, count])
-
-
+        write_counts(self.counts, path)

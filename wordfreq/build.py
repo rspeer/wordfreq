@@ -189,6 +189,14 @@ def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
     )
     save_wordlist_to_db(conn, 'twitter', 'xx', twitter_wordlist)
 
+    logger.info("Loading stemmed Twitter corpus.")
+    twitter_stems_wordlist = read_multilingual_csv(
+        os.path.join(source_dir, 'luminoso', 'twitter-stems-2014.csv')
+    )
+    for lang in twitter_stems_wordlist:
+        logger.info("\tLanguage: %s" % lang)
+        save_wordlist_to_db(conn, 'twitter-stems', lang, twitter_stems_wordlist[lang])
+
     logger.info("Done loading.")
 
 

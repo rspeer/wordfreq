@@ -5,7 +5,7 @@ DB_DIR = (os.environ.get('WORDFREQ_DATA')
           or os.path.expanduser('~/.cache/wordfreq'))
 
 # When the minor version number increments, the data may change.
-VERSION = '0.4.1'
+VERSION = '0.5.0'
 MINOR_VERSION = '.'.join(VERSION.split('.')[:2])
 
 # Put these options together to make a database filename.

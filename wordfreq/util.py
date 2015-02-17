@@ -1,6 +1,5 @@
 # coding: utf-8
 from unicodedata import normalize
-from ftfy.fixes import remove_unsafe_private_use
 
 
 def standardize_word(word):
@@ -21,4 +20,4 @@ def standardize_word(word):
       that the capitalized versions will not share a word count with the
       lowercase versions.
     """
-    return normalize('NFKC', remove_unsafe_private_use(word)).lower()
+    return normalize('NFKC', word).lower()

@@ -131,6 +131,24 @@ def get_db_connection(filename):
     return sqlite3.connect(filename)
 
 
+def read_leeds_wordlist_into_db(conn, filename, dbname, lang):
+    logger.info("Loading %r" % filename)
+    wordlist = read_leeds_corpus(filename)
+    save_wordlist_to_db(conn, dbname, lang, wordlist)
+
+
+def read_wordlist_into_db(conn, filename, dbname, lang='*'):
+    logger.info("Loading %r", filename)
+    if lang == '*':
+        multi_wordlist = read_multilingual_csv(filename)
+        for lang in multi_wordlist:
+            logger.info("\tLanguage: %s", lang)
+            save_wordlist_to_db(conn, dbname, lang, multi_wordlist[lang])
+    else:
+        wordlist = read_csv(filename)
+        save_wordlist_to_db(conn, dbname, lang, wordlist)
+
+
 LEEDS_LANGUAGES = ('ar', 'de', 'el', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh')
 def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
     """
@@ -157,54 +175,29 @@ def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
     if filename is None:
         filename = config.DB_FILENAME
 
+    def wordlist_path(*pieces):
+        return os.path.join(source_dir, *pieces)
+
     logger.info("Creating database")
     conn = create_db(filename)
 
-    logger.info("Loading Leeds internet corpus:")
     for lang in LEEDS_LANGUAGES:
-        logger.info("\tLanguage: %s" % lang)
-        filename = os.path.join(
-            source_dir, 'leeds', 'internet-%s-forms.num' % lang
-        )
-        wordlist = read_leeds_corpus(filename)
-        save_wordlist_to_db(conn, 'leeds-internet', lang, wordlist)
+        filename = wordlist_path('leeds', 'internet-%s-forms.num' % lang)
+        read_leeds_wordlist_into_db(conn, filename, 'leeds-internet', lang)
 
-    logger.info("Loading Google Books (English).")
-    google_wordlist = read_csv(
-        os.path.join(source_dir, 'google', 'google-books-english.csv')
-    )
-    save_wordlist_to_db(conn, 'google-books', 'en', google_wordlist)
+    read_wordlist_into_db(conn, wordlist_path('google', 'google-books-english.csv'), 'google-books', 'en')
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'twitter-52M.csv'), 'twitter', 'xx')
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'twitter-stems-2014.csv'), 'twitter-stems', '*')
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'twitter-surfaces-2014.csv'), 'twitter-surfaces', '*')
 
     logger.info("Loading combined multilingual corpus:")
-    multi_wordlist = read_multilingual_csv(
-        os.path.join(source_dir, 'luminoso', 'multilingual.csv')
-    )
+    multi_wordlist = read_multilingual_csv(wordlist_path('luminoso', 'multilingual.csv'))
     for lang in multi_wordlist:
-        logger.info("\tLanguage: %s" % lang)
-        save_wordlist_to_db(conn, 'multi', lang, multi_wordlist[lang])
-
-    logger.info("Loading Twitter corpus.")
-    twitter_wordlist = read_csv(
-        os.path.join(source_dir, 'luminoso', 'twitter-52M.csv')
-    )
-    save_wordlist_to_db(conn, 'twitter', 'xx', twitter_wordlist)
-
-    logger.info("Loading stemmed Twitter corpus.")
-    twitter_stems_wordlist = read_multilingual_csv(
-        os.path.join(source_dir, 'luminoso', 'twitter-stems-2014.csv')
-    )
-    for lang in twitter_stems_wordlist:
-        logger.info("\tLanguage: %s" % lang)
-        save_wordlist_to_db(conn, 'twitter-stems', lang, twitter_stems_wordlist[lang])
-
-    logger.info("Loading unstemmed Twitter corpus.")
-    twitter_stems_wordlist = read_multilingual_csv(
-        os.path.join(source_dir, 'luminoso', 'twitter-surfaces-2014.csv')
-    )
-    for lang in twitter_stems_wordlist:
-        logger.info("\tLanguage: %s" % lang)
-        save_wordlist_to_db(conn, 'twitter-surfaces', lang, twitter_stems_wordlist[lang])
-
+        if lang != 'nl':
+            logger.info("\tLanguage: %s" % lang)
+            save_wordlist_to_db(conn, 'multi', lang, multi_wordlist[lang])
+    # Load Dutch from a separate source. We may end up with more languages like this.
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'nl-combined-201503.csv'), 'multi', '*')
     logger.info("Done loading.")
 
 

@@ -30,10 +30,14 @@ def count_languages(counts):
 
 def merge_counts(count_dicts, balance=False):
     merged = defaultdict(float)
+    maxweight = None
     for counts in count_dicts:
-        weight = 1
         if balance:
-            weight = 1e9 / max(counts.values()) / len(count_dicts)
+            if maxweight is None:
+                maxweight = max(counts.values())
+            weight = maxweight / max(counts.values()) / len(count_dicts)
+        else:
+            weight = 1.
         for key, val in counts.items():
             merged[key] += val * weight
     return merged
@@ -48,7 +52,8 @@ def write_counts(counts, path, cutoff=2):
             if count < cutoff:
                 # Don't write all the terms that appeared too infrequently
                 break
-            writer.writerow([word, count])
+            if not ('"' in word or ',' in word):
+                writer.writerow([word, str(int(count))])
 
 
 class WordCountBuilder:
@@ -73,24 +78,27 @@ class WordCountBuilder:
         for tok in tokens:
             self.counts[tok] += 1
 
-    def count_wikipedia(self, path, glob='*/*'):
+    def count_wikipedia(self, path):
         """
         Read a directory of extracted Wikipedia articles. The articles can be
         grouped together into files, in which case they should be separated by
         lines beginning with ##.
         """
-        for filepath in sorted(path.glob(glob)):
-            print(filepath)
-            with filepath.open(encoding='utf-8') as file:
-                buf = []
-                for line in file:
-                    line = line.strip()
-                    if line.startswith('##'):
-                        self.try_wiki_article(' '.join(buf))
-                        buf = []
-                    else:
-                        buf.append(line)
-                self.try_wiki_article(' '.join(buf))
+        with path.open(encoding='utf-8') as file:
+            article_lines = []
+            for line in file:
+                line = line.strip()
+                if line.startswith('= ') and line.endswith(' ='):
+                    # Fake level-1 headings indicate boundaries between articles
+                    print(line)
+                    self.try_wiki_article(' '.join(article_lines))
+                    article_lines.clear()
+                else:
+                    # Skip other headings, so that "external" doesn't look
+                    # ridiculously common, for example
+                    if not (line.startswith('==') and line.endswith('==')):
+                        article_lines.append(line)
+            self.try_wiki_article(' '.join(article_lines))
 
     def try_wiki_article(self, text):
         if len(text) > 1000:

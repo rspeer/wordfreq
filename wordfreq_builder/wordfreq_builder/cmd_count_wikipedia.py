@@ -4,21 +4,21 @@ from pathlib import Path
 import argparse
 
 
-def count_wikipedia(pathname, surface=False):
-    path = Path(pathname)
+def count_wikipedia(filename, surface=False):
+    path = Path(filename)
     if surface == True:
         tokenizer = rosette_surface_tokenizer
     else:
         tokenizer = rosette_tokenizer
-    builder = WordCountBuilder(tokenizer=tokenizer)
+    builder = WordCountBuilder(tokenizer=tokenizer, unique_docs=False)
     builder.count_wikipedia(path)
-    builder.save_wordlist(path / 'counts.csv')
+    builder.save_wordlist(path.parent / 'counts.csv')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('dir', help='directory containing extracted Wikipedia text')
+    parser.add_argument('filename', help='flat text file containing extracted Wikipedia text')
     parser.add_argument('-s', '--surface', action='store_true', help='Use surface text instead of stems')
     args = parser.parse_args()
-    count_wikipedia(args.dir, surface=args.surface)
+    count_wikipedia(args.filename, surface=args.surface)
 

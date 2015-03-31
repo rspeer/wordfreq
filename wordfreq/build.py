@@ -193,11 +193,10 @@ def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
     logger.info("Loading combined multilingual corpus:")
     multi_wordlist = read_multilingual_csv(wordlist_path('luminoso', 'multilingual.csv'))
     for lang in multi_wordlist:
-        if lang != 'nl':
-            logger.info("\tLanguage: %s" % lang)
-            save_wordlist_to_db(conn, 'multi', lang, multi_wordlist[lang])
+        logger.info("\tLanguage: %s" % lang)
+        save_wordlist_to_db(conn, 'multi', lang, multi_wordlist[lang])
     # Load Dutch from a separate source. We may end up with more languages like this.
-    read_wordlist_into_db(conn, wordlist_path('luminoso', 'nl-combined-201503.csv'), 'multi', '*')
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'nl-combined-201503.csv'), 'stems', '*')
     logger.info("Done loading.")
 
 

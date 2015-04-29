@@ -2,7 +2,7 @@
 # Ninja build system:
 #
 #   http://martine.github.io/ninja/manual.html
-# 
+#
 # Ninja is available in the 'ninja-build' Ubuntu package. It's like make with
 # better parallelism and the ability for build steps to produce multiple
 # outputs. The tradeoff is that its rule syntax isn't full of magic for
@@ -18,11 +18,17 @@ DATA = ./data
 # Splits the single file $in into $slices parts, whose names will be
 # $prefix plus a two-digit numeric suffix.
 rule split
-  command = split -d -n $slices $in $prefix
+  command = mkdir -p $$(dirname $prefix) && split -d -n $slices $in $prefix
 
 # wiki2text is a tool I wrote using the development version of Nim, which
 # extracts plain text from Wikipedia dumps obtained from dumps.wikimedia.org.
 # The code is at https://github.com/rspeer/wiki2text, but right now it'll
 # take a bit of setup to get it to run.
 rule wiki2text
-  command = bunzip2 -c $in | wiki2text > $out
+  command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text > $out
+
+rule tokenize_twitter
+  command = mkdir -p $$(dirname $prefix) && wordfreq-tokenize-twitter $in $prefix
+
+rule cat
+  command = cat $in > $out

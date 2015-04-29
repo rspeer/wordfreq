@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse
 
 
-def count_twitter(pathname, offset=0, nsplit=1, surface=False):
+def count_twitter(pathname, offset=0, nsplit=1, surface=True):
     path = Path(pathname)
     if surface == True:
         tokenizer = rosette_surface_tokenizer
@@ -22,7 +22,6 @@ if __name__ == '__main__':
     parser.add_argument('filename', help='filename of input file containing one tweet per line')
     parser.add_argument('offset', type=int)
     parser.add_argument('nsplit', type=int)
-    parser.add_argument('-s', '--surface', action='store_true', help='Use surface text instead of stems')
     args = parser.parse_args()
-    count_twitter(args.filename, args.offset, args.nsplit, surface=args.surface)
+    count_twitter(args.filename, args.offset, args.nsplit, surface=True)
 

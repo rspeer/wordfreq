@@ -5,29 +5,47 @@ import re
 ROSETTE = RosetteReader()
 
 
-def rosette_tokenizer(text):
-    analysis, lang = ROSETTE.rosette.analyze(text)
-    # I'm aware this doesn't do the right things with multi-word stems.
-    # Wordfreq doesn't either. And wordfreq isn't designed to look up
-    # multiple words anyway.
-    tokens = []
-    for (stem, pos, span) in analysis:
-        for subtoken in stem.split(' '):
-            tokens.append(subtoken + '|' + lang)
-    return tokens
+# Rosette labels the orthographies of Chinese incorrectly
+ROSETTE_LANG_MAP = {
+    'zh_sc': 'zh-CN',
+    'zh_tc': 'zh-TW'
+}
+
+
+def last_tab(line):
+    """
+    Read lines by keeping only the last tab-separated value.
+    """
+    return line.split('\t')[-1].strip()
+
+
+def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
+    out_files = {}
+    for line in open(in_filename, encoding='utf-8'):
+        text = line_reader(line)
+        tokenized, language = tokenizer(text)
+        out_filename = '%s.%s.txt' % (out_prefix, language)
+        if out_filename in out_files:
+            out_file = out_files[out_filename]
+        else:
+            out_file = open(out_filename, 'w', encoding='utf-8')
+            out_files[out_filename] = out_file
+        print(tokenized, file=out_file)
+    for out_file in out_files.values():
+        out_file.close()
 
 
 def rosette_surface_tokenizer(text):
     analysis, lang = ROSETTE.rosette.analyze(text)
+    language = ROSETTE_LANG_MAP.get(lang, lang)
     tokens = []
     for (stem, pos, span) in analysis:
         surface_text = text[span[0]:span[1]]
-        for subtoken in surface_text.split(' '):
-            tokens.append(subtoken + '|' + lang)
-    return tokens
+        tokens.append(surface_text)
+    return ' '.join(tokens), language
 
 
-def treebank_surface_tokenizer(text):
+def treebank_surface_tokenizer(text, language='en'):
     """
     This is a simplified version of the Treebank tokenizer in NLTK.
 
@@ -45,6 +63,10 @@ def treebank_surface_tokenizer(text):
     as a result -- for example, it splits "wanna" into "wan" and "na", which
     are supposed to be considered unusual surface forms of "want" and "to".
     We just leave it as the word "wanna".
+
+    The language will just be returned, as this function isn't doing any
+    language detection. It defaults to 'en', as English is the language that
+    Treebank tokenization is designed for.
     """
     #starting quotes
     text = re.sub(r'^\"', r'``', text)
@@ -80,4 +102,4 @@ def treebank_surface_tokenizer(text):
     text = re.sub(r"([^' ])('ll|'LL|'re|'RE|'ve|'VE|n't|N'T) ", r"\1 \2 ",
                   text)
 
-    return text.split()
+    return text.split(), language

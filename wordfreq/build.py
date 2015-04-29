@@ -195,8 +195,10 @@ def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
     for lang in multi_wordlist:
         logger.info("\tLanguage: %s" % lang)
         save_wordlist_to_db(conn, 'multi', lang, multi_wordlist[lang])
+
     # Load Dutch from a separate source. We may end up with more languages like this.
     read_wordlist_into_db(conn, wordlist_path('luminoso', 'nl-combined-201503.csv'), 'stems', '*')
+
     logger.info("Done loading.")
 
 

@@ -10,12 +10,21 @@ def rosette_tokenizer(text):
     # I'm aware this doesn't do the right things with multi-word stems.
     # Wordfreq doesn't either. And wordfreq isn't designed to look up
     # multiple words anyway.
-    return [stem + '|' + lang for (stem, pos, span) in analysis]
+    tokens = []
+    for (stem, pos, span) in analysis:
+        for subtoken in stem.split(' '):
+            tokens.append(subtoken + '|' + lang)
+    return tokens
 
 
 def rosette_surface_tokenizer(text):
     analysis, lang = ROSETTE.rosette.analyze(text)
-    return [text[span[0]:span[1]] + '|' + lang for (stem, pos, span) in analysis]
+    tokens = []
+    for (stem, pos, span) in analysis:
+        surface_text = text[span[0]:span[1]]
+        for subtoken in surface_text.split(' '):
+            tokens.append(subtoken + '|' + lang)
+    return tokens
 
 
 def treebank_surface_tokenizer(text):

@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse
 
 
-def count_wikipedia(filename, surface=False):
+def count_wikipedia(filename, surface=True):
     path = Path(filename)
     if surface == True:
         tokenizer = rosette_surface_tokenizer
@@ -18,7 +18,6 @@ def count_wikipedia(filename, surface=False):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('filename', help='flat text file containing extracted Wikipedia text')
-    parser.add_argument('-s', '--surface', action='store_true', help='Use surface text instead of stems')
     args = parser.parse_args()
-    count_wikipedia(args.filename, surface=args.surface)
+    count_wikipedia(args.filename, surface=True)
 

@@ -5,7 +5,7 @@ CONFIG = {
     'data_dir': './data',
     'languages': [
         'en', 'es', 'fr', 'de', 'pt', 'nl', 'ru', 'it', 'ar', 'ms', 'id',
-        'ja', 'ko', 'zh-TW', 'zh-CN',
+        'ja', 'ko', 'zh-Hans', 'zh-Hant',
     ]
 }
 

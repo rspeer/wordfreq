@@ -7,8 +7,8 @@ ROSETTE = RosetteReader()
 
 # Rosette labels the orthographies of Chinese incorrectly
 ROSETTE_LANG_MAP = {
-    'zh_sc': 'zh-CN',
-    'zh_tc': 'zh-TW'
+    'zh_sc': 'zh-Hans',
+    'zh_tc': 'zh-Hant'
 }
 
 

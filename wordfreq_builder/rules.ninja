@@ -18,7 +18,7 @@ DATA = ./data
 # Splits the single file $in into $slices parts, whose names will be
 # $prefix plus a two-digit numeric suffix.
 rule split
-  command = mkdir -p $$(dirname $prefix) && split -d -n $slices $in $prefix
+  command = mkdir -p $$(dirname $prefix) && split -d -n r/$slices $in $prefix
 
 # wiki2text is a tool I wrote using the development version of Nim, which
 # extracts plain text from Wikipedia dumps obtained from dumps.wikimedia.org.

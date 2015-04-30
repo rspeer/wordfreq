@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from collections import defaultdict
 import sqlite3
 import codecs
@@ -47,14 +48,15 @@ def _read_csv_basic(filename):
 
     counts = {}
     for line in infile:
-        line = line.rstrip(u'\n')
-        word, count = line.rsplit(u',', 1)
-        count = float(count)
-        counts[standardize_word(word)] = count
+        if ',' in line:
+            line = line.rstrip('\n')
+            word, count = line.rsplit(',', 1)
+            count = float(count)
+            counts[standardize_word(word)] = count
     return counts
 
 
-NUMBER_RE = re.compile(u'[0-9]+')
+NUMBER_RE = re.compile('[0-9]+')
 def read_leeds_corpus(filename):
     """
     Load word frequencies from a "Web as Corpus" file, collected and
@@ -68,9 +70,9 @@ def read_leeds_corpus(filename):
     for line in infile:
         line = line.rstrip()
         if line:
-            rank = line.split(u' ')[0]
-            if NUMBER_RE.match(rank) and line.count(u' ') == 2:
-                _, freq, token = line.split(u' ')
+            rank = line.split(' ')[0]
+            if NUMBER_RE.match(rank) and line.count(' ') == 2:
+                _, freq, token = line.split(' ')
                 token = standardize_word(ftfy(token))
                 freq = float(freq)
                 counts[token] += freq
@@ -119,7 +121,7 @@ def create_db(filename):
         os.makedirs(base_dir)
 
     conn = get_db_connection(filename)
-    
+
     conn.execute(schema.SCHEMA)
     for index_definition in schema.INDICES:
         conn.execute(index_definition)
@@ -197,7 +199,7 @@ def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
         save_wordlist_to_db(conn, 'multi', lang, multi_wordlist[lang])
 
     # Load Dutch from a separate source. We may end up with more languages like this.
-    read_wordlist_into_db(conn, wordlist_path('luminoso', 'nl-combined-201503.csv'), 'stems', '*')
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'nl-combined-201504.csv'), 'surfaces', '*')
 
     logger.info("Done loading.")
 

@@ -17,14 +17,14 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
 
     language_detect_and_tokenize_deps(
         data_filename('raw-input/twitter/all-2014.txt'),
-        slice_prefix='slices/twitter/tweets-2014',
-        combined_prefix='generated/twitter/tweets-2014',
-        out=out, slices=10
+        slice_prefix=data_filename('slices/twitter/tweets-2014'),
+        combined_prefix=data_filename('generated/twitter/tweets-2014'),
+        out=out, slices=40
     )
 
 
 def language_detect_and_tokenize_deps(input_filename, slice_prefix,
-                                      combined_prefix, out, slices=10):
+                                      combined_prefix, out, slices):
     lines = []
     # split the input into slices
     slice_files = ['{prefix}.part{num:0>2d}'.format(prefix=slice_prefix, num=num)
@@ -33,7 +33,7 @@ def language_detect_and_tokenize_deps(input_filename, slice_prefix,
         outs=' '.join(slice_files), ins=input_filename
     )
     lines.append(build_rule)
-    lines.append("  prefix = {}".format(slice_prefix))
+    lines.append("  prefix = {}.part".format(slice_prefix))
     lines.append("  slices = {}".format(slices))
     lines.append("")
 
@@ -43,7 +43,7 @@ def language_detect_and_tokenize_deps(input_filename, slice_prefix,
             '{prefix}.{lang}.txt'.format(prefix=slice_file, lang=language)
             for language in CONFIG['languages']
         ]
-        build_rule = "build {outs}: tokenize_twitter {ins}".format(
+        build_rule = "build {outs}: tokenize_twitter {ins} | wordfreq_builder/tokenizers.py".format(
             outs=' '.join(language_outputs), ins=slice_file
         )
         lines.append(build_rule)
@@ -53,7 +53,7 @@ def language_detect_and_tokenize_deps(input_filename, slice_prefix,
     for language in CONFIG['languages']:
         combined_output = '{prefix}.{lang}.txt'.format(prefix=combined_prefix, lang=language)
         language_inputs = [
-            '{prefix}.{lang}'.format(prefix=slice_files[slicenum], lang=language)
+            '{prefix}.{lang}.txt'.format(prefix=slice_files[slicenum], lang=language)
             for slicenum in range(slices)
         ]
         build_rule = "build {outs}: cat {ins}".format(
@@ -65,5 +65,9 @@ def language_detect_and_tokenize_deps(input_filename, slice_prefix,
     print('\n'.join(lines), file=out)
 
 
-if __name__ == '__main__':
+def main():
     make_ninja_deps('rules.ninja')
+
+
+if __name__ == '__main__':
+    main()

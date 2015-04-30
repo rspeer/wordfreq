@@ -5,10 +5,13 @@ import re
 ROSETTE = RosetteReader()
 
 
-# Rosette labels the orthographies of Chinese incorrectly
+# Some of Rosette's language codes are incorrect. For example, 'zh_sc' should
+# mean "Chinese as used in Seychelles", which is kind of nonsense. What Rosette
+# really means is "Simplified Chinese", whose code is 'zh-Hans'.
 ROSETTE_LANG_MAP = {
     'zh_sc': 'zh-Hans',
-    'zh_tc': 'zh-Hant'
+    'zh_tc': 'zh-Hant',
+    'en_uc': 'en',
 }
 
 
@@ -24,19 +27,24 @@ def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     for line in open(in_filename, encoding='utf-8'):
         text = line_reader(line)
         tokenized, language = tokenizer(text)
-        out_filename = '%s.%s.txt' % (out_prefix, language)
-        if out_filename in out_files:
-            out_file = out_files[out_filename]
-        else:
-            out_file = open(out_filename, 'w', encoding='utf-8')
-            out_files[out_filename] = out_file
-        print(tokenized, file=out_file)
+        if language is not None:
+            out_filename = '%s.%s.txt' % (out_prefix, language)
+            if out_filename in out_files:
+                out_file = out_files[out_filename]
+            else:
+                out_file = open(out_filename, 'w', encoding='utf-8')
+                out_files[out_filename] = out_file
+            print(tokenized, file=out_file)
     for out_file in out_files.values():
         out_file.close()
 
 
 def rosette_surface_tokenizer(text):
-    analysis, lang = ROSETTE.rosette.analyze(text)
+    try:
+        analysis, lang = ROSETTE.rosette.analyze(text)
+    except (RuntimeError, UnicodeError) as e:
+        # Our Rosette interface throws errors given arbitrary data. :(
+        return text, None
     language = ROSETTE_LANG_MAP.get(lang, lang)
     tokens = []
     for (stem, pos, span) in analysis:

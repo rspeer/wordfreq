@@ -9,6 +9,11 @@ CONFIG = {
         'en', 'es', 'fr', 'de', 'pt', 'nl', 'ru', 'it', 'ar', 'ms', 'id',
         'ja', 'ko', 'zh-Hans', 'zh-Hant',
     ],
+    # Skip the Chinese Wikipedia until we know what to do with it
+    'wp_languages': [
+        'en', 'es', 'fr', 'de', 'pt', 'nl', 'ru', 'it', 'ar', 'ms', 'id',
+        'ja', 'ko'
+    ]
 }
 
 

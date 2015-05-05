@@ -43,7 +43,7 @@ rule tokenize_twitter
 #     number at the start of the line.
 #
 rule count
-  command = sort $in | uniq -c | sort -nrk 1 | sed -r 's/\s*([0-9]+)\s+(.*)$/\2,\1/' > $out
+  command = sort $in | uniq -c | sort -nrk 1 | sed -r 's/\s*([0-9]+)\s+(.*)/\2,\1/' > $out
 
 rule cat
   command = cat $in > $out

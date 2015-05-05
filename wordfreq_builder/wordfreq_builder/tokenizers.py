@@ -1,5 +1,6 @@
 from lumi_science.text_readers.rosette_readers import RosetteReader
 import re
+import unicodedata
 
 
 ROSETTE = RosetteReader()
@@ -15,6 +16,9 @@ ROSETTE_LANG_MAP = {
 }
 
 
+NON_PUNCT_RE = re.compile('[0-9A-Za-z\xc0-\u1fff\u2070-\u2fff\u301f-\ufeff０-９Ａ-Ｚａ-ｚ\uff66-\U0002ffff]')
+
+
 def last_tab(line):
     """
     Read lines by keeping only the last tab-separated value.
@@ -22,11 +26,26 @@ def last_tab(line):
     return line.split('\t')[-1].strip()
 
 
-def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
+def non_punct_filter(token):
+    if NON_PUNCT_RE.search(token):
+        return token.lower()
+    else:
+        return None
+
+
+def pretokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
+    """
+    Process a file by running it through the given tokenizer, sorting the
+    results by the language of each line, and inserting spaces into lines
+    to mark the token boundaries. This computes the 'hard part' of
+    tokenization and allows the results to be saved, so that we can change
+    the finer details of the output without re-running everything.
+    """
     out_files = {}
     for line in open(in_filename, encoding='utf-8'):
         text = line_reader(line)
-        tokenized, language = tokenizer(text)
+        tokens, language = tokenizer(text)
+        tokenized = ' '.join(tokens)
         if language is not None:
             out_filename = '%s.%s.txt' % (out_prefix, language)
             if out_filename in out_files:
@@ -37,6 +56,23 @@ def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
             print(tokenized, file=out_file)
     for out_file in out_files.values():
         out_file.close()
+
+
+def monolingual_tokenize_file(in_filename, out_filename, language,
+                              tokenizer, line_reader=last_tab,
+                              token_filter=non_punct_filter,
+                              sample_proportion=100):
+    with open(in_filename, encoding='utf-8', errors='replace') as in_file:
+        with open(out_filename, 'w', encoding='utf-8') as out_file:
+            for i, line in enumerate(in_file):
+                if i % sample_proportion == 0:
+                    text = line_reader(line)
+                    tokens, line_language = tokenizer(text)
+                    if line_language == language:
+                        filtered = [token_filter(t) for t in tokens]
+                        filtered = [t for t in filtered if t is not None]
+                        for token in filtered:
+                            print(token, file=out_file)
 
 
 def rosette_surface_tokenizer(text):
@@ -50,7 +86,7 @@ def rosette_surface_tokenizer(text):
     for (stem, pos, span) in analysis:
         surface_text = text[span[0]:span[1]]
         tokens.append(surface_text)
-    return ' '.join(tokens), language
+    return tokens, language
 
 
 def treebank_surface_tokenizer(text, language='en'):

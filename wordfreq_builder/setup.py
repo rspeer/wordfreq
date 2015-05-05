@@ -11,7 +11,8 @@ setup(
     packages=['wordfreq_builder'],
     entry_points={
         'console_scripts': [
-            'wordfreq-tokenize-twitter = wordfreq_builder.cli.tokenize_twitter:main',
+            'wordfreq-pretokenize-twitter = wordfreq_builder.cli.pretokenize_twitter:main',
+            'wordfreq-tokenize-wikipedia = wordfreq_builder.cli.tokenize_wikipedia:main',
             'wordfreq-build-deps = wordfreq_builder.cli.build_deps:main'
         ]
     }

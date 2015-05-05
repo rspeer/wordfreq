@@ -46,6 +46,11 @@ def wiki_parse_deps(dirname_in, dirname_out, languages):
             outs=output_file, ins=input_file
         )
         lines.append(build_rule)
+        output_file = path_out / 'wikipedia_{}.tokens.txt'.format(language)
+        build_rule = "build {outs}: wiki2tokens {ins}".format(
+            outs=output_file, ins=input_file
+        )
+        lines.append(build_rule)
     return lines
 
 
@@ -69,7 +74,7 @@ def language_detect_and_tokenize_deps(input_filename, slice_prefix,
             '{prefix}.{lang}.txt'.format(prefix=slice_file, lang=language)
             for language in CONFIG['languages']
         ]
-        build_rule = "build {outs}: tokenize_twitter {ins} | wordfreq_builder/tokenizers.py".format(
+        build_rule = "build {outs}: tokenize_twitter {ins}".format(
             outs=' '.join(language_outputs), ins=slice_file
         )
         lines.append(build_rule)

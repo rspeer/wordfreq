@@ -35,7 +35,11 @@ rule tokenize_twitter
 # This rule uses command-line tools to take in a file with one token per line,
 # and output a comma-separated file with the token counts:
 #
-#   * 'sort $in | uniq -c' does the actual counting.
+#   * 'LANG=C' disables fancy Unicode sorting and instead just sorts by byte
+#     order, which is fine because we only need this order so we can run
+#     'uniq'.
+#   * 'sort $in -T $tmp | uniq -c' does the actual counting. The possibly
+#     large amount of temporary output goes in $tmp.
 #   * 'sort -nrk 1' sorts the result in reverse numeric order by the first field
 #     (the count).
 #   * The 'sed' command rearranges the lines to be comma-separated values with
@@ -43,7 +47,7 @@ rule tokenize_twitter
 #     number at the start of the line.
 #
 rule count
-  command = sort $in | uniq -c | sort -nrk 1 | sed -r 's/\s*([0-9]+)\s+(.*)/\2,\1/' > $out
+  command = mkdir -p $tmp && mkdir -p $$(dirname $out) && LANG=C sort $in -T $tmp | uniq -c | sort -nrk 1 | sed -r 's/\s*([0-9]+)\s+(.*)/\2,\1/' > $out
 
 rule cat
   command = cat $in > $out

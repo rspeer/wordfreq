@@ -95,7 +95,7 @@ class CustomDevelopCommand(develop):
             self.run_command('download_db')
 
 
-requirements = ['ftfy >= 3']
+requirements = ['ftfy >= 4']
 if sys.version_info.major == 2:
     requirements.append('functools32')
 

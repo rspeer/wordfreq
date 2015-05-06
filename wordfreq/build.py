@@ -139,9 +139,9 @@ def read_leeds_wordlist_into_db(conn, filename, dbname, lang):
     save_wordlist_to_db(conn, dbname, lang, wordlist)
 
 
-def read_wordlist_into_db(conn, filename, dbname, lang='*'):
+def read_wordlist_into_db(conn, filename, dbname, language='*'):
     logger.info("Loading %r", filename)
-    if lang == '*':
+    if language == '*':
         multi_wordlist = read_multilingual_csv(filename)
         for lang in multi_wordlist:
             logger.info("\tLanguage: %s", lang)

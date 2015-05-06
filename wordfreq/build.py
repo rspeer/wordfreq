@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from collections import defaultdict
 import sqlite3
 import codecs
@@ -47,14 +48,15 @@ def _read_csv_basic(filename):
 
     counts = {}
     for line in infile:
-        line = line.rstrip(u'\n')
-        word, count = line.rsplit(u',', 1)
-        count = float(count)
-        counts[standardize_word(word)] = count
+        if ',' in line:
+            line = line.rstrip('\n')
+            word, count = line.rsplit(',', 1)
+            count = float(count)
+            counts[standardize_word(word)] = count
     return counts
 
 
-NUMBER_RE = re.compile(u'[0-9]+')
+NUMBER_RE = re.compile('[0-9]+')
 def read_leeds_corpus(filename):
     """
     Load word frequencies from a "Web as Corpus" file, collected and
@@ -68,9 +70,9 @@ def read_leeds_corpus(filename):
     for line in infile:
         line = line.rstrip()
         if line:
-            rank = line.split(u' ')[0]
-            if NUMBER_RE.match(rank) and line.count(u' ') == 2:
-                _, freq, token = line.split(u' ')
+            rank = line.split(' ')[0]
+            if NUMBER_RE.match(rank) and line.count(' ') == 2:
+                _, freq, token = line.split(' ')
                 token = standardize_word(ftfy(token))
                 freq = float(freq)
                 counts[token] += freq
@@ -119,7 +121,7 @@ def create_db(filename):
         os.makedirs(base_dir)
 
     conn = get_db_connection(filename)
-    
+
     conn.execute(schema.SCHEMA)
     for index_definition in schema.INDICES:
         conn.execute(index_definition)
@@ -129,6 +131,24 @@ def create_db(filename):
 
 def get_db_connection(filename):
     return sqlite3.connect(filename)
+
+
+def read_leeds_wordlist_into_db(conn, filename, dbname, lang):
+    logger.info("Loading %r" % filename)
+    wordlist = read_leeds_corpus(filename)
+    save_wordlist_to_db(conn, dbname, lang, wordlist)
+
+
+def read_wordlist_into_db(conn, filename, dbname, language='*'):
+    logger.info("Loading %r", filename)
+    if language == '*':
+        multi_wordlist = read_multilingual_csv(filename)
+        for lang in multi_wordlist:
+            logger.info("\tLanguage: %s", lang)
+            save_wordlist_to_db(conn, dbname, lang, multi_wordlist[lang])
+    else:
+        wordlist = read_csv(filename)
+        save_wordlist_to_db(conn, dbname, lang, wordlist)
 
 
 LEEDS_LANGUAGES = ('ar', 'de', 'el', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh')
@@ -157,53 +177,29 @@ def load_all_data(source_dir=None, filename=None, do_it_anyway=False):
     if filename is None:
         filename = config.DB_FILENAME
 
+    def wordlist_path(*pieces):
+        return os.path.join(source_dir, *pieces)
+
     logger.info("Creating database")
     conn = create_db(filename)
 
-    logger.info("Loading Leeds internet corpus:")
     for lang in LEEDS_LANGUAGES:
-        logger.info("\tLanguage: %s" % lang)
-        filename = os.path.join(
-            source_dir, 'leeds', 'internet-%s-forms.num' % lang
-        )
-        wordlist = read_leeds_corpus(filename)
-        save_wordlist_to_db(conn, 'leeds-internet', lang, wordlist)
+        filename = wordlist_path('leeds', 'internet-%s-forms.num' % lang)
+        read_leeds_wordlist_into_db(conn, filename, 'leeds-internet', lang)
 
-    logger.info("Loading Google Books (English).")
-    google_wordlist = read_csv(
-        os.path.join(source_dir, 'google', 'google-books-english.csv')
-    )
-    save_wordlist_to_db(conn, 'google-books', 'en', google_wordlist)
+    read_wordlist_into_db(conn, wordlist_path('google', 'google-books-english.csv'), 'google-books', 'en')
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'twitter-52M.csv'), 'twitter', 'xx')
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'twitter-stems-2014.csv'), 'twitter-stems', '*')
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'twitter-surfaces-2014.csv'), 'twitter-surfaces', '*')
 
     logger.info("Loading combined multilingual corpus:")
-    multi_wordlist = read_multilingual_csv(
-        os.path.join(source_dir, 'luminoso', 'multilingual.csv')
-    )
+    multi_wordlist = read_multilingual_csv(wordlist_path('luminoso', 'multilingual.csv'))
     for lang in multi_wordlist:
         logger.info("\tLanguage: %s" % lang)
         save_wordlist_to_db(conn, 'multi', lang, multi_wordlist[lang])
 
-    logger.info("Loading Twitter corpus.")
-    twitter_wordlist = read_csv(
-        os.path.join(source_dir, 'luminoso', 'twitter-52M.csv')
-    )
-    save_wordlist_to_db(conn, 'twitter', 'xx', twitter_wordlist)
-
-    logger.info("Loading stemmed Twitter corpus.")
-    twitter_stems_wordlist = read_multilingual_csv(
-        os.path.join(source_dir, 'luminoso', 'twitter-stems-2014.csv')
-    )
-    for lang in twitter_stems_wordlist:
-        logger.info("\tLanguage: %s" % lang)
-        save_wordlist_to_db(conn, 'twitter-stems', lang, twitter_stems_wordlist[lang])
-
-    logger.info("Loading unstemmed Twitter corpus.")
-    twitter_surface_wordlist = read_multilingual_csv(
-        os.path.join(source_dir, 'luminoso', 'twitter-surfaces-2014.csv')
-    )
-    for lang in twitter_surface_wordlist:
-        logger.info("\tLanguage: %s" % lang)
-        save_wordlist_to_db(conn, 'twitter-surfaces', lang, twitter_surface_wordlist[lang])
+    # Load Dutch from a separate source. We may end up with more languages like this.
+    read_wordlist_into_db(conn, wordlist_path('luminoso', 'nl-combined-201504.csv'), 'surfaces', '*')
 
     logger.info("Done loading.")
 

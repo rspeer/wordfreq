@@ -148,7 +148,7 @@ def read_wordlist_into_db(conn, filename, dbname, language='*'):
             save_wordlist_to_db(conn, dbname, lang, multi_wordlist[lang])
     else:
         wordlist = read_csv(filename)
-        save_wordlist_to_db(conn, dbname, lang, wordlist)
+        save_wordlist_to_db(conn, dbname, language, wordlist)
 
 
 LEEDS_LANGUAGES = ('ar', 'de', 'el', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh')

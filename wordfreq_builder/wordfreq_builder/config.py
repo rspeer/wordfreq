@@ -29,10 +29,11 @@ CONFIG = {
         ]
     },
     'wordlist_paths': {
-        'twitter': 'generated/twitter/tweets-2014.{lang}{ext}.txt',
-        'wikipedia': 'generated/wikipedia/wikipedia_{lang}{ext}.txt',
-        'opensubtitles': 'generated/opensubtitles/opensubtitles_{lang}{ext}.txt',
-        'leeds': 'generated/leeds/leeds_internet_{lang}{ext}.txt'
+        'twitter': 'generated/twitter/tweets-2014.{lang}.{ext}',
+        'wikipedia': 'generated/wikipedia/wikipedia_{lang}.{ext}',
+        'opensubtitles': 'generated/opensubtitles/opensubtitles_{lang}.{ext}',
+        'leeds': 'generated/leeds/leeds_internet_{lang}.{ext}',
+        'combined': 'generated/combined/combined_{lang}.{ext}'
     }
 }
 
@@ -41,7 +42,7 @@ def data_filename(filename):
     return os.path.join(CONFIG['data_dir'], filename)
 
 
-def wordlist_filename(source, language, extension=''):
+def wordlist_filename(source, language, extension='txt'):
     path = CONFIG['wordlist_paths'][source].format(
         lang=language, ext=extension
     )
@@ -54,3 +55,11 @@ def source_names(language):
     """
     return sorted([key for key in CONFIG['sources']
                   if language in CONFIG['sources'][key]])
+
+
+def all_languages():
+    languages = set()
+    for langlist in CONFIG['sources'].values():
+        languages |= set(langlist)
+    return sorted(languages)
+

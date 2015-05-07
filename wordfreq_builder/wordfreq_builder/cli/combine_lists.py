@@ -5,7 +5,7 @@ import argparse
 def merge_lists(input_names, output_name):
     freq_dicts = []
     for input_name in input_names:
-        freq_dicts.append(read_freqs(input_name))
+        freq_dicts.append(read_freqs(input_name, cutoff=2))
     merged = merge_freqs(freq_dicts)
     write_wordlist(merged, output_name)
 

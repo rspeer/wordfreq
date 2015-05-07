@@ -1,4 +1,6 @@
-from wordfreq_builder.config import CONFIG, data_filename, wordlist_filename
+from wordfreq_builder.config import (
+    CONFIG, data_filename, wordlist_filename, all_languages, source_names
+)
 import sys
 import pathlib
 
@@ -77,6 +79,7 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
             CONFIG['sources']['opensubtitles']
         )
     )
+    lines.extend(combine_lists(all_languages()))
 
     print('\n'.join(lines), file=out)
 
@@ -89,9 +92,9 @@ def wikipedia_deps(dirname_in, languages):
         input_file = max(path_in.glob(
             '{}wiki*.bz2'.format(language)
         ))
-        raw_file = wordlist_filename('wikipedia', language, '')
-        token_file = wordlist_filename('wikipedia', language, '.tokens')
-        count_file = wordlist_filename('wikipedia', language, '.counts')
+        raw_file = wordlist_filename('wikipedia', language, 'txt')
+        token_file = wordlist_filename('wikipedia', language, 'tokens.txt')
+        count_file = wordlist_filename('wikipedia', language, 'counts.txt')
 
         add_dep(lines, 'wiki2text', input_file, raw_file)
         add_dep(lines, 'wiki2tokens', input_file, token_file)
@@ -135,12 +138,12 @@ def twitter_deps(prefix_in, languages):
     lines = []
     for language in languages:
         input_file = '{prefix}.{lang}.txt'.format(prefix=prefix_in, lang=language)
-        token_file = wordlist_filename('twitter', language, '.tokens')
+        token_file = wordlist_filename('twitter', language, 'tokens.txt')
         add_dep(lines,
                 'format_twitter', input_file, token_file,
                 extra='wordfreq_builder/tokenizers.py')
 
-        count_file = wordlist_filename('twitter', language, '.counts')
+        count_file = wordlist_filename('twitter', language, 'counts.txt')
         add_dep(lines, 'count', token_file, count_file)
 
     return lines
@@ -152,7 +155,7 @@ def leeds_deps(dirname_in, languages):
         input_file = '{prefix}/internet-{lang}-forms.num'.format(
             prefix=dirname_in, lang=language
         )
-        reformatted_file = wordlist_filename('leeds', language, '.counts')
+        reformatted_file = wordlist_filename('leeds', language, 'counts.txt')
         add_dep(lines, 'convert_leeds', input_file, reformatted_file)
 
     return lines
@@ -164,9 +167,27 @@ def opensubtitles_deps(dirname_in, languages):
         input_file = '{prefix}/{lang}.txt'.format(
             prefix=dirname_in, lang=language
         )
-        reformatted_file = wordlist_filename('opensubtitles', language, '.counts')
+        reformatted_file = wordlist_filename('opensubtitles', language, 'counts.txt')
         add_dep(lines, 'convert_opensubtitles', input_file, reformatted_file)
 
+    return lines
+
+
+def combine_lists(languages):
+    lines = []
+    for language in languages:
+        sources = source_names(language)
+        input_files = [
+            wordlist_filename(source, language, 'counts.txt')
+            for source in sources
+        ]
+        output_file = wordlist_filename('combined', language)
+        add_dep(lines, 'merge', input_files, output_file,
+                extra='wordfreq_builder/word_counts.py')
+
+        output_dBpack = wordlist_filename('combined', language, 'msgpack.gz')
+        add_dep(lines, 'freqs2dB', output_file, output_dBpack,
+                extra='wordfreq_builder/word_counts.py')
     return lines
 
 

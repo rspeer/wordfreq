@@ -2,7 +2,10 @@ from wordfreq_builder.tokenizers import retokenize
 from collections import defaultdict
 from operator import itemgetter
 from ftfy import fix_text
+import math
 import csv
+import msgpack
+import gzip
 
 
 def count_tokens(filename):
@@ -14,7 +17,7 @@ def count_tokens(filename):
     return counts
 
 
-def read_freqs(filename, cutoff=2):
+def read_freqs(filename, cutoff=0):
     raw_counts = defaultdict(float)
     total = 0.
     with open(filename, encoding='utf-8', newline='') as infile:
@@ -35,6 +38,22 @@ def read_freqs(filename, cutoff=2):
     return freqs
 
 
+def freqs_to_dBpack(in_filename, out_filename, cutoff=-60):
+    freq_cutoff = 10 ** (cutoff / 10.)
+    freqs = read_freqs(in_filename, freq_cutoff)
+    dBpack = []
+    for token, freq in freqs.items():
+        dB = round(math.log10(freq) * 10)
+        if dB >= cutoff:
+            neg_dB = -dB
+            while neg_dB >= len(dBpack):
+                dBpack.append([])
+            dBpack[neg_dB].append(token)
+
+    with gzip.open(out_filename, 'wb') as outfile:
+        msgpack.dump(dBpack, outfile)
+
+
 def merge_freqs(freq_dicts):
     vocab = set()
     for freq_dict in freq_dicts:
@@ -51,7 +70,7 @@ def merge_freqs(freq_dicts):
     return merged
 
 
-def write_wordlist(freqs, filename):
+def write_wordlist(freqs, filename, cutoff=1e-8):
     """
     Write a dictionary of either raw counts or frequencies to a file of
     comma-separated values.
@@ -60,5 +79,7 @@ def write_wordlist(freqs, filename):
         writer = csv.writer(outfile)
         items = sorted(freqs.items(), key=itemgetter(1), reverse=True)
         for word, freq in items:
+            if freq < cutoff:
+                break
             if not ('"' in word or ',' in word):
                 writer.writerow([word, str(freq)])

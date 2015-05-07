@@ -8,5 +8,5 @@ wordfreq_builder.egg-info/PKG-INFO: setup.py
 
 # build the Ninja file that will take over the build process
 build.ninja: rules.ninja wordfreq_builder/ninja.py wordfreq_builder/config.py wordfreq_builder.egg-info/PKG-INFO
-	wordfreq-build-deps rules.ninja > build.ninja
+	$(PYTHON) -m wordfreq_builder.cli.build_deps rules.ninja > build.ninja
 

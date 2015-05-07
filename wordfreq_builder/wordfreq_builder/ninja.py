@@ -65,6 +65,19 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
             CONFIG['sources']['wikipedia']
         )
     )
+    lines.extend(
+        leeds_deps(
+            data_filename('source-lists/leeds'),
+            CONFIG['sources']['leeds']
+        )
+    )
+    lines.extend(
+        opensubtitles_deps(
+            data_filename('source-lists/opensubtitles'),
+            CONFIG['sources']['opensubtitles']
+        )
+    )
+
     print('\n'.join(lines), file=out)
 
 
@@ -115,6 +128,7 @@ def twitter_preprocess_deps(input_filename, slice_prefix,
             for slicenum in range(slices)
         ]
         add_dep(lines, 'cat', language_inputs, combined_output)
+    return lines
 
 
 def twitter_deps(prefix_in, languages):
@@ -128,6 +142,30 @@ def twitter_deps(prefix_in, languages):
 
         count_file = wordlist_filename('twitter', language, '.counts')
         add_dep(lines, 'count', token_file, count_file)
+
+    return lines
+
+
+def leeds_deps(dirname_in, languages):
+    lines = []
+    for language in languages:
+        input_file = '{prefix}/internet-{lang}-forms.num'.format(
+            prefix=dirname_in, lang=language
+        )
+        reformatted_file = wordlist_filename('leeds', language, '.counts')
+        add_dep(lines, 'convert_leeds', input_file, reformatted_file)
+
+    return lines
+
+
+def opensubtitles_deps(dirname_in, languages):
+    lines = []
+    for language in languages:
+        input_file = '{prefix}/{lang}.txt'.format(
+            prefix=dirname_in, lang=language
+        )
+        reformatted_file = wordlist_filename('opensubtitles', language, '.counts')
+        add_dep(lines, 'convert_opensubtitles', input_file, reformatted_file)
 
     return lines
 

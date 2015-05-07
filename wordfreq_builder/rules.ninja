@@ -29,25 +29,29 @@ rule wiki2text
 rule wiki2tokens
   command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text -t > $out
 
-rule tokenize_twitter
-  command = mkdir -p $$(dirname $prefix) && wordfreq-tokenize-twitter $in $prefix
+rule tokenize_japanese
+  command = mkdir -p $$(dirname $out) && mecab < $in | cut -f 1 | grep -v "EOS"
 
-# This rule uses command-line tools to take in a file with one token per line,
-# and output a comma-separated file with the token counts:
-#
-#   * 'LANG=C' disables fancy Unicode sorting and instead just sorts by byte
-#     order, which is fine because we only need this order so we can run
-#     'uniq'.
-#   * 'sort $in -T $tmp | uniq -c' does the actual counting. The possibly
-#     large amount of temporary output goes in $tmp.
-#   * 'sort -nrk 1' sorts the result in reverse numeric order by the first field
-#     (the count).
-#   * The 'sed' command rearranges the lines to be comma-separated values with
-#     the count coming second, instead of the count being a right-justified
-#     number at the start of the line.
-#
+rule tokenize_twitter
+  command = mkdir -p $$(dirname $prefix) && python -m wordfreq_builder.cli.pretokenize_twitter $in $prefix
+
+rule format_twitter
+  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.format_twitter $in $out
+
+# To convert the Leeds corpus, look for space-separated lines that start with
+# an integer and a decimal. The integer is the rank, which we discard. The
+# decimal is the frequency, and the remaining text is the term. Use sed -n
+# with /p to output only lines where the match was successful.
+rule convert_leeds
+  command = mkdir -p $$(dirname $out) && sed -rn 's/([0-9]+) ([0-9.]+) (.*)/\3,\2/p' < $in > $out
+
+# To convert the OpenSubtitles frequency data, simply replace spaces with
+# commas.
+rule convert_opensubtitles
+  command = mkdir -p $$(dirname $out) && tr ' ' ',' < $in > $out
+
 rule count
-  command = mkdir -p $tmp && mkdir -p $$(dirname $out) && LANG=C sort $in -T $tmp | uniq -c | sort -nrk 1 | sed -r 's/\s*([0-9]+)\s+(.*)/\2,\1/' > $out
+  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.count_tokens $in $out
 
 rule cat
   command = cat $in > $out

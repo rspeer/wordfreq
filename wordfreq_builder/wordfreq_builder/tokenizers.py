@@ -1,6 +1,6 @@
 from lumi_science.text_readers.rosette_readers import RosetteReader
+from html.entities import name2codepoint
 import re
-import unicodedata
 
 
 ROSETTE = RosetteReader()
@@ -18,6 +18,9 @@ ROSETTE_LANG_MAP = {
 
 NON_PUNCT_RE = re.compile('[0-9A-Za-z\xc0-\u1fff\u2070-\u2fff\u301f-\ufeff０-９Ａ-Ｚａ-ｚ\uff66-\U0002ffff]')
 
+EMOTICON_RANGE = '\u2600-\u26ff\U0001F000-\U0001F7FF'
+RETOKENIZE_RE = re.compile('[{0}#@/]|[^{0}#@/ ]+'.format(EMOTICON_RANGE))
+
 
 def last_tab(line):
     """
@@ -26,11 +29,15 @@ def last_tab(line):
     return line.split('\t')[-1].strip()
 
 
-def non_punct_filter(token):
+def lowercase_text_filter(token):
     if NON_PUNCT_RE.search(token):
         return token.lower()
     else:
         return None
+
+
+def is_url(token):
+    return token.startswith('http:') or token.startswith('https:')
 
 
 def pretokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
@@ -58,9 +65,60 @@ def pretokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
         out_file.close()
 
 
+ENTITY_RE = re.compile(r'& ?(amp|quot|lt|gt) ?;')
+
+
+def fix_entities(text):
+    """
+    Fix the few HTML entities that Twitter uses -- even if they've
+    already been tokenized.
+    """
+    def replace_entity(match):
+        return chr(name2codepoint[match.group(1)])
+    return ENTITY_RE.sub(replace_entity, text)
+
+
+def retokenize(text):
+    text = fix_entities(text)
+    tokens = RETOKENIZE_RE.findall(text)
+    skip_next = False
+    for token in tokens:
+        if token == '/' or token == '@':
+            # Avoid idiosyncratic tokens such as URLs and
+            # usernames
+            skip_next = True
+        elif skip_next:
+            skip_next = False
+        else:
+            if not is_url(token):
+                filtered = lowercase_text_filter(token)
+                if filtered:
+                    yield filtered
+
+
+def retokenize_file(in_filename, out_filename):
+    """
+    Process a file that has been tokenized (by inserting spaces) in a
+    language-specific way by Rosette.
+    """
+    with open(in_filename, encoding='utf-8') as in_file:
+        with open(out_filename, 'w', encoding='utf-8') as out_file:
+            for line in in_file:
+                skip_next = False
+                for token in retokenize(line.strip()):
+                    if skip_next:
+                        skip_next = False
+                    elif token == '/' or token == '@':
+                        # Avoid idiosyncratic tokens such as URLs and
+                        # usernames
+                        skip_next = True
+                    elif lowercase_text_filter(token):
+                        print(token, file=out_file)
+
+
 def monolingual_tokenize_file(in_filename, out_filename, language,
                               tokenizer, line_reader=last_tab,
-                              token_filter=non_punct_filter,
+                              token_filter=lowercase_text_filter,
                               sample_proportion=100):
     with open(in_filename, encoding='utf-8', errors='replace') as in_file:
         with open(out_filename, 'w', encoding='utf-8') as out_file:
@@ -78,7 +136,7 @@ def monolingual_tokenize_file(in_filename, out_filename, language,
 def rosette_surface_tokenizer(text):
     try:
         analysis, lang = ROSETTE.rosette.analyze(text)
-    except (RuntimeError, UnicodeError) as e:
+    except (RuntimeError, UnicodeError):
         # Our Rosette interface throws errors given arbitrary data. :(
         return text, None
     language = ROSETTE_LANG_MAP.get(lang, lang)

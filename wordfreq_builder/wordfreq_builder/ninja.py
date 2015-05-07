@@ -12,6 +12,27 @@ TMPDIR = data_filename('tmp')
 PRETOKENIZE_TWITTER = False
 
 
+def add_dep(lines, rule, input, output, extra=None, params=None):
+    if isinstance(output, list):
+        output = ' '.join(output)
+    if isinstance(input, list):
+        input = ' '.join(input)
+    if extra:
+        if isinstance(extra, list):
+            extra = ' '.join(extra)
+        extrastr = ' | ' + extra
+    else:
+        extrastr = ''
+    build_rule = "build {output}: {rule} {input}{extra}".format(
+        output=output, rule=rule, input=input, extra=extrastr
+    )
+    lines.append(build_rule)
+    if params:
+        for key, val in params.items():
+            lines.append("  {key} = {val}".format(locals()))
+    lines.append("")
+
+
 def make_ninja_deps(rules_filename, out=sys.stdout):
     """
     Output a complete Ninja file describing how to build the wordfreq data.
@@ -55,24 +76,13 @@ def wikipedia_deps(dirname_in, languages):
         input_file = max(path_in.glob(
             '{}wiki*.bz2'.format(language)
         ))
-        output_file = wordlist_filename('wikipedia', language, '')
-        build_rule = "build {outs}: wiki2text {ins}".format(
-            outs=output_file, ins=input_file
-        )
-        lines.append(build_rule)
-        output_file = wordlist_filename('wikipedia', language, '.tokens')
-        build_rule = "build {outs}: wiki2tokens {ins}".format(
-            outs=output_file, ins=input_file
-        )
-        lines.append(build_rule)
+        raw_file = wordlist_filename('wikipedia', language, '')
+        token_file = wordlist_filename('wikipedia', language, '.tokens')
+        count_file = wordlist_filename('wikipedia', language, '.counts')
 
-        token_file = output_file
-        output_file = wordlist_filename('wikipedia', language, '.counts')
-        build_rule = "build {outs}: count {ins}".format(
-            outs=output_file, ins=token_file
-        )
-        lines.append(build_rule)
-        lines.append("  tmp = {}".format(TMPDIR))
+        add_dep(lines, 'wiki2text', input_file, raw_file)
+        add_dep(lines, 'wiki2tokens', input_file, token_file)
+        add_dep(lines, 'count', token_file, count_file)
     return lines
 
 
@@ -83,13 +93,10 @@ def twitter_preprocess_deps(input_filename, slice_prefix,
     slice_files = ['{prefix}.part{num:0>2d}'.format(prefix=slice_prefix, num=num)
                    for num in range(slices)]
     # split the input into slices
-    build_rule = "build {outs}: split {ins}".format(
-        outs=' '.join(slice_files), ins=input_filename
-    )
-    lines.append(build_rule)
-    lines.append("  prefix = {}.part".format(slice_prefix))
-    lines.append("  slices = {}".format(slices))
-    lines.append("")
+    add_dep(lines,
+            'split', input_filename, slice_files,
+            {'prefix': '{}.part'.format(slice_prefix),
+             'slices': slices})
 
     for slicenum in range(slices):
         slice_file = slice_files[slicenum]
@@ -97,12 +104,8 @@ def twitter_preprocess_deps(input_filename, slice_prefix,
             '{prefix}.{lang}.txt'.format(prefix=slice_file, lang=language)
             for language in languages
         ]
-        build_rule = "build {outs}: tokenize_twitter {ins}".format(
-            outs=' '.join(language_outputs), ins=slice_file
-        )
-        lines.append(build_rule)
-        lines.append("  prefix = {}".format(slice_file))
-        lines.append("")
+        add_dep(lines, 'tokenize_twitter', slice_file, language_outputs,
+                {'prefix': slice_file})
 
     for language in languages:
         combined_output = '{prefix}.{lang}.txt'.format(prefix=combined_prefix, lang=language)
@@ -111,32 +114,20 @@ def twitter_preprocess_deps(input_filename, slice_prefix,
             '{prefix}.{lang}.txt'.format(prefix=slice_files[slicenum], lang=language)
             for slicenum in range(slices)
         ]
-        build_rule = "build {outs}: cat {ins}".format(
-            outs=combined_output,
-            ins=' '.join(language_inputs)
-        )
-        lines.append(build_rule)
+        add_dep(lines, 'cat', language_inputs, combined_output)
 
 
 def twitter_deps(prefix_in, languages):
     lines = []
     for language in languages:
         input_file = '{prefix}.{lang}.txt'.format(prefix=prefix_in, lang=language)
-        output_file = wordlist_filename('twitter', language, '.tokens')
-        build_rule = "build {outs}: format_twitter {ins} | {deps}".format(
-            outs=output_file,
-            ins=input_file,
-            deps='wordfreq_builder/tokenizers.py'
-        )
-        lines.append(build_rule)
+        token_file = wordlist_filename('twitter', language, '.tokens')
+        add_dep(lines,
+                'format_twitter', input_file, token_file,
+                extra='wordfreq_builder/tokenizers.py')
 
-        token_file = output_file
-        output_file = wordlist_filename('twitter', language, '.counts')
-        build_rule = "build {outs}: count {ins}".format(
-            outs=output_file, ins=token_file
-        )
-        lines.append(build_rule)
-        lines.append("  tmp = {}".format(TMPDIR))
+        count_file = wordlist_filename('twitter', language, '.counts')
+        add_dep(lines, 'count', token_file, count_file)
 
     return lines
 

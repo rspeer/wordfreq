@@ -1,33 +1,5 @@
 from wordfreq.config import DB_FILENAME, CACHE_SIZE
-from wordfreq.util import standardize_word
-import sqlite3
-import sys
-
-if sys.version_info.major == 2:
-    from functools32 import lru_cache
-    PY2 = True
-else:
-    from functools import lru_cache
-    PY2 = False
-
-SQLITE_ERROR_TEXT = """
-Couldn't open the wordlist database.
-You may need to run wordfreq's setup.py script.
-
-I was expecting to find the database at:
-
-    %(path)s
-
-This can be configured by setting the WORDFREQ_DATA environment variable.
-""" % {'path': DB_FILENAME}
-
-try:
-    if PY2:
-        CONN = sqlite3.connect(DB_FILENAME)
-    else:
-        CONN = sqlite3.connect(DB_FILENAME, check_same_thread=False)
-except sqlite3.OperationalError:
-    raise IOError(SQLITE_ERROR_TEXT)
+from functools import lru_cache
 
 
 @lru_cache(maxsize=CACHE_SIZE)

@@ -1,0 +1,63 @@
+# This defines the rules on how to build parts of the wordfreq lists, using the
+# Ninja build system:
+#
+#   http://martine.github.io/ninja/manual.html
+#
+# Ninja is available in the 'ninja-build' Ubuntu package. It's like make with
+# better parallelism and the ability for build steps to produce multiple
+# outputs. The tradeoff is that its rule syntax isn't full of magic for
+# expanding wildcards and finding dependencies, so in general you have to
+# write the dependencies using a script.
+#
+# This file will become the header of the larger build.ninja file, which also
+# contains the programatically-defined dependency graph.
+
+# Variables
+DATA = ./data
+
+# Splits the single file $in into $slices parts, whose names will be
+# $prefix plus a two-digit numeric suffix.
+rule split
+  command = mkdir -p $$(dirname $prefix) && split -d -n r/$slices $in $prefix
+
+# wiki2text is a tool I wrote using Nim 0.11, which extracts plain text from
+# Wikipedia dumps obtained from dumps.wikimedia.org.  The code is at
+# https://github.com/rspeer/wiki2text.
+rule wiki2text
+  command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text > $out
+
+rule wiki2tokens
+  command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text -t > $out
+
+rule tokenize_japanese
+  command = mkdir -p $$(dirname $out) && mecab < $in | cut -f 1 | grep -v "EOS"
+
+rule tokenize_twitter
+  command = mkdir -p $$(dirname $prefix) && python -m wordfreq_builder.cli.pretokenize_twitter $in $prefix
+
+rule format_twitter
+  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.format_twitter $in $out
+
+# To convert the Leeds corpus, look for space-separated lines that start with
+# an integer and a decimal. The integer is the rank, which we discard. The
+# decimal is the frequency, and the remaining text is the term. Use sed -n
+# with /p to output only lines where the match was successful.
+rule convert_leeds
+  command = mkdir -p $$(dirname $out) && sed -rn 's/([0-9]+) ([0-9.]+) (.*)/\3,\2/p' < $in > $out
+
+# To convert the OpenSubtitles frequency data, simply replace spaces with
+# commas.
+rule convert_opensubtitles
+  command = mkdir -p $$(dirname $out) && tr ' ' ',' < $in > $out
+
+rule count
+  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.count_tokens $in $out
+
+rule merge
+  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.combine_lists -o $out $in
+
+rule freqs2dB
+  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.freqs_to_dB $in $out
+
+rule cat
+  command = cat $in > $out

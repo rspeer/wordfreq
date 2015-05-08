@@ -16,10 +16,12 @@ ROSETTE_LANG_MAP = {
 }
 
 
-NON_PUNCT_RE = re.compile('[0-9A-Za-z\xc0-\u1fff\u2070-\u2fff\u301f-\ufeff０-９Ａ-Ｚａ-ｚ\uff66-\U0002ffff]')
+NON_PUNCT_RANGE = '[0-9A-Za-zª²³¹º\xc0-\u1fff\u2070-\u2fff\u301f-\ufeff０-９Ａ-Ｚａ-ｚ\uff66-\U0002ffff]'
+NON_PUNCT_RE = re.compile(NON_PUNCT_RANGE)
+TOKEN_RE = re.compile("{0}('{0})+".format(NON_PUNCT_RANGE)
 
 EMOTICON_RANGE = '\u2600-\u26ff\U0001F000-\U0001F7FF'
-RETOKENIZE_RE = re.compile('[{0}#@/]|[^{0}#@/ ]+'.format(EMOTICON_RANGE))
+ROSETTE_RETOKENIZE_RE = re.compile('[{0}#@/]|[^{0}#@/ ]+'.format(EMOTICON_RANGE))
 
 
 def last_tab(line):
@@ -30,7 +32,7 @@ def last_tab(line):
 
 
 def lowercase_text_filter(token):
-    if NON_PUNCT_RE.search(token):
+    if TOKEN_RE.search(token):
         return token.lower()
     else:
         return None
@@ -78,9 +80,13 @@ def fix_entities(text):
     return ENTITY_RE.sub(replace_entity, text)
 
 
-def retokenize(text):
+def tokenize(text):
+    return TOKEN_RE.findall(text)
+
+
+def retokenize_rosette(text):
     text = fix_entities(text)
-    tokens = RETOKENIZE_RE.findall(text)
+    tokens = ROSETTE_RETOKENIZE_RE.findall(text)
     skip_next = False
     for token in tokens:
         if token == '/' or token == '@':
@@ -105,7 +111,7 @@ def retokenize_file(in_filename, out_filename):
         with open(out_filename, 'w', encoding='utf-8') as out_file:
             for line in in_file:
                 skip_next = False
-                for token in retokenize(line.strip()):
+                for token in retokenize_rosette(line.strip()):
                     if skip_next:
                         skip_next = False
                     elif token == '/' or token == '@':

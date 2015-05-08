@@ -15,6 +15,11 @@
 # Variables
 DATA = ./data
 
+# How to build the build.ninja file itself. (Use the Makefile to get it the
+# first time.)
+rule build_deps
+  command = python -m wordfreq_builder.cli.build_deps $in > $out
+
 # Splits the single file $in into $slices parts, whose names will be
 # $prefix plus a two-digit numeric suffix.
 rule split

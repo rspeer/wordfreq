@@ -45,6 +45,10 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
         print(rulesfile.read(), file=out)
 
     lines = []
+    # The first dependency is to make sure the build file is up to date.
+    add_dep(lines, 'build_deps', 'rules.ninja', 'build.ninja',
+            extra='wordfreq_builder/ninja.py')
+    
     if PRETOKENIZE_TWITTER:
         lines.extend(
             twitter_preprocess_deps(
@@ -188,6 +192,8 @@ def combine_lists(languages):
         output_dBpack = wordlist_filename('combined', language, 'msgpack.gz')
         add_dep(lines, 'freqs2dB', output_file, output_dBpack,
                 extra='wordfreq_builder/word_counts.py')
+        
+        lines.append('default {}'.format(output_dBpack))
     return lines
 
 

@@ -10,7 +10,8 @@ CONFIG = {
         # look up in filenames for these various data sources.
         'twitter': [
             'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru'
+            'pt', 'ru',
+            # can be added later: 'th', 'tr'
         ],
         'wikipedia': [
             'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
@@ -34,7 +35,8 @@ CONFIG = {
         'opensubtitles': 'generated/opensubtitles/opensubtitles_{lang}.{ext}',
         'leeds': 'generated/leeds/leeds_internet_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}'
-    }
+    },
+    'min_sources': 2
 }
 
 
@@ -61,5 +63,7 @@ def all_languages():
     languages = set()
     for langlist in CONFIG['sources'].values():
         languages |= set(langlist)
-    return sorted(languages)
+    return [lang for lang in sorted(languages)
+            if len(source_names(lang))
+            >= CONFIG['min_sources']]
 

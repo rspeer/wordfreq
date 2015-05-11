@@ -16,6 +16,7 @@ CONFIG = {
         'wikipedia': [
             'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
             'pt', 'ru'
+            # many more can be added
         ],
         'opensubtitles': [
             # All languages where the most common word in OpenSubtitles
@@ -27,6 +28,11 @@ CONFIG = {
         ],
         'leeds': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh'
+        ],
+        'google-books': [
+            'en',
+            # Using the 2012 data, we could get French, German, Italian,
+            # Russian, Spanish, and (Simplified) Chinese.
         ]
     },
     'wordlist_paths': {
@@ -34,6 +40,7 @@ CONFIG = {
         'wikipedia': 'generated/wikipedia/wikipedia_{lang}.{ext}',
         'opensubtitles': 'generated/opensubtitles/opensubtitles_{lang}.{ext}',
         'leeds': 'generated/leeds/leeds_internet_{lang}.{ext}',
+        'google-books': 'generated/google-books/google_books_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}'
     },
     'min_sources': 2

@@ -72,6 +72,11 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
         )
     )
     lines.extend(
+        google_books_deps(
+            data_filename('raw-input/google-books')
+        )
+    )
+    lines.extend(
         leeds_deps(
             data_filename('source-lists/leeds'),
             CONFIG['sources']['leeds']
@@ -103,6 +108,22 @@ def wikipedia_deps(dirname_in, languages):
         add_dep(lines, 'wiki2text', input_file, raw_file)
         add_dep(lines, 'wiki2tokens', input_file, token_file)
         add_dep(lines, 'count', token_file, count_file)
+    return lines
+
+
+def google_books_deps(dirname_in):
+    # Get English data from the split-up files of the Google Syntactic N-grams
+    # 2013 corpus.
+    lines = []
+
+    # Yes, the files are numbered 00 through 98 of 99. This is not an
+    # off-by-one error. Not on my part, anyway.
+    input_files = [
+        '{}/nodes.{:>02d}-of-99.gz'.format(dirname_in, i)
+        for i in range(99)
+    ]
+    output_file = wordlist_filename('google-books', 'en', 'counts.txt')
+    add_dep(lines, 'convert_google_syntactic_ngrams', input_files, output_file)
     return lines
 
 
@@ -192,7 +213,7 @@ def combine_lists(languages):
         output_dBpack = wordlist_filename('combined', language, 'msgpack.gz')
         add_dep(lines, 'freqs2dB', output_file, output_dBpack,
                 extra='wordfreq_builder/word_counts.py')
-        
+
         lines.append('default {}'.format(output_dBpack))
     return lines
 

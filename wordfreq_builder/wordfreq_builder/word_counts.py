@@ -1,4 +1,4 @@
-from wordfreq_builder.tokenizers import tokenize
+from wordfreq import tokenize
 from collections import defaultdict
 from operator import itemgetter
 from ftfy import fix_text
@@ -9,6 +9,10 @@ import gzip
 
 
 def count_tokens(filename):
+    """
+    Count tokens that appear in a file, running each line through our
+    simple tokenizer.
+    """
     counts = defaultdict(int)
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
@@ -18,6 +22,9 @@ def count_tokens(filename):
 
 
 def read_freqs(filename, cutoff=0):
+    """
+    Read words and their frequencies from a CSV file.
+    """
     raw_counts = defaultdict(float)
     total = 0.
     with open(filename, encoding='utf-8', newline='') as infile:
@@ -39,6 +46,10 @@ def read_freqs(filename, cutoff=0):
 
 
 def freqs_to_dBpack(in_filename, out_filename, cutoff=-60):
+    """
+    Convert a dictionary of word frequencies to a file in the idiosyncratic
+    'dBpack' format.
+    """
     freq_cutoff = 10 ** (cutoff / 10.)
     freqs = read_freqs(in_filename, freq_cutoff)
     dBpack = []
@@ -58,6 +69,10 @@ def freqs_to_dBpack(in_filename, out_filename, cutoff=-60):
 
 
 def merge_freqs(freq_dicts):
+    """
+    Merge multiple dictionaries of frequencies, representing each word with
+    the word's average frequency over all sources.
+    """
     vocab = set()
     for freq_dict in freq_dicts:
         vocab |= set(freq_dict)

@@ -148,7 +148,7 @@ def twitter_deps(prefix_in, languages):
                 extra='wordfreq_builder/tokenizers.py')
 
         count_file = wordlist_filename('twitter', language, 'counts.txt')
-        add_dep(lines, 'count', token_file, count_file)
+        add_dep(lines, 'count', token_file, count_file, extra='wordfreq_builder/tokenizers.py')
 
     return lines
 

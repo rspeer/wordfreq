@@ -33,5 +33,6 @@ setup(
     classifiers = classifiers,
     long_description = "\n".join(doclines[2:]),
     packages=['wordfreq'],
+    include_package_data=True,
     install_requires=['ftfy >= 4', 'msgpack-python'],
 )

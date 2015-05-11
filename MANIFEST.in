@@ -1,0 +1,2 @@
+recursive-include wordfreq/data *.gz
+include README.md

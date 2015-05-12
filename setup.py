@@ -20,6 +20,9 @@ classifiers = [
 current_dir = os.path.dirname(__file__)
 README_contents = open(os.path.join(current_dir, 'README.txt')).read()
 doclines = README_contents.split("\n")
+dependencies = ['ftfy >= 4', 'msgpack-python', 'langcodes']
+if sys.version_info < (3, 4):
+    dependencies.append('pathlib')
 
 
 setup(
@@ -35,5 +38,5 @@ setup(
     long_description = "\n".join(doclines[2:]),
     packages=['wordfreq'],
     include_package_data=True,
-    install_requires=['ftfy >= 4', 'msgpack-python'],
+    install_requires=dependencies,
 )

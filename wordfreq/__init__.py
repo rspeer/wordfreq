@@ -75,7 +75,7 @@ def available_languages(wordlist='combined'):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_list(lang, wordlist='combined', match_cutoff=50):
+def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
     """
     Read the raw data from a wordlist file, returning it as a list of
     lists. (See `read_dBpack` for what this represents.)
@@ -91,13 +91,11 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=50):
     if score == 0:
         raise LookupError("No wordlist available for language %r" % lang)
 
-    # Convert the LanguageData object to a normalized language code
-    got = str(best)
-    if got != lang:
+    if best != lang:
         logger.warning(
             "You asked for word frequencies in language %r. Using the "
             "nearest match, which is %r (%s)."
-            % (lang, best.language_name('en'))
+            % (lang, best, langcodes.get(best).language_name('en'))
         )
 
     filepath = available[str(best)]
@@ -113,7 +111,7 @@ def dB_to_freq(dB):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_dict(lang, wordlist='combined', match_cutoff=50):
+def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
     """
     Get a word frequency list as a dictionary, mapping tokens to
     frequencies as floating-point probabilities.
@@ -190,7 +188,7 @@ def top_n_list(lang, n, wordlist='combined', ascii_only=False):
     return results
 
 
-def random_words(nwords=4, lang='en', wordlist='combined', bits_per_word=12,
+def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
                  ascii_only=False):
     n_choices = 2 ** bits_per_word
     choices = top_n_list(lang, n_choices, wordlist, ascii_only=ascii_only)
@@ -203,6 +201,6 @@ def random_words(nwords=4, lang='en', wordlist='combined', bits_per_word=12,
     return ' '.join(selected)
 
 
-def random_ascii_words(nwords=4, lang='en', wordlist='combined',
+def random_ascii_words(lang='en', wordlist='combined', nwords=4,
                        bits_per_word=12):
-    return random_words(nwords, lang, wordlist, bits_per_word, ascii_only=True)
+    return random_words(lang, wordlist, nwords, bits_per_word, ascii_only=True)

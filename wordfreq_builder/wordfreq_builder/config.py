@@ -1,7 +1,7 @@
 import os
 
 CONFIG = {
-    'version': '0.9.0',
+    'version': '1.0b',
     # data_dir is a relative or absolute path to where the wordlist data
     # is stored
     'data_dir': 'data',
@@ -71,6 +71,4 @@ def all_languages():
     for langlist in CONFIG['sources'].values():
         languages |= set(langlist)
     return [lang for lang in sorted(languages)
-            if len(source_names(lang))
-            >= CONFIG['min_sources']]
-
+            if len(source_names(lang)) >= CONFIG['min_sources']]

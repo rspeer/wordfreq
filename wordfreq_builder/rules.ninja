@@ -44,11 +44,24 @@ rule wiki2tokens
 # To tokenize Japanese, we run it through Mecab and take the first column.
 # We don't have a plan for tokenizing Chinese yet.
 rule tokenize_japanese
-  command = mkdir -p $$(dirname $out) && mecab < $in | cut -f 1 | grep -v "EOS"
+  command = mkdir -p $$(dirname $out) && mecab -b 1048576 < $in | cut -f 1 | grep -v "EOS" > $out
 
+# Tokenizing text from Twitter generally requires us to use a more powerful
+# tokenizer than the language-agnostic one.
+#
+# Our usual build process does not use this step. It just assumes it's already
+# done, because it takes a very long time. This is what the 'data/intermediate'
+# directory contains.
 rule tokenize_twitter
   command = mkdir -p $$(dirname $prefix) && python -m wordfreq_builder.cli.pretokenize_twitter $in $prefix
 
+# Convert the output of tokenize_twitter into the form used by wiki2tokens,
+# by inserting line breaks between tokens, and removing things that appear
+# to be URLs or usernames.
+#
+# I could have output it this way in the first place, but the fact is that I
+# didn't. Writing this rule to fix it was easier than re-doing three days of
+# computation.
 rule format_twitter
   command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.format_twitter $in $out
 

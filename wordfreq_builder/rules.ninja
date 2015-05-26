@@ -31,9 +31,18 @@ rule split
 rule wiki2text
   command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text > $out
 
+# The wiki2tokens rule is the same as the wiki2text rule, but uses the -t
+# flag to tell the Nim code to output one token per line (according to its
+# language-agnostic tokenizer, which splits on punctuation and whitespace in
+# basically the same way as wordfreq).
+#
+# The fact that this uses a language-agnostic tokenizer means it should not
+# be applied to Chinese or Japanese.
 rule wiki2tokens
   command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text -t > $out
 
+# To tokenize Japanese, we run it through Mecab and take the first column.
+# We don't have a plan for tokenizing Chinese yet.
 rule tokenize_japanese
   command = mkdir -p $$(dirname $out) && mecab < $in | cut -f 1 | grep -v "EOS"
 
@@ -47,8 +56,11 @@ rule format_twitter
 # an integer and a decimal. The integer is the rank, which we discard. The
 # decimal is the frequency, and the remaining text is the term. Use sed -n
 # with /p to output only lines where the match was successful.
+#
+# Grep out the term "EOS", an indication that Leeds used MeCab and didn't
+# strip out the EOS lines.
 rule convert_leeds
-  command = mkdir -p $$(dirname $out) && sed -rn 's/([0-9]+) ([0-9.]+) (.*)/\3,\2/p' < $in > $out
+  command = mkdir -p $$(dirname $out) && sed -rn 's/([0-9]+) ([0-9.]+) (.*)/\3,\2/p' < $in | grep -v 'EOS,' > $out
 
 # To convert the OpenSubtitles frequency data, simply replace spaces with
 # commas.

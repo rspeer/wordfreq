@@ -106,8 +106,13 @@ def wikipedia_deps(dirname_in, languages):
         count_file = wordlist_filename('wikipedia', language, 'counts.txt')
 
         add_dep(lines, 'wiki2text', input_file, raw_file)
-        add_dep(lines, 'wiki2tokens', input_file, token_file)
-        add_dep(lines, 'count', token_file, count_file)
+        if language == 'ja':
+            add_dep(lines, 'tokenize_japanese', raw_file, token_file)
+            add_dep(lines, 'count', token_file, count_file)
+        else:
+            add_dep(lines, 'wiki2tokens', input_file, token_file)
+            add_dep(lines, 'count', token_file, count_file)
+
     return lines
 
 

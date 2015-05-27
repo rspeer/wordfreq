@@ -1,4 +1,4 @@
-from wordfreq import tokenize
+from wordfreq import simple_tokenize
 from collections import defaultdict
 from operator import itemgetter
 from ftfy import fix_text
@@ -16,7 +16,7 @@ def count_tokens(filename):
     counts = defaultdict(int)
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
-            for token in tokenize(line.strip()):
+            for token in simple_tokenize(line.strip()):
                 counts[token] += 1
     return counts
 
@@ -33,7 +33,7 @@ def read_freqs(filename, cutoff=0):
             val = float(strval)
             if val < cutoff:
                 break
-            for token in tokenize(key):
+            for token in simple_tokenize(key):
                 token = fix_text(token)
                 total += val
                 # Use += so that, if we give the reader concatenated files with

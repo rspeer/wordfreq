@@ -48,7 +48,7 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
     # The first dependency is to make sure the build file is up to date.
     add_dep(lines, 'build_deps', 'rules.ninja', 'build.ninja',
             extra='wordfreq_builder/ninja.py')
-    
+
     if PRETOKENIZE_TWITTER:
         lines.extend(
             twitter_preprocess_deps(
@@ -101,16 +101,15 @@ def wikipedia_deps(dirname_in, languages):
         input_file = max(path_in.glob(
             '{}wiki*.bz2'.format(language)
         ))
-        raw_file = wordlist_filename('wikipedia', language, 'txt')
         token_file = wordlist_filename('wikipedia', language, 'tokens.txt')
         count_file = wordlist_filename('wikipedia', language, 'counts.txt')
 
-        add_dep(lines, 'wiki2text', input_file, raw_file)
+        add_dep(lines, 'wiki2tokens', input_file, token_file)
         if language == 'ja':
-            add_dep(lines, 'tokenize_japanese', raw_file, token_file)
-            add_dep(lines, 'count', token_file, count_file)
+            mecab_token_file = wordlist_filename('wikipedia', language, 'mecab-tokens.txt')
+            add_dep(lines, 'tokenize_japanese', token_file, mecab_token_file)
+            add_dep(lines, 'count', mecab_token_file, count_file)
         else:
-            add_dep(lines, 'wiki2tokens', input_file, token_file)
             add_dep(lines, 'count', token_file, count_file)
 
     return lines
@@ -174,7 +173,12 @@ def twitter_deps(prefix_in, languages):
                 extra='wordfreq_builder/tokenizers.py')
 
         count_file = wordlist_filename('twitter', language, 'counts.txt')
-        add_dep(lines, 'count', token_file, count_file, extra='wordfreq_builder/tokenizers.py')
+        if language == 'ja':
+            mecab_token_file = wordlist_filename('twitter', language, 'mecab-tokens.txt')
+            add_dep(lines, 'tokenize_japanese', token_file, mecab_token_file)
+            add_dep(lines, 'count', mecab_token_file, count_file, extra='wordfreq_builder/tokenizers.py')
+        else:
+            add_dep(lines, 'count', token_file, count_file, extra='wordfreq_builder/tokenizers.py')
 
     return lines
 

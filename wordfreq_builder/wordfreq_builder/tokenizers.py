@@ -1,6 +1,6 @@
 from lumi_science.text_readers.rosette_readers import RosetteReader
 from html.entities import name2codepoint
-from wordfreq import tokenize, TOKEN_RE
+from wordfreq import TOKEN_RE
 import re
 
 

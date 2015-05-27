@@ -18,13 +18,39 @@ DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 CACHE_SIZE = 100000
 
 
-def tokenize(text):
+def simple_tokenize(text):
     """
-    A simple tokenizer that can be applied to most languages. Strings that
-    are looked up in wordfreq will be run through this tokenizer first,
-    so that they can be expected to match the data.
+    A simple tokenizer that can be applied to most languages.
+
+    It considers a word to be made of a sequence of 'token characters', an
+    overly inclusive range that includes letters, Han characters, emoji, and a
+    bunch of miscellaneous whatnot, but excludes most punctuation and
+    whitespace.
+
+    The single complication for the sake of English is that apostrophes are not
+    considered part of the token if they appear on the edge of the character
+    sequence, but they are if they appear internally. "cats'" is not a token,
+    but "cat's" is.
     """
     return [token.lower() for token in TOKEN_RE.findall(text)]
+
+
+def tokenize(text, lang):
+    """
+    Tokenize this text in a way that's straightforward but appropriate for
+    the language.
+
+    So far, this means that Japanese is handled by mecab_tokenize, and
+    everything else is handled by simple_tokenize.
+
+    Strings that are looked up in wordfreq will be run through this function
+    first, so that they can be expected to match the data.
+    """
+    if lang == 'ja':
+        from wordfreq.mecab import mecab_tokenize
+        return mecab_tokenize(text)
+    else:
+        return simple_tokenize(text)
 
 
 def read_dBpack(filename):
@@ -163,7 +189,7 @@ def word_frequency(word, lang, wordlist='combined', default=0.):
     """
     freqs = get_frequency_dict(lang, wordlist)
     combined_value = None
-    for token in tokenize(word):
+    for token in tokenize(word, lang):
         if token not in freqs:
             # If any word is missing, just return the default value
             return default

@@ -3,6 +3,11 @@ from setuptools import setup
 import sys
 import os
 
+if sys.version_info[0] < 3:
+    print("Sorry, but wordfreq no longer supports Python 2.")
+    sys.exit(1)
+
+
 classifiers = [
     'Intended Audience :: Developers',
     'Intended Audience :: Science/Research',

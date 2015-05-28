@@ -164,6 +164,17 @@ def iter_wordlist(lang, wordlist='combined'):
             yield word
 
 
+def half_harmonic_mean(a, b):
+    """
+    An associative, commutative, monotonic function that returns a value
+    less than or equal to both a and b.
+
+    Used for estimating the frequency of terms made of multiple tokens, given
+    the assumption that the tokens very frequently appear together.
+    """
+    return (a * b) / (a + b)
+
+
 @lru_cache(maxsize=CACHE_SIZE)
 def word_frequency(word, lang, wordlist='combined', default=0.):
     """
@@ -199,7 +210,7 @@ def word_frequency(word, lang, wordlist='combined', default=0.):
         else:
             # Combine word values using the half-harmonic-mean formula,
             # (a * b) / (a + b). This operation is associative.
-            combined_value = (combined_value * value) / (combined_value + value)
+            combined_value = half_harmonic_mean(combined_value, value)
     return combined_value
 
 

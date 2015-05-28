@@ -2,6 +2,25 @@ Tools for working with word frequencies from various corpora.
 
 Author: Rob Speer
 
+## Installation
+
+wordfreq requires Python 3 and depends on a few other Python modules
+(msgpack-python, langcodes, and ftfy). You can install it and its dependencies
+in the usual way, either by getting it from pip:
+
+    pip3 install wordfreq
+
+or by getting the repository and running its setup.py:
+
+    python3 setup.py install
+
+To handle word frequency lookups in Japanese, you need to additionally install
+mecab-python3, which itself depends on libmecab-dev. These commands will
+install them on Ubuntu:
+
+    sudo apt-get install mecab-ipadic-utf8 libmecab-dev
+    pip3 install mecab-python3
+
 ## License
 
 `wordfreq` is freely redistributable under the MIT license (see
@@ -33,3 +52,4 @@ Some additional data was collected by a custom application that watches the
 streaming Twitter API, in accordance with Twitter's Developer Agreement &
 Policy. This software only gives statistics about words that are very commonly
 used on Twitter; it does not display or republish any Twitter content.
+

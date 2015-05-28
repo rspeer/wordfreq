@@ -19,7 +19,7 @@ classifiers = [
 ]
 
 current_dir = os.path.dirname(__file__)
-README_contents = open(os.path.join(current_dir, 'README.txt')).read()
+README_contents = open(os.path.join(current_dir, 'README.md')).read()
 doclines = README_contents.split("\n")
 dependencies = ['ftfy >= 4', 'msgpack-python', 'langcodes']
 if sys.version_info < (3, 4):
@@ -28,7 +28,7 @@ if sys.version_info < (3, 4):
 
 setup(
     name="wordfreq",
-    version='1.0b1',
+    version='1.0b2',
     maintainer='Luminoso Technologies, Inc.',
     maintainer_email='info@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',

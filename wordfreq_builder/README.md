@@ -15,32 +15,32 @@ out with Tools.
 
 - Copy the input data:
 
-    cp -rv /nfs/broadway/data/wordfreq_builder /ext/data/
+      cp -rv /nfs/broadway/data/wordfreq_builder /ext/data/
 
 - Make a symbolic link so that `data/` in this directory points to
   your copy of the input data:
 
-    ln -s /ext/data/wordfreq_builder data
+      ln -s /ext/data/wordfreq_builder data
 
 - Install the Ninja build system:
 
-    sudo apt-get install ninja-build
+      sudo apt-get install ninja-build
 
 - We need to build a Ninja build file using the Python code in
   `wordfreq_builder/ninja.py`. We could do this with Ninja, but... you see the
   chicken-and-egg problem, don't you. So this is the one thing the Makefile
   knows how to do.
 
-    make
+      make
 
 - Start the build, and find something else to do for a few hours:
 
-    ninja -v
+      ninja -v
 
 - You can copy the results into wordfreq with this command (supposing that
   $WORDFREQ points to your wordfreq repo):
 
-    cp data/generated/combined/*.msgpack.gz $WORDFREQ/wordfreq/data/
+      cp data/generated/combined/*.msgpack.gz $WORDFREQ/wordfreq/data/
 
 
 ## The dBpack data format

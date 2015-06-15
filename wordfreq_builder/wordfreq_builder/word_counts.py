@@ -92,6 +92,10 @@ def write_wordlist(freqs, filename, cutoff=1e-8):
     """
     Write a dictionary of either raw counts or frequencies to a file of
     comma-separated values.
+
+    Keep the CSV format simple by explicitly skipping words containing
+    commas or quotation marks. We don't believe we want those in our tokens
+    anyway.
     """
     with open(filename, 'w', encoding='utf-8', newline='\n') as outfile:
         writer = csv.writer(outfile)

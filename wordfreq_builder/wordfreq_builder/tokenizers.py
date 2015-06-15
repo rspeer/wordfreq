@@ -21,6 +21,24 @@ EMOTICON_RANGE = '\u2600-\u26ff\U0001F000-\U0001F7FF'
 ROSETTE_RETOKENIZE_RE = re.compile('[{0}#@/]|[^{0}#@/ ]+'.format(EMOTICON_RANGE))
 
 
+def rosette_surface_tokenizer(text):
+    """
+    Use Rosette to both detect the language of the given text and split it
+    into tokens.
+    """
+    try:
+        analysis, lang = ROSETTE.rosette.analyze(text)
+    except (RuntimeError, UnicodeError):
+        # Our Rosette interface throws errors given arbitrary data. :(
+        return text, None
+    language = ROSETTE_LANG_MAP.get(lang, lang)
+    tokens = []
+    for (stem, pos, span) in analysis:
+        surface_text = text[span[0]:span[1]]
+        tokens.append(surface_text)
+    return tokens, language
+
+
 def last_tab(line):
     """
     Read lines by keeping only the last tab-separated value.
@@ -29,6 +47,10 @@ def last_tab(line):
 
 
 def lowercase_text_filter(token):
+    """
+    If this looks like a token that we want to count, return it, lowercased.
+    If not, filter it out by returning None.
+    """
     if TOKEN_RE.search(token):
         return token.lower()
     else:
@@ -78,6 +100,11 @@ def fix_entities(text):
 
 
 def retokenize_rosette(text):
+    """
+    Given text that has had spaces inserted between tokens by Rosette,
+    apply some transformations that help us avoid counting the frequency
+    of UNLs and usernames.
+    """
     text = fix_entities(text)
     tokens = ROSETTE_RETOKENIZE_RE.findall(text)
     skip_next = False
@@ -95,30 +122,14 @@ def retokenize_rosette(text):
                     yield filtered
 
 
-def retokenize_file(in_filename, out_filename):
-    """
-    Process a file that has been tokenized (by inserting spaces) in a
-    language-specific way by Rosette.
-    """
-    with open(in_filename, encoding='utf-8') as in_file:
-        with open(out_filename, 'w', encoding='utf-8') as out_file:
-            for line in in_file:
-                skip_next = False
-                for token in retokenize_rosette(line.strip()):
-                    if skip_next:
-                        skip_next = False
-                    elif token == '/' or token == '@':
-                        # Avoid idiosyncratic tokens such as URLs and
-                        # usernames
-                        skip_next = True
-                    elif lowercase_text_filter(token):
-                        print(token, file=out_file)
-
-
 def monolingual_tokenize_file(in_filename, out_filename, language,
                               tokenizer, line_reader=last_tab,
                               token_filter=lowercase_text_filter,
                               sample_proportion=100):
+    """
+    Apply a tokenizer that can distinguish different languages, but only
+    keep the lines that are in the language we're asking for.
+    """
     with open(in_filename, encoding='utf-8', errors='replace') as in_file:
         with open(out_filename, 'w', encoding='utf-8') as out_file:
             for i, line in enumerate(in_file):
@@ -128,17 +139,3 @@ def monolingual_tokenize_file(in_filename, out_filename, language,
                     if line_language == language:
                         for token in tokens:
                             print(token, file=out_file)
-
-
-def rosette_surface_tokenizer(text):
-    try:
-        analysis, lang = ROSETTE.rosette.analyze(text)
-    except (RuntimeError, UnicodeError):
-        # Our Rosette interface throws errors given arbitrary data. :(
-        return text, None
-    language = ROSETTE_LANG_MAP.get(lang, lang)
-    tokens = []
-    for (stem, pos, span) in analysis:
-        surface_text = text[span[0]:span[1]]
-        tokens.append(surface_text)
-    return tokens, language

@@ -31,8 +31,8 @@ def test_tokenizer_3():
     eq_(result[0], 'en')
 
 def test_tokenizer_4():
-    text = "This is a really boring example website http://example.com"
-    tokens = ['this', 'is', 'a', 'really', 'boring', 'example', 'website']
+    text = "This is a really boring example tco http://t.co/n15ASlkase"
+    tokens = ['this', 'is', 'a', 'really', 'boring', 'example', 'tco']
     result = cld2_surface_tokenizer(text)
     eq_(result[1], tokens)
     eq_(result[0], 'en')

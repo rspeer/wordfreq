@@ -14,7 +14,7 @@ CLD2_BAD_CHAR_RANGE = "".join([
 CLD2_BAD_CHARS_RE = re.compile(CLD2_BAD_CHAR_RANGE)
 
 TWITTER_HANDLE_RE = re.compile('@{0}+'.format(NON_PUNCT_RANGE))
-URL_RE = re.compile(r'(?:http\:|https\:|\\)(/|{0}|\.)*'.format(NON_PUNCT_RANGE))
+TCO_RE = re.compile('http://t.co/[a-zA-Z0-9]+'.format(NON_PUNCT_RANGE))
 
 
 def cld2_surface_tokenizer(text):
@@ -36,7 +36,7 @@ def cld2_detect_language(text):
 def remove_handles_and_urls(text):
     text = fix_entities(text)
     text = TWITTER_HANDLE_RE.sub('', text)
-    text = URL_RE.sub('', text)
+    text = TCO_RE.sub('', text)
     return text
 
 def last_tab(line):

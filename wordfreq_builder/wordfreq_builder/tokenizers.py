@@ -10,7 +10,7 @@ CLD2_BAD_CHAR_RANGE = "".join([
     '\x7f-\x9f',
     '\ud800-\udfff',
     '\ufdd0-\ufdef'] +
-    [chr(65534+65536*x+y) for x in range(16) for y in range(2)])
+    [chr(65534+65536*x+y) for x in range(17) for y in range(2)])
 CLD2_BAD_CHARS_RE = re.compile(CLD2_BAD_CHAR_RANGE)
 
 TWITTER_HANDLE_RE = re.compile('@{0}+'.format(NON_PUNCT_RANGE))

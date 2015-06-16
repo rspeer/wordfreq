@@ -54,7 +54,7 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
             twitter_deps(
                 data_filename('raw-input/twitter/all-2014.txt'),
                 slice_prefix=data_filename('slices/twitter/tweets-2014'),
-                combined_prefix=data_filename('intermediate/twitter/tweets-2014'),
+                combined_prefix=data_filename('generated/twitter/tweets-2014'),
                 slices=40,
                 languages=CONFIG['sources']['twitter']
             )

@@ -9,7 +9,7 @@ setup(
     platforms=["any"],
     description="Turns raw data into word frequency lists",
     packages=['wordfreq_builder'],
-    install_requires=['msgpack-python'],
+    install_requires=['msgpack-python', 'pycld2'],
     entry_points={
         'console_scripts': [
             'wordfreq-pretokenize-twitter = wordfreq_builder.cli.pretokenize_twitter:main',

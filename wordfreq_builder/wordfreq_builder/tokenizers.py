@@ -14,7 +14,7 @@ CLD2_BAD_CHAR_RANGE = "".join([
 CLD2_BAD_CHARS_RE = re.compile(CLD2_BAD_CHAR_RANGE)
 
 TWITTER_HANDLE_RE = re.compile('@{0}+'.format(NON_PUNCT_RANGE))
-TCO_RE = re.compile('http://t.co/[a-zA-Z0-9]+'.format(NON_PUNCT_RANGE))
+TCO_RE = re.compile('http(?:s)?://t.co/[a-zA-Z0-9]+'.format(NON_PUNCT_RANGE))
 
 
 def cld2_surface_tokenizer(text):
@@ -55,19 +55,17 @@ def lowercase_text_filter(token):
     else:
         return None
 
-def pretokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
+def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     """
     Process a file by running it through the given tokenizer, sorting the
-    results by the language of each line, and inserting spaces into lines
-    to mark the token boundaries. This computes the 'hard part' of
-    tokenization and allows the results to be saved, so that we can change
-    the finer details of the output without re-running everything.
+    results by the language of each line, and inserting newlines
+    to mark the token boundaries.
     """
     out_files = {}
     for line in open(in_filename, encoding='utf-8'):
         text = line_reader(line)
         tokens, language = tokenizer(text)
-        tokenized = ' '.join(tokens)
+        tokenized = '\n'.join(tokens)
         if language is not None:
             out_filename = '%s.%s.txt' % (out_prefix, language)
             if out_filename in out_files:

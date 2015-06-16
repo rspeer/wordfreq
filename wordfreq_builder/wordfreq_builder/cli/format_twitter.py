@@ -1,4 +1,3 @@
-from wordfreq_builder.tokenizers import retokenize_rosette
 import argparse
 
 
@@ -6,7 +5,7 @@ def retokenize_file(in_filename, out_filename):
     with open(in_filename, encoding='utf-8') as in_file:
         with open(out_filename, 'w', encoding='utf-8') as out_file:
             for line in in_file:
-                for token in retokenize_rosette(line.strip()):
+                for token in line.strip().split():
                     print(token, file=out_file)
 
 

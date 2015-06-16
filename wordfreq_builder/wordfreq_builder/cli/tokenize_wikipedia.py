@@ -1,4 +1,4 @@
-from wordfreq_builder.tokenizers import rosette_surface_tokenizer, monolingual_tokenize_file
+from wordfreq_builder.tokenizers import cld2_surface_tokenizer, monolingual_tokenize_file
 import argparse
 
 
@@ -6,7 +6,7 @@ def tokenize_wikipedia(in_filename, out_filename, language, proportion):
     monolingual_tokenize_file(
         in_filename, out_filename,
         language=language,
-        tokenizer=rosette_surface_tokenizer,
+        tokenizer=cld2_surface_tokenizer,
         line_reader=strip_headings,
         sample_proportion=proportion
     )

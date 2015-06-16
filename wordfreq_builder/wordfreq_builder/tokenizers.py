@@ -1,50 +1,49 @@
-from lumi_science.text_readers.rosette_readers import RosetteReader
 from html.entities import name2codepoint
-from wordfreq import TOKEN_RE
+from wordfreq import tokenize, TOKEN_RE, NON_PUNCT_RANGE
 import re
+import pycld2
+
+CLD2_BAD_CHAR_RANGE = "".join([
+    '\x00-\x08',
+    '\x0b',
+    '\x0e-\x1f',
+    '\x7f-\x9f',
+    '\ud800-\udfff',
+    '\ufdd0-\ufdef'] +
+    [chr(65534+65536*x+y) for x in range(16) for y in range(2)])
+CLD2_BAD_CHARS_RE = re.compile(CLD2_BAD_CHAR_RANGE)
+
+TWITTER_HANDLE_RE = re.compile('@{0}+'.format(NON_PUNCT_RANGE))
+URL_RE = re.compile(r'(?:http\:|https\:|\\)(/|{0}|\.)*'.format(NON_PUNCT_RANGE))
 
 
-ROSETTE = RosetteReader()
-
-
-# Some of Rosette's language codes are incorrect. For example, 'zh_sc' should
-# mean "Chinese as used in Seychelles", which is kind of nonsense. What Rosette
-# really means is "Simplified Chinese", whose code is 'zh-Hans'.
-ROSETTE_LANG_MAP = {
-    'zh_sc': 'zh-Hans',
-    'zh_tc': 'zh-Hant',
-    'en_uc': 'en',
-}
-
-
-EMOTICON_RANGE = '\u2600-\u26ff\U0001F000-\U0001F7FF'
-ROSETTE_RETOKENIZE_RE = re.compile('[{0}#@/]|[^{0}#@/ ]+'.format(EMOTICON_RANGE))
-
-
-def rosette_surface_tokenizer(text):
+def cld2_surface_tokenizer(text):
     """
-    Use Rosette to both detect the language of the given text and split it
-    into tokens.
+    Uses CLD2 to detect the language and wordfreq tokenizer to create tokens
     """
-    try:
-        analysis, lang = ROSETTE.rosette.analyze(text)
-    except (RuntimeError, UnicodeError):
-        # Our Rosette interface throws errors given arbitrary data. :(
-        return text, None
-    language = ROSETTE_LANG_MAP.get(lang, lang)
-    tokens = []
-    for (stem, pos, span) in analysis:
-        surface_text = text[span[0]:span[1]]
-        tokens.append(surface_text)
-    return tokens, language
+    text = remove_handles_and_urls(text)
+    lang = cld2_detect_language(text)
+    tokens = tokenize(text, lang)
+    return lang, tokens
 
+def cld2_detect_language(text):
+    """
+    Uses CLD2 to detect the language
+    """
+    text = CLD2_BAD_CHARS_RE.sub('', text)
+    return pycld2.detect(text)[2][0][1]
+
+def remove_handles_and_urls(text):
+    text = fix_entities(text)
+    text = TWITTER_HANDLE_RE.sub('', text)
+    text = URL_RE.sub('', text)
+    return text
 
 def last_tab(line):
     """
     Read lines by keeping only the last tab-separated value.
     """
     return line.split('\t')[-1].strip()
-
 
 def lowercase_text_filter(token):
     """
@@ -55,11 +54,6 @@ def lowercase_text_filter(token):
         return token.lower()
     else:
         return None
-
-
-def is_url(token):
-    return token.startswith('http:') or token.startswith('https:')
-
 
 def pretokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     """
@@ -85,9 +79,7 @@ def pretokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     for out_file in out_files.values():
         out_file.close()
 
-
 ENTITY_RE = re.compile(r'& ?(amp|quot|lt|gt) ?;')
-
 
 def fix_entities(text):
     """
@@ -97,30 +89,6 @@ def fix_entities(text):
     def replace_entity(match):
         return chr(name2codepoint[match.group(1)])
     return ENTITY_RE.sub(replace_entity, text)
-
-
-def retokenize_rosette(text):
-    """
-    Given text that has had spaces inserted between tokens by Rosette,
-    apply some transformations that help us avoid counting the frequency
-    of UNLs and usernames.
-    """
-    text = fix_entities(text)
-    tokens = ROSETTE_RETOKENIZE_RE.findall(text)
-    skip_next = False
-    for token in tokens:
-        if token == '/' or token == '@':
-            # Avoid idiosyncratic tokens such as URLs and
-            # usernames
-            skip_next = True
-        elif skip_next:
-            skip_next = False
-        else:
-            if not is_url(token):
-                filtered = lowercase_text_filter(token)
-                if filtered:
-                    yield filtered
-
 
 def monolingual_tokenize_file(in_filename, out_filename, language,
                               tokenizer, line_reader=last_tab,

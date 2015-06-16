@@ -1,10 +1,10 @@
-from wordfreq_builder.tokenizers import rosette_surface_tokenizer, pretokenize_file
+from wordfreq_builder.tokenizers import cld2_surface_tokenizer, pretokenize_file
 import argparse
 
 
 def pretokenize_twitter(in_filename, out_prefix):
     pretokenize_file(in_filename, out_prefix,
-                     tokenizer=rosette_surface_tokenizer)
+                     tokenizer=cld2_surface_tokenizer)
 
 
 def main():

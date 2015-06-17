@@ -128,10 +128,14 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
 
 def dB_to_freq(dB):
     """
-    Decibels are a logarithmic scale of frequency. 0dB represents a frequency
-    of 1 (it happens every time). -10dB represents a frequency of 1/10, or
-    1 in every 10. -20dB represents a frequency of 1/100. In general x dB
-    represents a frequency of 10 ** (x/10)
+    Convert a word frequency from the logarithmic decibel scale that we use
+    internally, to a proportion from 0 to 1.
+
+    On this scale, 0 dB represents the maximum possible frequency of
+    1.0. -10 dB represents a word that happens 1 in 10 times,
+    -20 dB represents something that happens 1 in 100 times, and so on.
+
+    In general, x dB represents a frequency of 10 ** (x/10).
     """
     if dB > 0:
         raise ValueError(
@@ -233,11 +237,15 @@ def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
     """
     Returns a string of random, space separated words.
 
-    These words are are of the given language and from the given wordlist.
-    There are a total of nwords words in the string.
-    bits_per_word is an estimate of the entropy provided by each word.
+    These words are of the given language and from the given wordlist.
+    There will be `nwords` words in the string.
+
+    `bits_per_word` determines the amount of entropy provided by each word;
+    when it's higher, this function will choose from a larger list of
+    words, some of which are more rare.
+
     You can restrict the selection of words to those written in ASCII
-    characters by setting ascii_only to True.
+    characters by setting `ascii_only` to True.
     """
     n_choices = 2 ** bits_per_word
     choices = top_n_list(lang, n_choices, wordlist, ascii_only=ascii_only)
@@ -253,10 +261,13 @@ def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
 def random_ascii_words(lang='en', wordlist='combined', nwords=4,
                        bits_per_word=12):
     """
-    Returns a string of random, space separated, ascii words.
+    Returns a string of random, space separated, ASCII words.
 
-    These words are are of the given language and from the given wordlist.
-    There are a total of nwords words in the string.
-    bits_per_word is an estimate of the entropy provided by each word.
+    These words are of the given language and from the given wordlist.
+    There will be `nwords` words in the string.
+
+    `bits_per_word` determines the amount of entropy provided by each word;
+    when it's higher, this function will choose from a larger list of
+    words, some of which are more rare.
     """
     return random_words(lang, wordlist, nwords, bits_per_word, ascii_only=True)

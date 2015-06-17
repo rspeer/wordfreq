@@ -128,6 +128,10 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
 
 
 def dB_to_freq(dB):
+    """
+    Converts decibels to freequency.
+    If the decibels is positive, throws a ValueError
+    """
     if dB > 0:
         raise ValueError(
             "A frequency cannot be a positive number of decibels."

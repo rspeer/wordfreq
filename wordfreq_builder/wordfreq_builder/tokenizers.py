@@ -66,7 +66,7 @@ def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
         for line in in_file:
             text = line_reader(line)
             tokens, language = tokenizer(text)
-            if language is not None:
+            if language == 'un':
                 tokenized = '\n'.join(tokens)
                 out_filename = '%s.%s.txt' % (out_prefix, language)
                 if out_filename in out_files:

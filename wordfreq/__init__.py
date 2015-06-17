@@ -95,7 +95,7 @@ def available_languages(wordlist='combined'):
         list_name = path.name.split('.')[0]
         name, lang = list_name.split('_')
         if name == wordlist:
-            available[lang] = path
+            available[lang] = str(path)
     return available
 
 
@@ -122,9 +122,8 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
             "nearest match, which is %r (%s)."
             % (lang, best, langcodes.get(best).language_name('en'))
         )
-
-    filepath = available[str(best)]
-    return read_dBpack(str(filepath))
+        
+    return read_dBpack(available[best])
 
 
 def dB_to_freq(dB):

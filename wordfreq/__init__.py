@@ -163,8 +163,7 @@ def iter_wordlist(lang, wordlist='combined'):
     each band.
     """
     for sublist in get_frequency_list(lang, wordlist):
-        for word in sublist:
-            yield word
+        yield from sublist
 
 
 def half_harmonic_mean(a, b):

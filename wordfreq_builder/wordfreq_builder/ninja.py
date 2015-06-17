@@ -11,7 +11,7 @@ TMPDIR = data_filename('tmp')
 
 
 # Set this to True to rebuild the Twitter tokenization (which takes days)
-PRETOKENIZE_TWITTER = False
+TOKENIZE_TWITTER = True
 
 
 def add_dep(lines, rule, input, output, extra=None, params=None):
@@ -31,7 +31,7 @@ def add_dep(lines, rule, input, output, extra=None, params=None):
     lines.append(build_rule)
     if params:
         for key, val in params.items():
-            lines.append("  {key} = {val}".format(locals()))
+            lines.append("  {key} = {val}".format(key=key, val=val))
     lines.append("")
 
 
@@ -49,22 +49,16 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
     add_dep(lines, 'build_deps', 'rules.ninja', 'build.ninja',
             extra='wordfreq_builder/ninja.py')
 
-    if PRETOKENIZE_TWITTER:
+    if TOKENIZE_TWITTER:
         lines.extend(
-            twitter_preprocess_deps(
+            twitter_deps(
                 data_filename('raw-input/twitter/all-2014.txt'),
                 slice_prefix=data_filename('slices/twitter/tweets-2014'),
-                combined_prefix=data_filename('intermediate/twitter/tweets-2014'),
+                combined_prefix=data_filename('generated/twitter/tweets-2014'),
                 slices=40,
                 languages=CONFIG['sources']['twitter']
             )
         )
-    lines.extend(
-        twitter_deps(
-            data_filename('intermediate/twitter/tweets-2014'),
-            languages=CONFIG['sources']['twitter']
-        )
-    )
     lines.extend(
         wikipedia_deps(
             data_filename('raw-input/wikipedia'),
@@ -98,6 +92,7 @@ def wikipedia_deps(dirname_in, languages):
     path_in = pathlib.Path(dirname_in)
     for language in languages:
         # Find the most recent file for this language
+        # Skip over files that do not exist
         input_file = max(path_in.glob(
             '{}wiki*.bz2'.format(language)
         ))
@@ -131,7 +126,7 @@ def google_books_deps(dirname_in):
     return lines
 
 
-def twitter_preprocess_deps(input_filename, slice_prefix,
+def twitter_deps(input_filename, slice_prefix,
                             combined_prefix, slices, languages):
     lines = []
 
@@ -140,7 +135,7 @@ def twitter_preprocess_deps(input_filename, slice_prefix,
     # split the input into slices
     add_dep(lines,
             'split', input_filename, slice_files,
-            {'prefix': '{}.part'.format(slice_prefix),
+            params={'prefix': '{}.part'.format(slice_prefix),
              'slices': slices})
 
     for slicenum in range(slices):
@@ -150,35 +145,26 @@ def twitter_preprocess_deps(input_filename, slice_prefix,
             for language in languages
         ]
         add_dep(lines, 'tokenize_twitter', slice_file, language_outputs,
-                {'prefix': slice_file})
+                params={'prefix': slice_file})
 
     for language in languages:
-        combined_output = '{prefix}.{lang}.txt'.format(prefix=combined_prefix, lang=language)
+        combined_output = wordlist_filename('twitter', language, 'tokens.txt')
 
         language_inputs = [
             '{prefix}.{lang}.txt'.format(prefix=slice_files[slicenum], lang=language)
             for slicenum in range(slices)
         ]
+
         add_dep(lines, 'cat', language_inputs, combined_output)
-    return lines
-
-
-def twitter_deps(prefix_in, languages):
-    lines = []
-    for language in languages:
-        input_file = '{prefix}.{lang}.txt'.format(prefix=prefix_in, lang=language)
-        token_file = wordlist_filename('twitter', language, 'tokens.txt')
-        add_dep(lines,
-                'format_twitter', input_file, token_file,
-                extra='wordfreq_builder/tokenizers.py')
 
         count_file = wordlist_filename('twitter', language, 'counts.txt')
+
         if language == 'ja':
             mecab_token_file = wordlist_filename('twitter', language, 'mecab-tokens.txt')
-            add_dep(lines, 'tokenize_japanese', token_file, mecab_token_file)
+            add_dep(lines, 'tokenize_japanese', combined_output, mecab_token_file)
             add_dep(lines, 'count', mecab_token_file, count_file, extra='wordfreq_builder/tokenizers.py')
         else:
-            add_dep(lines, 'count', token_file, count_file, extra='wordfreq_builder/tokenizers.py')
+            add_dep(lines, 'count', combined_output, count_file, extra='wordfreq_builder/tokenizers.py')
 
     return lines
 

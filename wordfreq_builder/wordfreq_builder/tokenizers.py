@@ -62,18 +62,19 @@ def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     to mark the token boundaries.
     """
     out_files = {}
-    for line in open(in_filename, encoding='utf-8'):
-        text = line_reader(line)
-        tokens, language = tokenizer(text)
-        tokenized = '\n'.join(tokens)
-        if language is not None:
-            out_filename = '%s.%s.txt' % (out_prefix, language)
-            if out_filename in out_files:
-                out_file = out_files[out_filename]
-            else:
-                out_file = open(out_filename, 'w', encoding='utf-8')
-                out_files[out_filename] = out_file
-            print(tokenized, file=out_file)
+    with open(in_filename, encoding='utf-8') as in_file:
+        for line in in_file:
+            text = line_reader(line)
+            tokens, language = tokenizer(text)
+            tokenized = '\n'.join(tokens)
+            if language is not None:
+                out_filename = '%s.%s.txt' % (out_prefix, language)
+                if out_filename in out_files:
+                    out_file = out_files[out_filename]
+                else:
+                    out_file = open(out_filename, 'w', encoding='utf-8')
+                    out_files[out_filename] = out_file
+                print(tokenized, file=out_file)
     for out_file in out_files.values():
         out_file.close()
 

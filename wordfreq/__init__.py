@@ -128,8 +128,10 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
 
 def dB_to_freq(dB):
     """
-    Converts decibels to freequency.
-    If the decibels is positive, throws a ValueError
+    Decibels are a logarithmic scale of frequency. 0dB represents a frequency
+    of 1 (it happens every time). -10dB represents a frequency of 1/10, or
+    1 in every 10. -20dB represents a frequency of 1/100. In general x dB
+    represents a frequency of 10 ** (x/10)
     """
     if dB > 0:
         raise ValueError(

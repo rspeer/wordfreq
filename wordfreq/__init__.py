@@ -82,8 +82,7 @@ def read_dBpack(filename):
         [[], [], [], ['fish'], [], [], ['blue', 'red']]
     """
     with gzip.open(filename, 'rb') as infile:
-        got = msgpack.load(infile, encoding='utf-8')
-    return got
+        return msgpack.load(infile, encoding='utf-8')
 
 
 def available_languages(wordlist='combined'):

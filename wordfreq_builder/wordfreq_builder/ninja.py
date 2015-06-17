@@ -92,6 +92,7 @@ def wikipedia_deps(dirname_in, languages):
     path_in = pathlib.Path(dirname_in)
     for language in languages:
         # Find the most recent file for this language
+        # Skip over files that do not exist
         input_file = max(path_in.glob(
             '{}wiki*.bz2'.format(language)
         ))
@@ -147,13 +148,24 @@ def twitter_deps(input_filename, slice_prefix,
                 params={'prefix': slice_file})
 
     for language in languages:
-        combined_output = '{prefix}.{lang}.txt'.format(prefix=combined_prefix, lang=language)
+        combined_output = wordlist_filename('twitter', language, 'tokens.txt')
 
         language_inputs = [
             '{prefix}.{lang}.txt'.format(prefix=slice_files[slicenum], lang=language)
             for slicenum in range(slices)
         ]
+
         add_dep(lines, 'cat', language_inputs, combined_output)
+
+        count_file = wordlist_filename('twitter', language, 'counts.txt')
+
+        if language == 'ja':
+            mecab_token_file = wordlist_filename('twitter', language, 'mecab-tokens.txt')
+            add_dep(lines, 'tokenize_japanese', combined_output, mecab_token_file)
+            add_dep(lines, 'count', mecab_token_file, count_file, extra='wordfreq_builder/tokenizers.py')
+        else:
+            add_dep(lines, 'count', combined_output, count_file, extra='wordfreq_builder/tokenizers.py')
+
     return lines
 
 

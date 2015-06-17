@@ -82,8 +82,7 @@ def read_dBpack(filename):
         [[], [], [], ['fish'], [], [], ['blue', 'red']]
     """
     with gzip.open(filename, 'rb') as infile:
-        got = msgpack.load(infile, encoding='utf-8')
-    return got
+        return msgpack.load(infile, encoding='utf-8')
 
 
 def available_languages(wordlist='combined'):
@@ -96,7 +95,7 @@ def available_languages(wordlist='combined'):
         list_name = path.name.split('.')[0]
         name, lang = list_name.split('_')
         if name == wordlist:
-            available[lang] = path
+            available[lang] = str(path)
     return available
 
 
@@ -124,11 +123,16 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
             % (lang, best, langcodes.get(best).language_name('en'))
         )
 
-    filepath = available[str(best)]
-    return read_dBpack(str(filepath))
+    return read_dBpack(available[best])
 
 
 def dB_to_freq(dB):
+    """
+    Decibels are a logarithmic scale of frequency. 0dB represents a frequency
+    of 1 (it happens every time). -10dB represents a frequency of 1/10, or
+    1 in every 10. -20dB represents a frequency of 1/100. In general x dB
+    represents a frequency of 10 ** (x/10)
+    """
     if dB > 0:
         raise ValueError(
             "A frequency cannot be a positive number of decibels."
@@ -160,8 +164,7 @@ def iter_wordlist(lang, wordlist='combined'):
     each band.
     """
     for sublist in get_frequency_list(lang, wordlist):
-        for word in sublist:
-            yield word
+        yield from sublist
 
 
 def half_harmonic_mean(a, b):
@@ -227,6 +230,15 @@ def top_n_list(lang, n, wordlist='combined', ascii_only=False):
 
 def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
                  ascii_only=False):
+    """
+    Returns a string of random, space separated words.
+
+    These words are are of the given language and from the given wordlist.
+    There are a total of nwords words in the string.
+    bits_per_word is an estimate of the entropy provided by each word.
+    You can restrict the selection of words to those written in ASCII
+    characters by setting ascii_only to True.
+    """
     n_choices = 2 ** bits_per_word
     choices = top_n_list(lang, n_choices, wordlist, ascii_only=ascii_only)
     if len(choices) < n_choices:
@@ -240,4 +252,11 @@ def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
 
 def random_ascii_words(lang='en', wordlist='combined', nwords=4,
                        bits_per_word=12):
+    """
+    Returns a string of random, space separated, ascii words.
+
+    These words are are of the given language and from the given wordlist.
+    There are a total of nwords words in the string.
+    bits_per_word is an estimate of the entropy provided by each word.
+    """
     return random_words(lang, wordlist, nwords, bits_per_word, ascii_only=True)

@@ -122,7 +122,7 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
             "nearest match, which is %r (%s)."
             % (lang, best, langcodes.get(best).language_name('en'))
         )
-        
+
     return read_dBpack(available[best])
 
 
@@ -233,8 +233,9 @@ def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
 
     These words are are of the given language and from the given wordlist.
     There are a total of nwords words in the string.
-    bits_pre_words is an estimate of the entropy provided by each word.
-    If ascii_only, then the words are ascii only.
+    bits_per_word is an estimate of the entropy provided by each word.
+    You can restrict the selection of words to those written in ASCII
+    characters by setting ascii_only to True.
     """
     n_choices = 2 ** bits_per_word
     choices = top_n_list(lang, n_choices, wordlist, ascii_only=ascii_only)
@@ -254,7 +255,6 @@ def random_ascii_words(lang='en', wordlist='combined', nwords=4,
 
     These words are are of the given language and from the given wordlist.
     There are a total of nwords words in the string.
-    bits_pre_words is an estimate of the entropy provided by each word.
-    If ascii_only, then the words are ascii only.
+    bits_per_word is an estimate of the entropy provided by each word.
     """
     return random_words(lang, wordlist, nwords, bits_per_word, ascii_only=True)

@@ -26,7 +26,7 @@ def read_freqs(filename, cutoff=0):
     Read words and their frequencies from a CSV file.
 
     Only words with a frequency greater than `cutoff` are returned.
-    
+
     If `cutoff` is greater than 0, the csv file must be sorted by frequency
     in descending order.
     """
@@ -52,8 +52,11 @@ def read_freqs(filename, cutoff=0):
 
 def freqs_to_dBpack(in_filename, out_filename, cutoff=-60):
     """
-    Convert a dictionary of word frequencies to a file in the idiosyncratic
-    'dBpack' format.
+    Convert a csv file of words and their frequencies to a file in the
+    idiosyncratic 'dBpack' format.
+
+    Only words with a frequency greater than `cutoff` dB will be written to
+    the new file.
     """
     freq_cutoff = 10 ** (cutoff / 10.)
     freqs = read_freqs(in_filename, freq_cutoff)

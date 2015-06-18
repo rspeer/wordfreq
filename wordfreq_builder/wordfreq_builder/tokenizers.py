@@ -93,11 +93,16 @@ def fix_entities(text):
 
 def monolingual_tokenize_file(in_filename, out_filename, language,
                               tokenizer, line_reader=last_tab,
-                              token_filter=lowercase_text_filter,
-                              sample_proportion=100):
+                              sample_proportion=1):
     """
-    Apply a tokenizer that can distinguish different languages, but only
-    keep the lines that are in the language we're asking for.
+    Process a file by running it through the given tokenizer, only keeping
+    lines of the language we're asking for, and inserting newlines
+    to mark the token boundaries.
+
+    `line_reader` is applied to each line before it given to the tokenizer
+
+    Only the first line out of every `sample_proportion` lines are run through
+    then tokenizer.
     """
     with open(in_filename, encoding='utf-8', errors='replace') as in_file:
         with open(out_filename, 'w', encoding='utf-8') as out_file:

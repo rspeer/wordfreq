@@ -105,7 +105,7 @@ def test_not_really_random():
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
     eq_(random_ascii_words(nwords=4, lang='ja', bits_per_word=0),
-        'http http http http')
+        'rt rt rt rt')
 
 
 @raises(ValueError)

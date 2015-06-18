@@ -24,6 +24,11 @@ def count_tokens(filename):
 def read_freqs(filename, cutoff=0):
     """
     Read words and their frequencies from a CSV file.
+
+    Only words with a frequency greater than `cutoff` are returned.
+    
+    If `cutoff` is greater than 0, the csv file must be sorted by frequency
+    in descending order.
     """
     raw_counts = defaultdict(float)
     total = 0.

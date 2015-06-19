@@ -23,8 +23,8 @@ CONFIG = {
             # appears at least 5000 times
             'ar', 'bg', 'bs', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et',
             'fa', 'fi', 'fr', 'he', 'hr', 'hu', 'id', 'is', 'it', 'lt', 'lv',
-            'mk', 'ms', 'nb', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sq', 'sr',
-            'sv', 'tr', 'uk', 'zh'
+            'mk', 'ms', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq',
+            'sr', 'sv', 'tr', 'uk', 'zh'
         ],
         'leeds': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh'

@@ -4,13 +4,15 @@ import re
 import pycld2
 
 CLD2_BAD_CHAR_RANGE = "".join([
+    '[',
     '\x00-\x08',
     '\x0b',
     '\x0e-\x1f',
     '\x7f-\x9f',
     '\ud800-\udfff',
     '\ufdd0-\ufdef'] +
-    [chr(65534+65536*x+y) for x in range(17) for y in range(2)])
+    [chr(65534+65536*x+y) for x in range(17) for y in range(2)] +
+    [']'])
 CLD2_BAD_CHARS_RE = re.compile(CLD2_BAD_CHAR_RANGE)
 
 TWITTER_HANDLE_RE = re.compile('@{0}+'.format(NON_PUNCT_RANGE))
@@ -62,18 +64,19 @@ def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     to mark the token boundaries.
     """
     out_files = {}
-    for line in open(in_filename, encoding='utf-8'):
-        text = line_reader(line)
-        tokens, language = tokenizer(text)
-        tokenized = '\n'.join(tokens)
-        if language is not None:
-            out_filename = '%s.%s.txt' % (out_prefix, language)
-            if out_filename in out_files:
-                out_file = out_files[out_filename]
-            else:
-                out_file = open(out_filename, 'w', encoding='utf-8')
-                out_files[out_filename] = out_file
-            print(tokenized, file=out_file)
+    with open(in_filename, encoding='utf-8') as in_file:
+        for line in in_file:
+            text = line_reader(line)
+            language, tokens = tokenizer(text)
+            if language != 'un':
+                tokenized = '\n'.join(tokens)
+                out_filename = '%s.%s.txt' % (out_prefix, language)
+                if out_filename in out_files:
+                    out_file = out_files[out_filename]
+                else:
+                    out_file = open(out_filename, 'w', encoding='utf-8')
+                    out_files[out_filename] = out_file
+                print(tokenized, file=out_file)
     for out_file in out_files.values():
         out_file.close()
 
@@ -90,11 +93,16 @@ def fix_entities(text):
 
 def monolingual_tokenize_file(in_filename, out_filename, language,
                               tokenizer, line_reader=last_tab,
-                              token_filter=lowercase_text_filter,
-                              sample_proportion=100):
+                              sample_proportion=1):
     """
-    Apply a tokenizer that can distinguish different languages, but only
-    keep the lines that are in the language we're asking for.
+    Process a file by running it through the given tokenizer, only keeping
+    lines of the language we're asking for, and inserting newlines
+    to mark the token boundaries.
+
+    `line_reader` is applied to each line before it given to the tokenizer
+
+    Only the first line out of every `sample_proportion` lines are run through
+    then tokenizer.
     """
     with open(in_filename, encoding='utf-8', errors='replace') as in_file:
         with open(out_filename, 'w', encoding='utf-8') as out_file:

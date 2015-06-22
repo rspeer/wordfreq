@@ -205,11 +205,11 @@ def combine_lists(languages):
         add_dep(lines, 'merge', input_files, output_file,
                 extra='wordfreq_builder/word_counts.py')
 
-        output_dBpack = wordlist_filename('combined', language, 'msgpack.gz')
-        add_dep(lines, 'freqs2dB', output_file, output_dBpack,
+        output_cBpack = wordlist_filename('combined', language, 'msgpack.gz')
+        add_dep(lines, 'freqs2cB', output_file, output_cBpack,
                 extra='wordfreq_builder/word_counts.py')
 
-        lines.append('default {}'.format(output_dBpack))
+        lines.append('default {}'.format(output_cBpack))
     return lines
 
 

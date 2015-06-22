@@ -50,30 +50,33 @@ def read_freqs(filename, cutoff=0):
     return freqs
 
 
-def freqs_to_dBpack(in_filename, out_filename, cutoff=-60):
+def freqs_to_cBpack(in_filename, out_filename, cutoff=-600):
     """
     Convert a csv file of words and their frequencies to a file in the
-    idiosyncratic 'dBpack' format.
+    idiosyncratic 'cBpack' format.
 
-    Only words with a frequency greater than `cutoff` dB will be written to
-    the new file.
+    Only words with a frequency greater than `cutoff` centibels will be
+    written to the new file.
     """
-    freq_cutoff = 10 ** (cutoff / 10.)
+    freq_cutoff = 10 ** (cutoff / 100.)
     freqs = read_freqs(in_filename, freq_cutoff)
-    dBpack = []
+    cBpack = []
     for token, freq in freqs.items():
-        dB = round(math.log10(freq) * 10)
-        if dB >= cutoff:
-            neg_dB = -dB
-            while neg_dB >= len(dBpack):
-                dBpack.append([])
-            dBpack[neg_dB].append(token)
+        cB = round(math.log10(freq) * 100)
+        if cB >= cutoff:
+            neg_cB = -cB
+            while neg_cB >= len(cBpack):
+                cBpack.append([])
+            cBpack[neg_cB].append(token)
 
-    for sublist in dBpack:
+    for sublist in cBpack:
         sublist.sort()
 
+    # Write a "header" consisting of a dictionary at the start of the file
+    cBpack_data = [{'format': 'cB', 'version': 1}] + cBpack
+
     with gzip.open(out_filename, 'wb') as outfile:
-        msgpack.dump(dBpack, outfile)
+        msgpack.dump(cBpack_data, outfile)
 
 
 def merge_freqs(freq_dicts):

@@ -1,5 +1,5 @@
 from wordfreq import (
-    word_frequency, available_languages, dB_to_freq, iter_wordlist,
+    word_frequency, available_languages, cB_to_freq, iter_wordlist,
     top_n_list, random_words, random_ascii_words
 )
 from nose.tools import (
@@ -48,7 +48,7 @@ def test_most_common_words():
         return top_n_list(lang, 1)[0]
 
     eq_(get_most_common('ar'), 'في')
-    eq_(get_most_common('de'), 'der')
+    eq_(get_most_common('de'), 'die')
     eq_(get_most_common('en'), 'the')
     eq_(get_most_common('es'), 'de')
     eq_(get_most_common('fr'), 'de')
@@ -70,15 +70,15 @@ def test_language_matching():
     eq_(word_frequency('的', 'cmn'), freq)
 
 
-def test_dB_conversion():
-    eq_(dB_to_freq(0), 1.)
-    assert_almost_equal(dB_to_freq(-10), 0.1)
-    assert_almost_equal(dB_to_freq(-60), 1e-6)
+def test_cB_conversion():
+    eq_(cB_to_freq(0), 1.)
+    assert_almost_equal(cB_to_freq(-100), 0.1)
+    assert_almost_equal(cB_to_freq(-600), 1e-6)
 
 
 @raises(ValueError)
-def test_failed_dB_conversion():
-    dB_to_freq(1)
+def test_failed_cB_conversion():
+    cB_to_freq(1)
 
 
 def test_tokenization():

@@ -87,8 +87,8 @@ rule count
 rule merge
   command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.combine_lists -o $out $in
 
-rule freqs2dB
-  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.freqs_to_dB $in $out
+rule freqs2cB
+  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.freqs_to_cB $in $out
 
 rule cat
   command = cat $in > $out

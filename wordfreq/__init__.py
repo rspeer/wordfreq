@@ -53,36 +53,56 @@ def tokenize(text, lang):
         return simple_tokenize(text)
 
 
-def read_dBpack(filename):
+def read_cBpack(filename):
     """
     Read a file from an idiosyncratic format that we use for storing
-    approximate word frequencies, called "dBpack".
+    approximate word frequencies, called "cBpack".
 
-    The dBpack format is as follows:
+    The cBpack format is as follows:
 
     - The file on disk is a gzipped file in msgpack format, which decodes to a
-      list of lists of words.
+      list whose first element is a header, and whose remaining elements are
+      lists of words.
+
+    - The header is a dictionary with 'format' and 'version' keys that make
+      sure that we're reading the right thing.
 
     - Each inner list of words corresponds to a particular word frequency,
-      rounded to the nearest decibel. 0 dB represents a word that occurs with
-      probability 1, so it is the only word in the data (this of course doesn't
-      happen). -20 dB represents a word that occurs once per 100 tokens, -30 dB
-      represents a word that occurs once per 1000 tokens, and so on.
+      rounded to the nearest centibel -- that is, one tenth of a decibel, or
+      a factor of 10 ** .01.
 
-    - The index of each list within the overall list is the negative of its
-      frequency in decibels.
+      0 cB represents a word that occurs with probability 1, so it is the only
+      word in the data (this of course doesn't happen). -200 cB represents a
+      word that occurs once per 100 tokens, -300 cB represents a word that
+      occurs once per 1000 tokens, and so on.
+
+    - The index of each list within the overall list (without the header) is
+      the negative of its frequency in centibels.
 
     - Each inner list is sorted in alphabetical order.
 
     As an example, consider a corpus consisting only of the words "red fish
-    blue fish". The word "fish" occurs as 50% of tokens (-3 dB), while "red"
-    and "blue" occur as 25% of tokens (-6 dB). The dBpack file of their word
-    frequencies would decode to this list:
+    blue fish". The word "fish" occurs as 50% of tokens (-30 cB), while "red"
+    and "blue" occur as 25% of tokens (-60 cB). The cBpack file of their word
+    frequencies would decode to this:
 
-        [[], [], [], ['fish'], [], [], ['blue', 'red']]
+        [
+            {'format': 'cB', 'version': 1},
+            [], [], [], ...    # 30 empty lists
+            ['fish'],
+            [], [], [], ...    # 29 more empty lists
+            ['blue', 'red']
+        ]
     """
     with gzip.open(filename, 'rb') as infile:
-        return msgpack.load(infile, encoding='utf-8')
+        data = msgpack.load(infile, encoding='utf-8')
+        header = data[0]
+        if (
+            not isinstance(header, dict) or header.get('format') != 'cB'
+            or header.get('version') != 1
+        ):
+            raise ValueError("Unexpected header: %r" % header)
+        return data[1:]
 
 
 def available_languages(wordlist='combined'):
@@ -103,7 +123,7 @@ def available_languages(wordlist='combined'):
 def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
     """
     Read the raw data from a wordlist file, returning it as a list of
-    lists. (See `read_dBpack` for what this represents.)
+    lists. (See `read_cBpack` for what this represents.)
 
     Because we use the `langcodes` module, we can handle slight
     variations in language codes. For example, looking for 'pt-BR',
@@ -123,25 +143,25 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
             % (lang, best, langcodes.get(best).language_name('en'))
         )
 
-    return read_dBpack(available[best])
+    return read_cBpack(available[best])
 
 
-def dB_to_freq(dB):
+def cB_to_freq(cB):
     """
-    Convert a word frequency from the logarithmic decibel scale that we use
+    Convert a word frequency from the logarithmic centibel scale that we use
     internally, to a proportion from 0 to 1.
 
-    On this scale, 0 dB represents the maximum possible frequency of
-    1.0. -10 dB represents a word that happens 1 in 10 times,
-    -20 dB represents something that happens 1 in 100 times, and so on.
+    On this scale, 0 cB represents the maximum possible frequency of
+    1.0. -100 cB represents a word that happens 1 in 10 times,
+    -200 cB represents something that happens 1 in 100 times, and so on.
 
-    In general, x dB represents a frequency of 10 ** (x/10).
+    In general, x cB represents a frequency of 10 ** (x/100).
     """
-    if dB > 0:
+    if cB > 0:
         raise ValueError(
             "A frequency cannot be a positive number of decibels."
         )
-    return 10 ** (dB / 10)
+    return 10 ** (cB / 100)
 
 
 @lru_cache(maxsize=None)
@@ -154,7 +174,7 @@ def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
     pack = get_frequency_list(lang, wordlist, match_cutoff)
     for index, bucket in enumerate(pack):
         for word in bucket:
-            freqs[word] = dB_to_freq(-index)
+            freqs[word] = cB_to_freq(-index)
     return freqs
 
 

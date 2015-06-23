@@ -62,7 +62,7 @@ def read_cBpack(filename):
 
     - The file on disk is a gzipped file in msgpack format, which decodes to a
       list whose first element is a header, and whose remaining elements are
-      lists of words, preceded by a header.
+      lists of words.
 
     - The header is a dictionary with 'format' and 'version' keys that make
       sure that we're reading the right thing.

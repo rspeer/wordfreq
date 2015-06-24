@@ -227,7 +227,12 @@ def word_frequency(word, lang, wordlist='combined', default=0.):
     """
     freqs = get_frequency_dict(lang, wordlist)
     combined_value = None
-    for token in tokenize(word, lang):
+    tokens = tokenize(word, lang)
+
+    if len(tokens) == 0:
+        return default
+
+    for token in tokens:
         if token not in freqs:
             # If any word is missing, just return the default value
             return default

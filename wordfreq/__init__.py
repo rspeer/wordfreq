@@ -16,6 +16,12 @@ DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 CACHE_SIZE = 100000
 
 def _emoji_char_class():
+    """
+    Build a regex for emoji substitution.  First we create a regex character set
+    (like "[a-cv-z]") matching characters we consider emoji (see the docstring
+    of _replace_problem_text()).  The final regex matches one such character
+    followed by any number of spaces and identical characters.
+    """
     ranges = []
     for i, c in enumerate(chardata.CHAR_CLASS_STRING):
         if c == '3' and i >= 0x2600 and i != 0xfffd:
@@ -28,8 +34,20 @@ def _emoji_char_class():
 EMOJI_RANGE = _emoji_char_class()
 
 def _non_punct_class():
+    """
+    Builds a regex that matches anything that is not a one of the following
+    classes:
+    - P: punctuation
+    - S: symbols
+    - Z: separators
+    - M: combining marks
+    - C: control characters
+    This will classify symbols, including emoji, as punctuation; callers that
+    want to treat emoji separately should filter them out first.
+    """
+
     try:
-        with open('non_punct.txt') as file:
+        with open('data/non_punct.txt') as file:
             return file.read()
     except FileNotFoundError:
         non_punct = [chr(x) for x in range(0x110000)

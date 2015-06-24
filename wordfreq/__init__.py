@@ -27,7 +27,6 @@ def _emoji_char_class():
 
 EMOJI_RANGE = _emoji_char_class()
 
-# FIXME: Find a better way to get a list of all non punctuation unicodes
 def _non_punct_class():
     try:
         with open('non_punct.txt') as file:

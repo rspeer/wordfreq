@@ -29,10 +29,19 @@ EMOJI_RANGE = _emoji_char_class()
 
 # FIXME: Find a better way to get a list of all non punctuation unicodes
 def _non_punct_class():
-    non_punct = [chr(x) for x in range(0x110000)
-                    if unicodedata.category(chr(x))[0] not in 'PSZMC']
+    try:
+        with open('non_punct.txt') as file:
+            return file.read()
+    except FileNotFoundError:
+        non_punct = [chr(x) for x in range(0x110000)
+                        if unicodedata.category(chr(x))[0] not in 'PSZMC']
 
-    return '[%s]' % ''.join(non_punct)
+        out = '[%s]' % ''.join(non_punct)
+
+        with open('non_punct.txt', mode='w') as file:
+            file.write(out)
+
+        return out
 
 NON_PUNCT_RANGE = _non_punct_class()
 

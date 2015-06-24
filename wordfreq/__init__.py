@@ -1,5 +1,7 @@
 from pkg_resources import resource_filename
 from functools import lru_cache
+import unicodedata
+from ftfy import chardata
 import langcodes
 import msgpack
 import re
@@ -9,14 +11,32 @@ import random
 import logging
 logger = logging.getLogger(__name__)
 
-
-NON_PUNCT_RANGE = '[0-9A-Za-zª²³¹º\xc0-\u1fff\u2070-\u2fff\u301f-\ufeff０-９Ａ-Ｚａ-ｚ\uff66-\U0002ffff]'
-NON_PUNCT_RE = re.compile(NON_PUNCT_RANGE)
-TOKEN_RE = re.compile("{0}+(?:'{0}+)*".format(NON_PUNCT_RANGE))
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 CACHE_SIZE = 100000
 
+def _emoji_char_class():
+    ranges = []
+    for i, c in enumerate(chardata.CHAR_CLASS_STRING):
+        if c == '3' and i >= 0x2600 and i != 0xfffd:
+            if ranges and i == ranges[-1][1] + 1:
+                ranges[-1][1] = i
+            else:
+                ranges.append([i, i])
+    return '[%s]' % ''.join(chr(a) + '-' + chr(b) for a, b in ranges)
+
+EMOJI_RANGE = _emoji_char_class()
+
+# FIXME: Find a better way to get a list of all non punctuation unicodes
+def _non_punct_class():
+    non_punct = [chr(x) for x in range(0x110000)
+                    if unicodedata.category(chr(x))[0] not in 'PSZMC']
+
+    return '[%s]' % ''.join(non_punct)
+
+NON_PUNCT_RANGE = _non_punct_class()
+
+TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
 
 def simple_tokenize(text):
     """

@@ -50,16 +50,8 @@ def _non_punct_class():
         with non_punct_file.open() as file:
             return file.read()
     except FileNotFoundError:
-        non_punct = []
-        for x in range(0x110000):
-            cat = unicodedata.category(chr(x))
-            if cat[0] not in 'PSZC' or cat == 'Cn':
-                non_punct.append(x)
 
-        non_punct_ranges = to_ranges(non_punct)
-
-        out = '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
-                for start, end in non_punct_ranges)
+        out = func_to_regex(lambda c: unicodedata.category(c)[0] not in 'PSZC')
 
         with non_punct_file.open(mode='w') as file:
             file.write(out)
@@ -75,13 +67,8 @@ def _combining_mark_class():
         with _combining_mark_file.open() as file:
             return file.read()
     except FileNotFoundError:
-        combining_mark = [x for x in range(0x110000)
-                        if unicodedata.category(chr(x))[0] == 'M']
 
-        combining_mark_ranges = to_ranges(combining_mark)
-
-        out = '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
-                for start, end in combining_mark_ranges)
+        out = func_to_regex(lambda c: unicodedata.category(c)[0] == 'M')
 
         with _combining_mark_file.open(mode='w') as file:
             file.write(out)
@@ -89,18 +76,58 @@ def _combining_mark_class():
         return out
 
 
-def to_ranges(seq):
+def func_to_ranges(accept):
     """
-    Converts a sequence of int's into a list of inclusives ranges
+    Converts a function that accepts a single unicode character into a list of
+    ranges. Unassigned unicode are automatically accepted
     """
     ranges = []
-    start_range = seq[0]
-    for previous, elem in zip(seq, seq[1:]):
-        if elem - previous != 1:
-            ranges.append((start_range, previous))
-            start_range = elem
-    ranges.append((start_range, seq[-1]))
+    start = None
+    for x in range(0x110000):
+        cat = unicodedata.category(chr(x))
+        if cat == 'Cn' or accept(chr(x)):
+            if start is None:
+                start = x
+        else:
+            if start is not None:
+                ranges.append((start, x-1))
+                start = None
+
+    if start is not None:
+        ranges.append((start, x))
+
     return ranges
+
+unassigned_ranges = None
+
+def func_to_regex(accept):
+    """
+    Converts a function that accepts a single unicode character into a regex.
+    Unassigned unicode characters are treated like their neighbors.
+    """
+    ranges = []
+    start = None
+    for x in range(0x110000):
+        cat = unicodedata.category(chr(x))
+        if cat == 'Cn' or accept(chr(x)):
+            if start is None:
+                start = x
+        else:
+            if start is not None:
+                ranges.append((start, x-1))
+                start = None
+
+    if start is not None:
+        ranges.append((start, x))
+
+    global unassigned_ranges
+    if unassigned_ranges is None:
+        unassigned_ranges = set(func_to_ranges(lambda _: False))
+
+    ranges = [range for range in ranges if range not in unassigned_ranges]
+
+    return '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
+                                for start, end in ranges)
 
 
 COMBINING_MARK_RE = re.compile(_combining_mark_class())

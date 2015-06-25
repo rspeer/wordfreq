@@ -46,8 +46,9 @@ def _non_punct_class():
     This will classify symbols, including emoji, as punctuation; callers that
     want to treat emoji separately should filter them out first.
     """
+    non_punct = DATA_PATH / 'non_punct.txt'
     try:
-        with open('wordfreq/data/non_punct.txt') as file:
+        with non_punct.open() as file:
             return file.read()
     except FileNotFoundError:
         non_punct = [x for x in range(0x110000)
@@ -58,7 +59,7 @@ def _non_punct_class():
         out = '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
                 for start, end in non_punct_ranges)
 
-        with open('wordfreq/data/non_punct.txt', mode='w') as file:
+        with non_punct.open(mode='w') as file:
             file.write(out)
 
         return out

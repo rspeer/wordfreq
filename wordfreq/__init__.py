@@ -3,6 +3,7 @@ from functools import lru_cache
 import unicodedata
 from ftfy import chardata
 import langcodes
+import itertools
 import msgpack
 import re
 import gzip
@@ -45,20 +46,37 @@ def _non_punct_class():
     This will classify symbols, including emoji, as punctuation; callers that
     want to treat emoji separately should filter them out first.
     """
-
     try:
-        with open('data/non_punct.txt') as file:
+        with open('wordfreq/data/non_punct.txt') as file:
             return file.read()
     except FileNotFoundError:
-        non_punct = [chr(x) for x in range(0x110000)
+        non_punct = [x for x in range(0x110000)
                         if unicodedata.category(chr(x))[0] not in 'PSZMC']
 
-        out = '[%s]' % ''.join(non_punct)
+        non_punct_ranges = to_ranges(non_punct)
 
-        with open('non_punct.txt', mode='w') as file:
+        out = '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
+                for start, end in non_punct_ranges)
+
+        with open('wordfreq/data/non_punct.txt', mode='w') as file:
             file.write(out)
 
         return out
+
+def to_ranges(seq):
+    """
+    Converts a sequence of int's into a list of inclusives ranges
+    """
+    ranges = []
+    start_range = seq[0]
+    for previous, elem in zip(seq, seq[1:]):
+        if elem - previous != 1:
+            ranges.append((start_range, previous))
+            start_range = elem
+    ranges.append((start_range, seq[-1]))
+    return ranges
+
+
 
 NON_PUNCT_RANGE = _non_punct_class()
 

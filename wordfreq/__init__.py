@@ -50,8 +50,11 @@ def _non_punct_class():
         with non_punct_file.open() as file:
             return file.read()
     except FileNotFoundError:
-        non_punct = [x for x in range(0x110000)
-                        if unicodedata.category(chr(x))[0] not in 'PSZC']
+        non_punct = []
+        for x in range(0x110000):
+            cat = unicodedata.category(chr(x))
+            if cat[0] not in 'PSZC' or cat == 'Cn':
+                non_punct.append(x)
 
         non_punct_ranges = to_ranges(non_punct)
 

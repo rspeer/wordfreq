@@ -118,6 +118,10 @@ def tokenize(text, lang):
         except NameError:
             from wordfreq.mecab import mecab_tokenize
             return mecab_tokenize(text)
+    elif lang == 'ar':
+        tokens = simple_tokenize(text)
+        tokens = [token.replace('ـ', '') for token in tokens]
+        return [token for token in tokens if token] # remove empty strings
     else:
         return simple_tokenize(text)
 

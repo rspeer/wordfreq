@@ -41,28 +41,50 @@ def _non_punct_class():
     - P: punctuation
     - S: symbols
     - Z: separators
-    - M: combining marks
     - C: control characters
     This will classify symbols, including emoji, as punctuation; callers that
     want to treat emoji separately should filter them out first.
     """
-    non_punct = DATA_PATH / 'non_punct.txt'
+    non_punct_file = DATA_PATH / 'non_punct.txt'
     try:
-        with non_punct.open() as file:
+        with non_punct_file.open() as file:
             return file.read()
     except FileNotFoundError:
         non_punct = [x for x in range(0x110000)
-                        if unicodedata.category(chr(x))[0] not in 'PSZMC']
+                        if unicodedata.category(chr(x))[0] not in 'PSZC']
 
         non_punct_ranges = to_ranges(non_punct)
 
         out = '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
                 for start, end in non_punct_ranges)
 
-        with non_punct.open(mode='w') as file:
+        with non_punct_file.open(mode='w') as file:
             file.write(out)
 
         return out
+
+def _combining_mark_class():
+    """
+    Builds a regex that matches anything that is a combining mark
+    """
+    _combining_mark_file = DATA_PATH / 'combining_mark.txt'
+    try:
+        with _combining_mark_file.open() as file:
+            return file.read()
+    except FileNotFoundError:
+        combining_mark = [x for x in range(0x110000)
+                        if unicodedata.category(chr(x))[0] == 'M']
+
+        combining_mark_ranges = to_ranges(combining_mark)
+
+        out = '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
+                for start, end in combining_mark_ranges)
+
+        with _combining_mark_file.open(mode='w') as file:
+            file.write(out)
+
+        return out
+
 
 def to_ranges(seq):
     """
@@ -78,7 +100,7 @@ def to_ranges(seq):
     return ranges
 
 
-
+COMBINING_MARK_RE = re.compile(_combining_mark_class())
 NON_PUNCT_RANGE = _non_punct_class()
 
 TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
@@ -107,7 +129,7 @@ def tokenize(text, lang):
 
     So far, this means that Japanese is handled by mecab_tokenize, and
     everything else is handled by simple_tokenize. Additionally, Arabic commas
-    are removed.
+    and combining marks are removed.
 
     Strings that are looked up in wordfreq will be run through this function
     first, so that they can be expected to match the data.
@@ -120,7 +142,8 @@ def tokenize(text, lang):
             return mecab_tokenize(text)
     elif lang == 'ar':
         tokens = simple_tokenize(text)
-        tokens = [token.replace('ـ', '') for token in tokens]
+        tokens = [token.replace('ـ', '') for token in tokens] # remove arabic commas
+        tokens = [COMBINING_MARK_RE.sub('', token) for token in tokens]
         return [token for token in tokens if token] # remove empty strings
     else:
         return simple_tokenize(text)

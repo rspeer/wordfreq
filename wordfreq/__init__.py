@@ -106,14 +106,18 @@ def tokenize(text, lang):
     the language.
 
     So far, this means that Japanese is handled by mecab_tokenize, and
-    everything else is handled by simple_tokenize.
+    everything else is handled by simple_tokenize. Additionally, Arabic commas
+    are removed.
 
     Strings that are looked up in wordfreq will be run through this function
     first, so that they can be expected to match the data.
     """
     if lang == 'ja':
-        from wordfreq.mecab import mecab_tokenize
-        return mecab_tokenize(text)
+        try:
+            return mecab_tokenize(text)
+        except NameError:
+            from wordfreq.mecab import mecab_tokenize
+            return mecab_tokenize(text)
     else:
         return simple_tokenize(text)
 

@@ -124,7 +124,7 @@ def simple_tokenize(text):
     """
     return [token.lower() for token in TOKEN_RE.findall(text)]
 
-
+mecab_tokenize = None
 def tokenize(text, lang):
     """
     Tokenize this text in a way that's straightforward but appropriate for
@@ -138,11 +138,10 @@ def tokenize(text, lang):
     first, so that they can be expected to match the data.
     """
     if lang == 'ja':
-        try:
-            return mecab_tokenize(text)
-        except NameError:
+        global mecab_tokenize
+        if mecab_tokenize is None:
             from wordfreq.mecab import mecab_tokenize
-            return mecab_tokenize(text)
+        return mecab_tokenize(text)
     elif lang == 'ar':
         tokens = simple_tokenize(text)
         tokens = [token.replace('ـ', '') for token in tokens] # remove arabic commas

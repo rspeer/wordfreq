@@ -1,6 +1,9 @@
 from pkg_resources import resource_filename
 from functools import lru_cache
+import unicodedata
+from ftfy import chardata
 import langcodes
+import itertools
 import msgpack
 import re
 import gzip
@@ -9,14 +12,128 @@ import random
 import logging
 logger = logging.getLogger(__name__)
 
-
-NON_PUNCT_RANGE = '[0-9A-Za-zª²³¹º\xc0-\u1fff\u2070-\u2fff\u301f-\ufeff０-９Ａ-Ｚａ-ｚ\uff66-\U0002ffff]'
-NON_PUNCT_RE = re.compile(NON_PUNCT_RANGE)
-TOKEN_RE = re.compile("{0}+(?:'{0}+)*".format(NON_PUNCT_RANGE))
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 CACHE_SIZE = 100000
 
+def _emoji_char_class():
+    """
+    Build a regex for emoji substitution.  First we create a regex character set
+    (like "[a-cv-z]") matching characters we consider emoji (see the docstring
+    of _replace_problem_text()).  The final regex matches one such character
+    followed by any number of spaces and identical characters.
+    """
+    ranges = []
+    for i, c in enumerate(chardata.CHAR_CLASS_STRING):
+        if c == '3' and i >= 0x2600 and i != 0xfffd:
+            if ranges and i == ranges[-1][1] + 1:
+                ranges[-1][1] = i
+            else:
+                ranges.append([i, i])
+    return '[%s]' % ''.join(chr(a) + '-' + chr(b) for a, b in ranges)
+
+EMOJI_RANGE = _emoji_char_class()
+
+def _non_punct_class():
+    """
+    Builds a regex that matches anything that is not a one of the following
+    classes:
+    - P: punctuation
+    - S: symbols
+    - Z: separators
+    - C: control characters
+    This will classify symbols, including emoji, as punctuation; callers that
+    want to treat emoji separately should filter them out first.
+    """
+    non_punct_file = DATA_PATH / 'non_punct.txt'
+    try:
+        with non_punct_file.open() as file:
+            return file.read()
+    except FileNotFoundError:
+
+        out = func_to_regex(lambda c: unicodedata.category(c)[0] not in 'PSZC')
+
+        with non_punct_file.open(mode='w') as file:
+            file.write(out)
+
+        return out
+
+def _combining_mark_class():
+    """
+    Builds a regex that matches anything that is a combining mark
+    """
+    _combining_mark_file = DATA_PATH / 'combining_mark.txt'
+    try:
+        with _combining_mark_file.open() as file:
+            return file.read()
+    except FileNotFoundError:
+
+        out = func_to_regex(lambda c: unicodedata.category(c)[0] == 'M')
+
+        with _combining_mark_file.open(mode='w') as file:
+            file.write(out)
+
+        return out
+
+
+def func_to_ranges(accept):
+    """
+    Converts a function that accepts a single unicode character into a list of
+    ranges. Unassigned unicode are automatically accepted.
+    """
+    ranges = []
+    start = None
+    for x in range(0x110000):
+        cat = unicodedata.category(chr(x))
+        if cat == 'Cn' or accept(chr(x)):
+            if start is None:
+                start = x
+        else:
+            if start is not None:
+                ranges.append((start, x-1))
+                start = None
+
+    if start is not None:
+        ranges.append((start, x))
+
+    return ranges
+
+unassigned_ranges = None
+
+def func_to_regex(accept):
+    """
+    Converts a function that accepts a single unicode character into a regex.
+    Unassigned unicode characters are treated like their neighbors.
+    """
+    ranges = []
+    start = None
+    for x in range(0x110000):
+        cat = unicodedata.category(chr(x))
+        if cat == 'Cn' or accept(chr(x)):
+            if start is None:
+                start = x
+        else:
+            if start is not None:
+                ranges.append((start, x-1))
+                start = None
+
+    if start is not None:
+        ranges.append((start, x))
+
+    global unassigned_ranges
+    if unassigned_ranges is None:
+        unassigned_ranges = set(func_to_ranges(lambda _: False))
+
+    ranges = [range for range in ranges if range not in unassigned_ranges]
+
+    return '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
+                                for start, end in ranges)
+
+
+COMBINING_MARK_RE = re.compile(_combining_mark_class())
+NON_PUNCT_RANGE = _non_punct_class()
+
+TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
 
 def simple_tokenize(text):
     """
@@ -34,21 +151,29 @@ def simple_tokenize(text):
     """
     return [token.lower() for token in TOKEN_RE.findall(text)]
 
-
+mecab_tokenize = None
 def tokenize(text, lang):
     """
     Tokenize this text in a way that's straightforward but appropriate for
     the language.
 
     So far, this means that Japanese is handled by mecab_tokenize, and
-    everything else is handled by simple_tokenize.
+    everything else is handled by simple_tokenize. Additionally, Arabic commas
+    and combining marks are removed.
 
     Strings that are looked up in wordfreq will be run through this function
     first, so that they can be expected to match the data.
     """
     if lang == 'ja':
-        from wordfreq.mecab import mecab_tokenize
+        global mecab_tokenize
+        if mecab_tokenize is None:
+            from wordfreq.mecab import mecab_tokenize
         return mecab_tokenize(text)
+    elif lang == 'ar':
+        tokens = simple_tokenize(text)
+        tokens = [token.replace('ـ', '') for token in tokens] # remove tatweel
+        tokens = [COMBINING_MARK_RE.sub('', token) for token in tokens]
+        return [token for token in tokens if token] # remove empty strings
     else:
         return simple_tokenize(text)
 

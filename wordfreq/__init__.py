@@ -79,7 +79,7 @@ def _combining_mark_class():
 def func_to_ranges(accept):
     """
     Converts a function that accepts a single unicode character into a list of
-    ranges. Unassigned unicode are automatically accepted
+    ranges. Unassigned unicode are automatically accepted.
     """
     ranges = []
     start = None
@@ -171,7 +171,7 @@ def tokenize(text, lang):
         return mecab_tokenize(text)
     elif lang == 'ar':
         tokens = simple_tokenize(text)
-        tokens = [token.replace('ـ', '') for token in tokens] # remove arabic commas
+        tokens = [token.replace('ـ', '') for token in tokens] # remove tatweel
         tokens = [COMBINING_MARK_RE.sub('', token) for token in tokens]
         return [token for token in tokens if token] # remove empty strings
     else:

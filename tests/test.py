@@ -23,7 +23,9 @@ def test_languages():
 
     # Laughter is the universal language
     for lang in avail:
-        if lang != 'zh':  # we don't have enough Chinese data yet
+        if lang not in {'zh', 'ja'}:
+            # we do not have enough Chinese data
+            # Japanese people do not lol
             assert_greater(word_frequency('lol', lang), 0)
 
             # Make up a weirdly verbose language code and make sure

@@ -105,13 +105,13 @@ def test_phrase_freq():
 def test_not_really_random():
     # If your xkcd-style password comes out like this, maybe you shouldn't
     # use it
-    eq_(random_ascii_words(nwords=4, lang='en', bits_per_word=0),
+    eq_(random_words(nwords=4, lang='en', bits_per_word=0),
         'the the the the')
 
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
-    eq_(random_words(nwords=4, lang='ja', bits_per_word=0),
-        'の の の の')
+    eq_(random_ascii_words(nwords=4, lang='ja', bits_per_word=0),
+        'e e e e')
 
 
 @raises(ValueError)

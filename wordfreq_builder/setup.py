@@ -14,7 +14,6 @@ setup(
         'console_scripts': [
             'wordfreq-pretokenize-twitter = wordfreq_builder.cli.pretokenize_twitter:main',
             'wordfreq-format-twitter = wordfreq_builder.cli.format_twitter:main',
-            'wordfreq-tokenize-wikipedia = wordfreq_builder.cli.tokenize_wikipedia:main',
             'wordfreq-build-deps = wordfreq_builder.cli.build_deps:main'
         ]
     }

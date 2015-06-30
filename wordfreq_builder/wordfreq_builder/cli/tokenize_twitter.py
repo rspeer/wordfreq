@@ -4,7 +4,7 @@ import argparse
 
 def tokenize_twitter(in_filename, out_prefix):
     tokenize_file(in_filename, out_prefix,
-                     tokenizer=cld2_surface_tokenizer)
+                  tokenizer=cld2_surface_tokenizer)
 
 
 def main():

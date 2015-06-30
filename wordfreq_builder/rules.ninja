@@ -46,12 +46,8 @@ rule wiki2tokens
 rule tokenize_japanese
   command = mkdir -p $$(dirname $out) && mecab -b 1048576 < $in | cut -f 1 | grep -v "EOS" > $out
 
-# Tokenizing text from Twitter generally requires us to use a more powerful
-# tokenizer than the language-agnostic one.
-#
-# Our usual build process does not use this step. It just assumes it's already
-# done, because it takes a very long time. This is what the 'data/intermediate'
-# directory contains.
+# Tokenizing text from Twitter requires us to language-detect and tokenize
+# in the same step.
 rule tokenize_twitter
   command = mkdir -p $$(dirname $prefix) && python -m wordfreq_builder.cli.tokenize_twitter $in $prefix
 

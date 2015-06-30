@@ -23,7 +23,9 @@ def test_languages():
 
     # Laughter is the universal language
     for lang in avail:
-        if lang != 'zh':  # we don't have enough Chinese data yet
+        if lang not in {'zh', 'ja'}:
+            # we do not have enough Chinese data
+            # Japanese people do not lol
             assert_greater(word_frequency('lol', lang), 0)
 
             # Make up a weirdly verbose language code and make sure
@@ -109,7 +111,7 @@ def test_not_really_random():
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
     eq_(random_ascii_words(nwords=4, lang='ja', bits_per_word=0),
-        'rt rt rt rt')
+        'e e e e')
 
 
 @raises(ValueError)

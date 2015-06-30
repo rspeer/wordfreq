@@ -95,6 +95,12 @@ def test_tokenization():
     # apply.
     eq_(tokenize("can.t", 'en'), ['can', 't'])
 
+
+def test_casefolding():
+    eq_(tokenize('WEISS', 'de'), ['weiss'])
+    eq_(tokenize('weiß', 'de'), ['weiss'])
+
+
 def test_phrase_freq():
     plant = word_frequency("plan.t", 'en')
     assert_greater(plant, 0)

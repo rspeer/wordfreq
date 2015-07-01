@@ -96,16 +96,16 @@ def wikipedia_deps(dirname_in, languages):
         input_file = max(path_in.glob(
             '{}wiki*.bz2'.format(language)
         ))
-        token_file = wordlist_filename('wikipedia', language, 'tokens.txt')
+        plain_text_file = wordlist_filename('wikipedia', language, 'txt')
         count_file = wordlist_filename('wikipedia', language, 'counts.txt')
 
-        add_dep(lines, 'wiki2tokens', input_file, token_file)
+        add_dep(lines, 'wiki2text', input_file, plain_text_file)
         if language == 'ja':
             mecab_token_file = wordlist_filename('wikipedia', language, 'mecab-tokens.txt')
-            add_dep(lines, 'tokenize_japanese', token_file, mecab_token_file)
+            add_dep(lines, 'tokenize_japanese', plain_text_file, mecab_token_file)
             add_dep(lines, 'count', mecab_token_file, count_file)
         else:
-            add_dep(lines, 'count', token_file, count_file)
+            add_dep(lines, 'count', plain_text_file, count_file)
 
     return lines
 

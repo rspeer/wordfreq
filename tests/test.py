@@ -34,6 +34,15 @@ def test_languages():
             assert_greater(word_frequency('lol', new_lang_code), 0)
 
 
+def test_twitter():
+    avail = available_languages('twitter')
+    assert_greater(len(avail), 12)
+
+    for lang in avail:
+        assert_greater(word_frequency('rt', lang, 'twitter'),
+                       word_frequency('rt', lang, 'combined'))
+
+
 def test_defaults():
     eq_(word_frequency('esquivalience', 'en'), 0)
     eq_(word_frequency('esquivalience', 'en', default=1e-6), 1e-6)

@@ -205,11 +205,21 @@ def combine_lists(languages):
         add_dep(lines, 'merge', input_files, output_file,
                 extra='wordfreq_builder/word_counts.py')
 
-        output_cBpack = wordlist_filename('combined', language, 'msgpack.gz')
+        output_cBpack = wordlist_filename('combined-dist', language, 'msgpack.gz')
         add_dep(lines, 'freqs2cB', output_file, output_cBpack,
                 extra='wordfreq_builder/word_counts.py')
 
         lines.append('default {}'.format(output_cBpack))
+
+        # Write standalone lists for Twitter frequency
+        if language in CONFIG['sources']['twitter']:
+            input_file = wordlist_filename('twitter', language, 'counts.txt')
+            output_cBpack = wordlist_filename('twitter-dist', language, 'msgpack.gz')
+            add_dep(lines, 'freqs2cB', input_file, output_cBpack,
+                    extra='wordfreq_builder/word_counts.py')
+
+            lines.append('default {}'.format(output_cBpack))
+
     return lines
 
 

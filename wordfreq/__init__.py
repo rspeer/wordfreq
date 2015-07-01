@@ -149,7 +149,7 @@ def simple_tokenize(text):
     sequence, but they are if they appear internally. "cats'" is not a token,
     but "cat's" is.
     """
-    return [token.lower() for token in TOKEN_RE.findall(text)]
+    return [token.casefold() for token in TOKEN_RE.findall(text)]
 
 mecab_tokenize = None
 def tokenize(text, lang):

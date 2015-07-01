@@ -95,6 +95,12 @@ def test_tokenization():
     # apply.
     eq_(tokenize("can.t", 'en'), ['can', 't'])
 
+
+def test_casefolding():
+    eq_(tokenize('WEISS', 'de'), ['weiss'])
+    eq_(tokenize('weiß', 'de'), ['weiss'])
+
+
 def test_phrase_freq():
     plant = word_frequency("plan.t", 'en')
     assert_greater(plant, 0)
@@ -111,7 +117,7 @@ def test_not_really_random():
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
     eq_(random_ascii_words(nwords=4, lang='ja', bits_per_word=0),
-        'e e e e')
+        'rt rt rt rt')
 
 
 @raises(ValueError)

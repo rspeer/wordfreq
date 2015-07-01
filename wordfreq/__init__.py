@@ -331,15 +331,17 @@ def half_harmonic_mean(a, b):
 def word_frequency(word, lang, wordlist='combined', default=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
-    specified `wordlist`. The default (and currently only) wordlist is
-    'combined', built from whichever of these four sources have sufficient
-    data for the language:
+    specified `wordlist`. The default wordlist is 'combined', built from
+    whichever of these four sources have sufficient data for the language:
 
       - Full text of Wikipedia
       - A sample of 72 million tweets collected from Twitter in 2014,
         divided roughly into languages using automatic language detection
       - Frequencies extracted from OpenSubtitles
       - The Leeds Internet Corpus
+
+    Another available wordlist is 'twitter', which uses only the data from
+    Twitter.
 
     Words that we believe occur at least once per million tokens, based on
     the average of these lists, will appear in the word frequency list.

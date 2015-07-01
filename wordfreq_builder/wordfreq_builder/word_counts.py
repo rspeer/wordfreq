@@ -12,9 +12,11 @@ def count_tokens(filename):
     """
     Count tokens that appear in a file, running each line through our
     simple tokenizer.
+
+    Unicode errors in the input data will become token boundaries.
     """
     counts = defaultdict(int)
-    with open(filename, encoding='utf-8') as infile:
+    with open(filename, encoding='utf-8', errors='replace') as infile:
         for line in infile:
             for token in simple_tokenize(line.strip()):
                 counts[token] += 1

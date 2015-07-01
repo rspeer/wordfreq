@@ -31,16 +31,6 @@ rule split
 rule wiki2text
   command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text > $out
 
-# The wiki2tokens rule is the same as the wiki2text rule, but uses the -t
-# flag to tell the Nim code to output one token per line (according to its
-# language-agnostic tokenizer, which splits on punctuation and whitespace in
-# basically the same way as wordfreq).
-#
-# The fact that this uses a language-agnostic tokenizer means it should not
-# be applied to Chinese or Japanese.
-rule wiki2tokens
-  command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text -t > $out
-
 # To tokenize Japanese, we run it through Mecab and take the first column.
 # We don't have a plan for tokenizing Chinese yet.
 rule tokenize_japanese

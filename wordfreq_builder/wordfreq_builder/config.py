@@ -41,7 +41,9 @@ CONFIG = {
         'opensubtitles': 'generated/opensubtitles/opensubtitles_{lang}.{ext}',
         'leeds': 'generated/leeds/leeds_internet_{lang}.{ext}',
         'google-books': 'generated/google-books/google_books_{lang}.{ext}',
-        'combined': 'generated/combined/combined_{lang}.{ext}'
+        'combined': 'generated/combined/combined_{lang}.{ext}',
+        'combined-dist': 'dist/combined_{lang}.{ext}',
+        'twitter-dist': 'dist/twitter_{lang}.{ext}'
     },
     'min_sources': 2
 }

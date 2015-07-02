@@ -50,5 +50,8 @@ setup(
     # turn, it depends on libmecab-dev being installed on the system. It's not
     # listed under 'install_requires' because wordfreq should be usable in
     # other languages without it.
+    extras_require={
+        'mecab': 'mecab-python3'
+    },
     tests_require=['mecab-python3'],
 )

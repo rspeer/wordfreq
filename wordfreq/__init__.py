@@ -198,7 +198,7 @@ def cB_to_freq(cB):
     """
     if cB > 0:
         raise ValueError(
-            "A frequency cannot be a positive number of decibels."
+            "A frequency cannot be a positive number of centibels."
         )
     return 10 ** (cB / 100)
 

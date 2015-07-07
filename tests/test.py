@@ -1,6 +1,7 @@
 from wordfreq import (
     word_frequency, available_languages, cB_to_freq, iter_wordlist,
-    top_n_list, random_words, random_ascii_words, tokenize
+    top_n_list, random_words, random_ascii_words, tokenize,
+    half_harmonic_mean
 )
 from nose.tools import (
     eq_, assert_almost_equal, assert_greater, assert_less, raises
@@ -96,7 +97,6 @@ def test_tokenization():
     # We preserve apostrophes within words, so "can't" is a single word in the
     # data, while the fake word "plan't" can't be found.
     eq_(tokenize("can't", 'en'), ["can't"])
-    eq_(tokenize("plan't", 'en'), ["plan't"])
 
     eq_(tokenize('😂test', 'en'), ['😂', 'test'])
 
@@ -113,8 +113,13 @@ def test_casefolding():
 def test_phrase_freq():
     plant = word_frequency("plan.t", 'en')
     assert_greater(plant, 0)
-    assert_less(plant, word_frequency('plan', 'en'))
-    assert_less(plant, word_frequency('t', 'en'))
+    assert_almost_equal(
+        plant,
+        half_harmonic_mean(
+            word_frequency('plan', 'en'),
+            word_frequency('t', 'en')
+            )
+        )
 
 
 def test_not_really_random():

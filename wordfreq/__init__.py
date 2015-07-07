@@ -243,7 +243,7 @@ def half_harmonic_mean(a, b):
 
 
 @lru_cache(maxsize=CACHE_SIZE)
-def word_frequency(word, lang, wordlist='combined', default=0.):
+def word_frequency(word, lang, wordlist='combined', minimum=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
     specified `wordlist`. The default wordlist is 'combined', built from
@@ -261,7 +261,7 @@ def word_frequency(word, lang, wordlist='combined', default=0.):
 
     Words that we believe occur at least once per million tokens, based on
     the average of these lists, will appear in the word frequency list.
-    If you look up a word that's not in the list, you'll get the `default`
+    If you look up a word that's not in the list, you'll get the `minimum`
     value, which itself defaults to 0.
 
     If a word decomposes into multiple tokens, we'll return a smoothed estimate
@@ -273,12 +273,12 @@ def word_frequency(word, lang, wordlist='combined', default=0.):
     tokens = tokenize(word, lang)
 
     if len(tokens) == 0:
-        return default
+        return minimum
 
     for token in tokens:
         if token not in freqs:
             # If any word is missing, just return the default value
-            return default
+            return minimum
         value = freqs[token]
         if combined_value is None:
             combined_value = value

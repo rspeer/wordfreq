@@ -230,10 +230,9 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
       - Full text of Wikipedia
       - A sample of 72 million tweets collected from Twitter in 2014,
         divided roughly into languages using automatic language detection
-      - Google Books Syntactic Ngrams 2013
       - Frequencies extracted from OpenSubtitles
       - The Leeds Internet Corpus
-      - Google Books Ngrams and Google Books Syntactic Ngrams
+      - Google Books Syntactic Ngrams 2013
 
     Another available wordlist is 'twitter', which uses only the data from
     Twitter.

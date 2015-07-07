@@ -44,10 +44,10 @@ def test_twitter():
                        word_frequency('rt', lang, 'combined'))
 
 
-def test_defaults():
+def test_minimums():
     eq_(word_frequency('esquivalience', 'en'), 0)
     eq_(word_frequency('esquivalience', 'en', minimum=1e-6), 1e-6)
-
+    eq_(word_frequency('the', 'en', minimum=1), 1)
 
 def test_most_common_words():
     # If something causes the most common words in well-supported languages to

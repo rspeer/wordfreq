@@ -73,7 +73,6 @@ def simple_tokenize(text):
     """
     return [token.casefold() for token in TOKEN_RE.findall(text)]
 
-mecab_tokenize = None
 def tokenize(text, lang):
     """
     Tokenize this text in a way that's straightforward but appropriate for
@@ -87,10 +86,7 @@ def tokenize(text, lang):
     first, so that they can be expected to match the data.
     """
     if lang == 'ja':
-        global mecab_tokenize
-        if mecab_tokenize is None:
-            from wordfreq.mecab import mecab_tokenize
-        return mecab_tokenize(text)
+        from wordfreq.mecab import mecab_tokenize
 
     if lang == 'ar':
         text = COMBINING_MARK_RE.sub('', text.replace('ـ', ''))

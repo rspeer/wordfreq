@@ -19,20 +19,13 @@ CACHE_SIZE = 100000
 def _emoji_char_class():
     """
     Build a regex for emoji substitution.  First we create a regex character set
-    (like "[a-cv-z]") matching characters we consider emoji (see the docstring
-    of _replace_problem_text()).  The final regex matches one such character
-    followed by any number of spaces and identical characters.
+    (like "[a-cv-z]") matching characters we consider emoji. The final regex
+    matches one such character followed by any number of spaces and identical
+    characters.
     """
-    ranges = []
-    for i, c in enumerate(chardata.CHAR_CLASS_STRING):
-        if c == '3' and i >= 0x2600 and i != 0xfffd:
-            if ranges and i == ranges[-1][1] + 1:
-                ranges[-1][1] = i
-            else:
-                ranges.append([i, i])
-    return '[%s]' % ''.join(chr(a) + '-' + chr(b) for a, b in ranges)
-
-EMOJI_RANGE = _emoji_char_class()
+    non_punct_file = DATA_PATH / 'emoji.txt'
+    with non_punct_file.open() as file:
+        return file.read()
 
 def _non_punct_class():
     """
@@ -46,91 +39,20 @@ def _non_punct_class():
     want to treat emoji separately should filter them out first.
     """
     non_punct_file = DATA_PATH / 'non_punct.txt'
-    try:
-        with non_punct_file.open() as file:
-            return file.read()
-    except FileNotFoundError:
-
-        out = func_to_regex(lambda c: unicodedata.category(c)[0] not in 'PSZC')
-
-        with non_punct_file.open(mode='w') as file:
-            file.write(out)
-
-        return out
+    with non_punct_file.open() as file:
+        return file.read()
 
 def _combining_mark_class():
     """
     Builds a regex that matches anything that is a combining mark
     """
-    _combining_mark_file = DATA_PATH / 'combining_mark.txt'
-    try:
-        with _combining_mark_file.open() as file:
-            return file.read()
-    except FileNotFoundError:
-
-        out = func_to_regex(lambda c: unicodedata.category(c)[0] == 'M')
-
-        with _combining_mark_file.open(mode='w') as file:
-            file.write(out)
-
-        return out
-
-
-def func_to_ranges(accept):
-    """
-    Converts a function that accepts a single unicode character into a list of
-    ranges. Unassigned unicode are automatically accepted.
-    """
-    ranges = []
-    start = None
-    for x in range(0x110000):
-        cat = unicodedata.category(chr(x))
-        if cat == 'Cn' or accept(chr(x)):
-            if start is None:
-                start = x
-        else:
-            if start is not None:
-                ranges.append((start, x-1))
-                start = None
-
-    if start is not None:
-        ranges.append((start, x))
-
-    return ranges
-
-unassigned_ranges = None
-
-def func_to_regex(accept):
-    """
-    Converts a function that accepts a single unicode character into a regex.
-    Unassigned unicode characters are treated like their neighbors.
-    """
-    ranges = []
-    start = None
-    for x in range(0x110000):
-        cat = unicodedata.category(chr(x))
-        if cat == 'Cn' or accept(chr(x)):
-            if start is None:
-                start = x
-        else:
-            if start is not None:
-                ranges.append((start, x-1))
-                start = None
-
-    if start is not None:
-        ranges.append((start, x))
-
-    global unassigned_ranges
-    if unassigned_ranges is None:
-        unassigned_ranges = set(func_to_ranges(lambda _: False))
-
-    ranges = [range for range in ranges if range not in unassigned_ranges]
-
-    return '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
-                                for start, end in ranges)
-
+    combining_mark_file = DATA_PATH / 'combining_mark.txt'
+    with combining_mark_file.open() as file:
+        return file.read()
 
 COMBINING_MARK_RE = re.compile(_combining_mark_class())
+
+EMOJI_RANGE = _emoji_char_class()
 NON_PUNCT_RANGE = _non_punct_class()
 
 TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
@@ -169,13 +91,11 @@ def tokenize(text, lang):
         if mecab_tokenize is None:
             from wordfreq.mecab import mecab_tokenize
         return mecab_tokenize(text)
-    elif lang == 'ar':
-        tokens = simple_tokenize(text)
-        tokens = [token.replace('ـ', '') for token in tokens] # remove tatweel
-        tokens = [COMBINING_MARK_RE.sub('', token) for token in tokens]
-        return [token for token in tokens if token] # remove empty strings
-    else:
-        return simple_tokenize(text)
+
+    if lang == 'ar':
+        text = COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
+
+    return simple_tokenize(text)
 
 
 def read_cBpack(filename):

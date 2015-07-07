@@ -4,6 +4,7 @@ import langcodes
 import msgpack
 import re
 import gzip
+import itertools
 import pathlib
 import random
 import logging
@@ -226,8 +227,7 @@ def iter_wordlist(lang, wordlist='combined'):
     with the same rounded frequency, appearing in alphabetical order within
     each band.
     """
-    for sublist in get_frequency_list(lang, wordlist):
-        yield from sublist
+    return itertools.chain(*get_frequency_list(lang, wordlist))
 
 
 def half_harmonic_mean(a, b):

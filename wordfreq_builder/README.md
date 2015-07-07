@@ -116,10 +116,9 @@ by the `convert_leeds` rule in `rules.ninja`.
 The file `data/raw-input/twitter/all-2014.txt` contains about 72 million tweets
 collected by the `ftfy.streamtester` package in 2014.
 
-It takes a lot of work -- and a lot of Rosette, in particular -- to convert
-these tweets into data that's usable for wordfreq. They have to be
-language-detected and then tokenized. So the result of language-detection
-and tokenization is stored in `data/intermediate/twitter`.
+It takes a lot of work to convert these tweets into data that's usable for
+wordfreq. They have to be language-detected and then tokenized. So the result
+of language-detection and tokenization is stored in `data/intermediate/twitter`.
 
 ### Google Books
 

@@ -1,7 +1,8 @@
 import argparse
 import unicodedata
-import chardata
+from ftfy import chardata
 import pathlib
+from pkg_resources import resource_filename
 
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
@@ -38,7 +39,7 @@ def _non_punct_class():
     This will classify symbols, including emoji, as punctuation; callers that
     want to treat emoji separately should filter them out first.
     """
-    non_punct_file = DATA_PATH / 'non_punct.txt
+    non_punct_file = DATA_PATH / 'non_punct.txt'
 
     out = func_to_regex(lambda c: unicodedata.category(c)[0] not in 'PSZC')
 
@@ -52,7 +53,7 @@ def _combining_mark_class():
     combining_mark_file = DATA_PATH / 'combining_mark.txt'
     out = func_to_regex(lambda c: unicodedata.category(c)[0] == 'M')
 
-    with _combining_mark_file.open(mode='w') as file:
+    with combining_mark_file.open(mode='w') as file:
         file.write(out)
 
 def func_to_regex(accept):
@@ -69,7 +70,7 @@ def func_to_regex(accept):
         if accept(c):
             has_accepted = True
             if start is None:
-                start = None
+                start = c
         elif unicodedata.category(c) == 'Cn':
             if start is None:
                 start = c

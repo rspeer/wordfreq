@@ -1,5 +1,22 @@
 import argparse
 import unicodedata
+import chardata
+
+def _emoji_char_class():
+    """
+    Build a regex for emoji substitution.  First we create a regex character set
+    (like "[a-cv-z]") matching characters we consider emoji The final regex
+    matches one such character followed by any number of spaces and identical
+    characters.
+    """
+    ranges = []
+    for i, c in enumerate(chardata.CHAR_CLASS_STRING):
+        if c == '3' and i >= 0x2600 and i != 0xfffd:
+            if ranges and i == ranges[-1][1] + 1:
+                ranges[-1][1] = i
+            else:
+                ranges.append([i, i])
+    return '[%s]' % ''.join(chr(a) + '-' + chr(b) for a, b in ranges)
 
 def func_to_regex(accept):
     """

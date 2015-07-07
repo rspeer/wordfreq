@@ -1,6 +1,9 @@
 import argparse
 import unicodedata
 import chardata
+import pathlib
+
+DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 def _emoji_char_class():
     """
@@ -9,6 +12,8 @@ def _emoji_char_class():
     matches one such character followed by any number of spaces and identical
     characters.
     """
+    emoji_file = DATA_PATH / 'emoji.txt'
+
     ranges = []
     for i, c in enumerate(chardata.CHAR_CLASS_STRING):
         if c == '3' and i >= 0x2600 and i != 0xfffd:
@@ -16,7 +21,38 @@ def _emoji_char_class():
                 ranges[-1][1] = i
             else:
                 ranges.append([i, i])
-    return '[%s]' % ''.join(chr(a) + '-' + chr(b) for a, b in ranges)
+    out = '[%s]' % ''.join(chr(a) + '-' + chr(b) for a, b in ranges)
+
+    with emoji_file.open(mode='w') as file:
+        file.write(out)
+
+def _non_punct_class():
+    """
+    Builds a regex that matches anything that is not a one of the following
+    classes:
+    - P: punctuation
+    - S: symbols
+    - Z: separators
+    - C: control characters
+    This will classify symbols, including emoji, as punctuation; callers that
+    want to treat emoji separately should filter them out first.
+    """
+    non_punct_file = DATA_PATH / 'non_punct.txt
+
+    out = func_to_regex(lambda c: unicodedata.category(c)[0] not in 'PSZC')
+
+    with non_punct_file.open(mode='w') as file:
+        file.write(out)
+
+def _combining_mark_class():
+    """
+    Builds a regex that matches anything that is a combining mark
+    """
+    combining_mark_file = DATA_PATH / 'combining_mark.txt'
+    out = func_to_regex(lambda c: unicodedata.category(c)[0] == 'M')
+
+    with _combining_mark_file.open(mode='w') as file:
+        file.write(out)
 
 def func_to_regex(accept):
     """
@@ -48,9 +84,6 @@ def func_to_regex(accept):
     return '[%s]' % ''.join(ranges)
 
 if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser(description='Generate a regex matching a function')
-    parser.add_argument('acceptor', help='an python function that accepts a single char')
-    args = parser.parse_args()
-    print(func_to_regex(eval(args.acceptor)))
+    _combining_mark_class()
+    _non_punct_class()
+    _emoji_char_class()

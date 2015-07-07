@@ -291,6 +291,11 @@ def word_frequency(word, lang, wordlist='combined', default=0.):
 
 @lru_cache(maxsize=100)
 def top_n_list(lang, n, wordlist='combined', ascii_only=False):
+    """
+    Return a frequency list of length `n` in descending order of frequency.
+    This list contains words from `wordlist`, of the given language.
+    If `ascii_only`, then only ascii words are considered.
+    """
     results = []
     for word in iter_wordlist(lang, wordlist):
         if (not ascii_only) or max(word) <= '~':

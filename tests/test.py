@@ -137,3 +137,14 @@ def test_not_really_random():
 @raises(ValueError)
 def test_not_enough_ascii():
     random_ascii_words(lang='zh')
+
+def test_ar():
+    eq_(
+        tokenize('متــــــــعب', 'ar'),
+        ['متعب']
+    )
+
+    eq_(
+        tokenize('حَرَكَات', 'ar'),
+        ['حركات']
+    )

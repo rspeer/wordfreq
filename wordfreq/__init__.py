@@ -300,7 +300,7 @@ def top_n_list(lang, n, wordlist='combined', ascii_only=False):
     return results
 
 
-def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
+def random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12,
                  ascii_only=False):
     """
     Returns a string of random, space separated words.
@@ -326,7 +326,7 @@ def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
     return ' '.join(selected)
 
 
-def random_ascii_words(lang='en', wordlist='combined', nwords=4,
+def random_ascii_words(lang='en', wordlist='combined', nwords=5,
                        bits_per_word=12):
     """
     Returns a string of random, space separated, ASCII words.

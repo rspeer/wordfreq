@@ -213,8 +213,9 @@ def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
     freqs = {}
     pack = get_frequency_list(lang, wordlist, match_cutoff)
     for index, bucket in enumerate(pack):
+        freq = cB_to_freq(-index)
         for word in bucket:
-            freqs[word] = cB_to_freq(-index)
+            freqs[word] = freq
     return freqs
 
 

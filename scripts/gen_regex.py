@@ -16,6 +16,7 @@ def _emoji_char_class():
 
     ranges = []
     for i, c in enumerate(chardata.CHAR_CLASS_STRING):
+        # c represents the character class (3 corresponds to emoji)
         if c == '3' and i >= 0x2600 and i != 0xfffd:
             if ranges and i == ranges[-1][1] + 1:
                 ranges[-1][1] = i

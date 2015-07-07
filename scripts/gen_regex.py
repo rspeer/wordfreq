@@ -15,18 +15,13 @@ def _emoji_char_class():
     """
     emoji_file = DATA_PATH / 'emoji.txt'
 
-    ranges = []
-    for i, c in enumerate(chardata.CHAR_CLASS_STRING):
-        # c represents the character class (3 corresponds to emoji)
-        if c == '3' and i >= 0x2600 and i != 0xfffd:
-            if ranges and i == ranges[-1][1] + 1:
-                ranges[-1][1] = i
-            else:
-                ranges.append([i, i])
-    out = '[%s]' % ''.join(chr(a) + '-' + chr(b) for a, b in ranges)
+    def accept(c):
+        x = ord(c)
+        return chardata.CHAR_CLASS_STRING[x] == '3' and \
+                x >= 0x2600 and x != 0xfffd
 
-    with emoji_file.open(mode='w') as file:
-        file.write(out)
+    with (DATA_PATH / 'emoji.txt').open(mode='w') as file:
+        file.write(func_to_regex(accept))
 
 
 def _non_punct_class():

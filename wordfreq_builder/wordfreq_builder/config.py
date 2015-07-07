@@ -50,10 +50,17 @@ CONFIG = {
 
 
 def data_filename(filename):
+    """
+    Convert a relative filename to a path inside the configured data_dir.
+    """
     return os.path.join(CONFIG['data_dir'], filename)
 
 
 def wordlist_filename(source, language, extension='txt'):
+    """
+    Get the path where a particular built wordlist should go, parameterized by
+    its language and its file extension.
+    """
     path = CONFIG['wordlist_paths'][source].format(
         lang=language, ext=extension
     )
@@ -64,11 +71,15 @@ def source_names(language):
     """
     Get the names of data sources that supply data for the given language.
     """
-    return sorted([key for key in CONFIG['sources']
-                  if language in CONFIG['sources'][key]])
+    return sorted(key for key in CONFIG['sources']
+                  if language in CONFIG['sources'][key])
 
 
 def all_languages():
+    """
+    Get all languages that should have their data built, which is those that
+    are supported by at least `min_sources` sources.
+    """
     languages = set()
     for langlist in CONFIG['sources'].values():
         languages |= set(langlist)

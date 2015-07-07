@@ -234,8 +234,8 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
 
     Words that we believe occur at least once per million tokens, based on
     the average of these lists, will appear in the word frequency list.
-    If you look up a word that's not in the list, you'll get the `minimum`
-    value, which itself defaults to 0.
+
+    The value returned will always be at least as large as `minimum`.
 
     If a word decomposes into multiple tokens, we'll return a smoothed estimate
     of the word frequency that is no greater than the frequency of any of its
@@ -259,7 +259,7 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
             # Combine word values using the half-harmonic-mean formula,
             # (a * b) / (a + b). This operation is associative.
             combined_value = half_harmonic_mean(combined_value, value)
-    return combined_value
+    return max(combined_value, minimum)
 
 
 @lru_cache(maxsize=100)

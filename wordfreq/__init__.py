@@ -15,6 +15,9 @@ DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 CACHE_SIZE = 100000
 
 def load_range(filename):
+    """
+    Loads a file from the data path
+    """
     with (DATA_PATH / filename).open() as file:
         return file.read()
 

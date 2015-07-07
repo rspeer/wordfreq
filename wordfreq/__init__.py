@@ -14,47 +14,15 @@ DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 CACHE_SIZE = 100000
 
-
-def _emoji_char_class():
-    """
-    Build a regex for emoji substitution.  First we create a regex character set
-    (like "[a-cv-z]") matching characters we consider emoji. The final regex
-    matches one such character followed by any number of spaces and identical
-    characters.
-    """
-    non_punct_file = DATA_PATH / 'emoji.txt'
-    with non_punct_file.open() as file:
+def load_range(filename):
+    with (DATA_PATH / filename).open() as file:
         return file.read()
 
+EMOJI_RANGE = load_range('emoji.txt')
+NON_PUNCT_RANGE = load_range('non_punct.txt')
+COMBINING_MARK_RANGE = load_range('combining_mark.txt')
 
-def _non_punct_class():
-    """
-    Builds a regex that matches anything that is not a one of the following
-    classes:
-    - P: punctuation
-    - S: symbols
-    - Z: separators
-    - C: control characters
-    This will classify symbols, including emoji, as punctuation; callers that
-    want to treat emoji separately should filter them out first.
-    """
-    non_punct_file = DATA_PATH / 'non_punct.txt'
-    with non_punct_file.open() as file:
-        return file.read()
-
-
-def _combining_mark_class():
-    """
-    Builds a regex that matches anything that is a combining mark
-    """
-    combining_mark_file = DATA_PATH / 'combining_mark.txt'
-    with combining_mark_file.open() as file:
-        return file.read()
-
-COMBINING_MARK_RE = re.compile(_combining_mark_class())
-
-EMOJI_RANGE = _emoji_char_class()
-NON_PUNCT_RANGE = _non_punct_class()
+COMBINING_MARK_RE = re.compile(COMBINING_MARK_RANGE)
 
 TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
 

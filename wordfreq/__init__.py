@@ -87,6 +87,7 @@ def tokenize(text, lang):
     """
     if lang == 'ja':
         from wordfreq.mecab import mecab_tokenize
+        return mecab_tokenize(text)
 
     if lang == 'ar':
         text = COMBINING_MARK_RE.sub('', text.replace('ـ', ''))

@@ -1,9 +1,6 @@
 from pkg_resources import resource_filename
 from functools import lru_cache
-import unicodedata
-from ftfy import chardata
 import langcodes
-import itertools
 import msgpack
 import re
 import gzip

@@ -14,8 +14,6 @@ def mecab_tokenize(text):
     contains the same table that the command-line version of MeCab would output.
     We find the tokens in the first column of this table.
     """
-    parsed_str = MECAB_ANALYZER.parse(text.strip())
-    lines = [line for line in parsed_str.split('\n')
-             if line != '' and line != 'EOS']
-    tokens = [line.split('\t')[0] for line in lines]
-    return tokens
+    return [line.split('\t')[0]
+            for line in MECAB_ANALYZER.parse(text.strip()).split('\n')
+            if line != '' and line != 'EOS']

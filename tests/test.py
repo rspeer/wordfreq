@@ -1,9 +1,10 @@
 from wordfreq import (
-    word_frequency, available_languages, cB_to_freq, iter_wordlist,
-    top_n_list, random_words, random_ascii_words, tokenize
+    word_frequency, available_languages, cB_to_freq,
+    top_n_list, random_words, random_ascii_words, tokenize,
+    half_harmonic_mean
 )
 from nose.tools import (
-    eq_, assert_almost_equal, assert_greater, assert_less, raises
+    eq_, assert_almost_equal, assert_greater, raises
 )
 
 
@@ -43,10 +44,10 @@ def test_twitter():
                        word_frequency('rt', lang, 'combined'))
 
 
-def test_defaults():
+def test_minimums():
     eq_(word_frequency('esquivalience', 'en'), 0)
-    eq_(word_frequency('esquivalience', 'en', default=1e-6), 1e-6)
-
+    eq_(word_frequency('esquivalience', 'en', minimum=1e-6), 1e-6)
+    eq_(word_frequency('the', 'en', minimum=1), 1)
 
 def test_most_common_words():
     # If something causes the most common words in well-supported languages to
@@ -96,7 +97,6 @@ def test_tokenization():
     # We preserve apostrophes within words, so "can't" is a single word in the
     # data, while the fake word "plan't" can't be found.
     eq_(tokenize("can't", 'en'), ["can't"])
-    eq_(tokenize("plan't", 'en'), ["plan't"])
 
     eq_(tokenize('😂test', 'en'), ['😂', 'test'])
 
@@ -113,8 +113,13 @@ def test_casefolding():
 def test_phrase_freq():
     plant = word_frequency("plan.t", 'en')
     assert_greater(plant, 0)
-    assert_less(plant, word_frequency('plan', 'en'))
-    assert_less(plant, word_frequency('t', 'en'))
+    assert_almost_equal(
+        plant,
+        half_harmonic_mean(
+            word_frequency('plan', 'en'),
+            word_frequency('t', 'en')
+            )
+        )
 
 
 def test_not_really_random():
@@ -132,3 +137,14 @@ def test_not_really_random():
 @raises(ValueError)
 def test_not_enough_ascii():
     random_ascii_words(lang='zh')
+
+def test_ar():
+    eq_(
+        tokenize('متــــــــعب', 'ar'),
+        ['متعب']
+    )
+
+    eq_(
+        tokenize('حَرَكَات', 'ar'),
+        ['حركات']
+    )

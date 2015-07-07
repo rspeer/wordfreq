@@ -1,12 +1,10 @@
 from pkg_resources import resource_filename
 from functools import lru_cache
-import unicodedata
-from ftfy import chardata
 import langcodes
-import itertools
 import msgpack
 import re
 import gzip
+import itertools
 import pathlib
 import random
 import logging
@@ -16,124 +14,21 @@ DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 CACHE_SIZE = 100000
 
-def _emoji_char_class():
+def load_range(filename):
     """
-    Build a regex for emoji substitution.  First we create a regex character set
-    (like "[a-cv-z]") matching characters we consider emoji (see the docstring
-    of _replace_problem_text()).  The final regex matches one such character
-    followed by any number of spaces and identical characters.
+    Loads a file from the data path
     """
-    ranges = []
-    for i, c in enumerate(chardata.CHAR_CLASS_STRING):
-        if c == '3' and i >= 0x2600 and i != 0xfffd:
-            if ranges and i == ranges[-1][1] + 1:
-                ranges[-1][1] = i
-            else:
-                ranges.append([i, i])
-    return '[%s]' % ''.join(chr(a) + '-' + chr(b) for a, b in ranges)
+    with (DATA_PATH / filename).open() as file:
+        return file.read()
 
-EMOJI_RANGE = _emoji_char_class()
+EMOJI_RANGE = load_range('emoji.txt')
+NON_PUNCT_RANGE = load_range('non_punct.txt')
+COMBINING_MARK_RANGE = load_range('combining_mark.txt')
 
-def _non_punct_class():
-    """
-    Builds a regex that matches anything that is not a one of the following
-    classes:
-    - P: punctuation
-    - S: symbols
-    - Z: separators
-    - C: control characters
-    This will classify symbols, including emoji, as punctuation; callers that
-    want to treat emoji separately should filter them out first.
-    """
-    non_punct_file = DATA_PATH / 'non_punct.txt'
-    try:
-        with non_punct_file.open() as file:
-            return file.read()
-    except FileNotFoundError:
-
-        out = func_to_regex(lambda c: unicodedata.category(c)[0] not in 'PSZC')
-
-        with non_punct_file.open(mode='w') as file:
-            file.write(out)
-
-        return out
-
-def _combining_mark_class():
-    """
-    Builds a regex that matches anything that is a combining mark
-    """
-    _combining_mark_file = DATA_PATH / 'combining_mark.txt'
-    try:
-        with _combining_mark_file.open() as file:
-            return file.read()
-    except FileNotFoundError:
-
-        out = func_to_regex(lambda c: unicodedata.category(c)[0] == 'M')
-
-        with _combining_mark_file.open(mode='w') as file:
-            file.write(out)
-
-        return out
-
-
-def func_to_ranges(accept):
-    """
-    Converts a function that accepts a single unicode character into a list of
-    ranges. Unassigned unicode are automatically accepted.
-    """
-    ranges = []
-    start = None
-    for x in range(0x110000):
-        cat = unicodedata.category(chr(x))
-        if cat == 'Cn' or accept(chr(x)):
-            if start is None:
-                start = x
-        else:
-            if start is not None:
-                ranges.append((start, x-1))
-                start = None
-
-    if start is not None:
-        ranges.append((start, x))
-
-    return ranges
-
-unassigned_ranges = None
-
-def func_to_regex(accept):
-    """
-    Converts a function that accepts a single unicode character into a regex.
-    Unassigned unicode characters are treated like their neighbors.
-    """
-    ranges = []
-    start = None
-    for x in range(0x110000):
-        cat = unicodedata.category(chr(x))
-        if cat == 'Cn' or accept(chr(x)):
-            if start is None:
-                start = x
-        else:
-            if start is not None:
-                ranges.append((start, x-1))
-                start = None
-
-    if start is not None:
-        ranges.append((start, x))
-
-    global unassigned_ranges
-    if unassigned_ranges is None:
-        unassigned_ranges = set(func_to_ranges(lambda _: False))
-
-    ranges = [range for range in ranges if range not in unassigned_ranges]
-
-    return '[%s]' % ''.join("%s-%s" % (chr(start), chr(end))
-                                for start, end in ranges)
-
-
-COMBINING_MARK_RE = re.compile(_combining_mark_class())
-NON_PUNCT_RANGE = _non_punct_class()
+COMBINING_MARK_RE = re.compile(COMBINING_MARK_RANGE)
 
 TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
+
 
 def simple_tokenize(text):
     """
@@ -169,13 +64,11 @@ def tokenize(text, lang):
         if mecab_tokenize is None:
             from wordfreq.mecab import mecab_tokenize
         return mecab_tokenize(text)
-    elif lang == 'ar':
-        tokens = simple_tokenize(text)
-        tokens = [token.replace('ـ', '') for token in tokens] # remove tatweel
-        tokens = [COMBINING_MARK_RE.sub('', token) for token in tokens]
-        return [token for token in tokens if token] # remove empty strings
-    else:
-        return simple_tokenize(text)
+
+    if lang == 'ar':
+        text = COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
+
+    return simple_tokenize(text)
 
 
 def read_cBpack(filename):
@@ -284,7 +177,7 @@ def cB_to_freq(cB):
     """
     if cB > 0:
         raise ValueError(
-            "A frequency cannot be a positive number of decibels."
+            "A frequency cannot be a positive number of centibels."
         )
     return 10 ** (cB / 100)
 
@@ -298,8 +191,9 @@ def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
     freqs = {}
     pack = get_frequency_list(lang, wordlist, match_cutoff)
     for index, bucket in enumerate(pack):
+        freq = cB_to_freq(-index)
         for word in bucket:
-            freqs[word] = cB_to_freq(-index)
+            freqs[word] = freq
     return freqs
 
 
@@ -312,8 +206,7 @@ def iter_wordlist(lang, wordlist='combined'):
     with the same rounded frequency, appearing in alphabetical order within
     each band.
     """
-    for sublist in get_frequency_list(lang, wordlist):
-        yield from sublist
+    return itertools.chain(*get_frequency_list(lang, wordlist))
 
 
 def half_harmonic_mean(a, b):
@@ -328,25 +221,26 @@ def half_harmonic_mean(a, b):
 
 
 @lru_cache(maxsize=CACHE_SIZE)
-def word_frequency(word, lang, wordlist='combined', default=0.):
+def word_frequency(word, lang, wordlist='combined', minimum=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
     specified `wordlist`. The default wordlist is 'combined', built from
-    whichever of these four sources have sufficient data for the language:
+    whichever of these five sources have sufficient data for the language:
 
       - Full text of Wikipedia
       - A sample of 72 million tweets collected from Twitter in 2014,
         divided roughly into languages using automatic language detection
       - Frequencies extracted from OpenSubtitles
       - The Leeds Internet Corpus
+      - Google Books Ngrams and Google Books Syntactic Ngrams
 
     Another available wordlist is 'twitter', which uses only the data from
     Twitter.
 
     Words that we believe occur at least once per million tokens, based on
     the average of these lists, will appear in the word frequency list.
-    If you look up a word that's not in the list, you'll get the `default`
-    value, which itself defaults to 0.
+
+    The value returned will always be at least as large as `minimum`.
 
     If a word decomposes into multiple tokens, we'll return a smoothed estimate
     of the word frequency that is no greater than the frequency of any of its
@@ -357,12 +251,12 @@ def word_frequency(word, lang, wordlist='combined', default=0.):
     tokens = tokenize(word, lang)
 
     if len(tokens) == 0:
-        return default
+        return minimum
 
     for token in tokens:
         if token not in freqs:
             # If any word is missing, just return the default value
-            return default
+            return minimum
         value = freqs[token]
         if combined_value is None:
             combined_value = value
@@ -370,11 +264,16 @@ def word_frequency(word, lang, wordlist='combined', default=0.):
             # Combine word values using the half-harmonic-mean formula,
             # (a * b) / (a + b). This operation is associative.
             combined_value = half_harmonic_mean(combined_value, value)
-    return combined_value
+    return max(combined_value, minimum)
 
 
 @lru_cache(maxsize=100)
 def top_n_list(lang, n, wordlist='combined', ascii_only=False):
+    """
+    Return a frequency list of length `n` in descending order of frequency.
+    This list contains words from `wordlist`, of the given language.
+    If `ascii_only`, then only ascii words are considered.
+    """
     results = []
     for word in iter_wordlist(lang, wordlist):
         if (not ascii_only) or max(word) <= '~':
@@ -384,7 +283,7 @@ def top_n_list(lang, n, wordlist='combined', ascii_only=False):
     return results
 
 
-def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
+def random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12,
                  ascii_only=False):
     """
     Returns a string of random, space separated words.
@@ -410,7 +309,7 @@ def random_words(lang='en', wordlist='combined', nwords=4, bits_per_word=12,
     return ' '.join(selected)
 
 
-def random_ascii_words(lang='en', wordlist='combined', nwords=4,
+def random_ascii_words(lang='en', wordlist='combined', nwords=5,
                        bits_per_word=12):
     """
     Returns a string of random, space separated, ASCII words.

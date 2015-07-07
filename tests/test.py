@@ -46,7 +46,7 @@ def test_twitter():
 
 def test_defaults():
     eq_(word_frequency('esquivalience', 'en'), 0)
-    eq_(word_frequency('esquivalience', 'en', default=1e-6), 1e-6)
+    eq_(word_frequency('esquivalience', 'en', minimum=1e-6), 1e-6)
 
 
 def test_most_common_words():

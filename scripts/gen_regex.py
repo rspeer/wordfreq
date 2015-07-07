@@ -8,25 +8,31 @@ from pkg_resources import resource_filename
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 
+def cache_regex_from_func(filename, func):
+    """
+    Generates a regex from a function that accepts a single unicode character,
+    and caches it in the data path at filename.
+    """
+    with (DATA_PATH / filename).open(mode='w') as file:
+        file.write(func_to_regex(func))
+
+
 def _emoji_char_class():
     """
     Build a regex for emoji substitution.  We create a regex character set
     (like "[a-cv-z]") matching characters we consider emoji.
     """
-    emoji_file = DATA_PATH / 'emoji.txt'
-
-    def accept(c):
-        x = ord(c)
-        return chardata.CHAR_CLASS_STRING[x] == '3' and \
-                x >= 0x2600 and x != 0xfffd
-
-    with (DATA_PATH / 'emoji.txt').open(mode='w') as file:
-        file.write(func_to_regex(accept))
+    cache_regex_from_func(
+        'emoji.txt',
+        lambda c:
+            chardata.CHAR_CLASS_STRING[ord(c)] == '3' and
+            c >= '\u2600' and c != '\ufffd'
+    )
 
 
 def _non_punct_class():
     """
-    Builds a regex that matches anything that is not a one of the following
+    Builds a regex that matches anything that is not one of the following
     classes:
     - P: punctuation
     - S: symbols
@@ -35,23 +41,20 @@ def _non_punct_class():
     This will classify symbols, including emoji, as punctuation; callers that
     want to treat emoji separately should filter them out first.
     """
-    non_punct_file = DATA_PATH / 'non_punct.txt'
-
-    out = func_to_regex(lambda c: unicodedata.category(c)[0] not in 'PSZC')
-
-    with non_punct_file.open(mode='w') as file:
-        file.write(out)
+    cache_regex_from_func(
+        'non_punct.txt',
+        lambda c: unicodedata.category(c)[0] not in 'PSZC'
+    )
 
 
 def _combining_mark_class():
     """
     Builds a regex that matches anything that is a combining mark
     """
-    combining_mark_file = DATA_PATH / 'combining_mark.txt'
-    out = func_to_regex(lambda c: unicodedata.category(c)[0] == 'M')
-
-    with combining_mark_file.open(mode='w') as file:
-        file.write(out)
+    cache_regex_from_func(
+        'combining_mark.txt',
+        lambda c: unicodedata.category(c)[0] == 'M'
+    )
 
 
 def func_to_regex(accept):

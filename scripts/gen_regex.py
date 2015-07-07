@@ -1,4 +1,3 @@
-import argparse
 import unicodedata
 from ftfy import chardata
 import pathlib

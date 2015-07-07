@@ -1,10 +1,10 @@
 from wordfreq import (
-    word_frequency, available_languages, cB_to_freq, iter_wordlist,
+    word_frequency, available_languages, cB_to_freq,
     top_n_list, random_words, random_ascii_words, tokenize,
     half_harmonic_mean
 )
 from nose.tools import (
-    eq_, assert_almost_equal, assert_greater, assert_less, raises
+    eq_, assert_almost_equal, assert_greater, raises
 )
 
 

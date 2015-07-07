@@ -4,7 +4,9 @@ from ftfy import chardata
 import pathlib
 from pkg_resources import resource_filename
 
+
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
+
 
 def _emoji_char_class():
     """
@@ -28,6 +30,7 @@ def _emoji_char_class():
     with emoji_file.open(mode='w') as file:
         file.write(out)
 
+
 def _non_punct_class():
     """
     Builds a regex that matches anything that is not a one of the following
@@ -46,6 +49,7 @@ def _non_punct_class():
     with non_punct_file.open(mode='w') as file:
         file.write(out)
 
+
 def _combining_mark_class():
     """
     Builds a regex that matches anything that is a combining mark
@@ -55,6 +59,7 @@ def _combining_mark_class():
 
     with combining_mark_file.open(mode='w') as file:
         file.write(out)
+
 
 def func_to_regex(accept):
     """
@@ -84,6 +89,7 @@ def func_to_regex(accept):
             ranges.append('-'.join([start, chr(x-1)]))
 
     return '[%s]' % ''.join(ranges)
+
 
 if __name__ == '__main__':
     _combining_mark_class()

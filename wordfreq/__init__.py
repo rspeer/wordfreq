@@ -14,6 +14,7 @@ DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 CACHE_SIZE = 100000
 
+
 def _emoji_char_class():
     """
     Build a regex for emoji substitution.  First we create a regex character set
@@ -24,6 +25,7 @@ def _emoji_char_class():
     non_punct_file = DATA_PATH / 'emoji.txt'
     with non_punct_file.open() as file:
         return file.read()
+
 
 def _non_punct_class():
     """
@@ -40,6 +42,7 @@ def _non_punct_class():
     with non_punct_file.open() as file:
         return file.read()
 
+
 def _combining_mark_class():
     """
     Builds a regex that matches anything that is a combining mark
@@ -54,6 +57,7 @@ EMOJI_RANGE = _emoji_char_class()
 NON_PUNCT_RANGE = _non_punct_class()
 
 TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
+
 
 def simple_tokenize(text):
     """
@@ -70,6 +74,7 @@ def simple_tokenize(text):
     but "cat's" is.
     """
     return [token.casefold() for token in TOKEN_RE.findall(text)]
+
 
 def tokenize(text, lang):
     """

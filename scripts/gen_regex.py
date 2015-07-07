@@ -10,10 +10,8 @@ DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 def _emoji_char_class():
     """
-    Build a regex for emoji substitution.  First we create a regex character set
-    (like "[a-cv-z]") matching characters we consider emoji. The final regex
-    matches one such character followed by any number of spaces and identical
-    characters.
+    Build a regex for emoji substitution.  We create a regex character set
+    (like "[a-cv-z]") matching characters we consider emoji.
     """
     emoji_file = DATA_PATH / 'emoji.txt'
 

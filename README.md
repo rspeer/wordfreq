@@ -21,6 +21,12 @@ install them on Ubuntu:
     sudo apt-get install mecab-ipadic-utf8 libmecab-dev
     pip3 install mecab-python3
 
+## Unicode data
+
+The tokenizers used to split non-Japanese phrases use regexes built using the
+`unicodedata` module from Python 3.4, which uses Unicode version 6.3.0.  To
+update these regexes, run `scripts/gen_regex.py`.
+
 ## License
 
 `wordfreq` is freely redistributable under the MIT license (see

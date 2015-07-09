@@ -306,8 +306,7 @@ def random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12,
             "There aren't enough words in the wordlist to provide %d bits of "
             "entropy per word." % bits_per_word
         )
-    selected = [random.choice(choices) for i in range(nwords)]
-    return ' '.join(selected)
+    return ' '.join([random.choice(choices) for i in range(nwords)])
 
 
 def random_ascii_words(lang='en', wordlist='combined', nwords=5,

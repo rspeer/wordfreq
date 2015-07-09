@@ -10,13 +10,13 @@ import random
 import logging
 logger = logging.getLogger(__name__)
 
-DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 CACHE_SIZE = 100000
+DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 def load_range(filename):
     """
-    Loads a file from the data path
+    Load a file from the data path.
     """
     with (DATA_PATH / filename).open() as file:
         return file.read()
@@ -26,7 +26,6 @@ NON_PUNCT_RANGE = load_range('non_punct.txt')
 COMBINING_MARK_RANGE = load_range('combining_mark.txt')
 
 COMBINING_MARK_RE = re.compile(COMBINING_MARK_RANGE)
-
 TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
 
 
@@ -45,6 +44,7 @@ def simple_tokenize(text):
     but "cat's" is.
     """
     return [token.casefold() for token in TOKEN_RE.findall(text)]
+
 
 mecab_tokenize = None
 def tokenize(text, lang):

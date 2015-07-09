@@ -209,42 +209,29 @@ def iter_wordlist(lang, wordlist='combined'):
     return itertools.chain(*get_frequency_list(lang, wordlist))
 
 
-def half_harmonic_mean(a, b):
-    """
-    An associative, commutative, monotonic function that returns a value
-    less than or equal to both a and b.
-
-    Used for estimating the frequency of terms made of multiple tokens, given
-    the assumption that the tokens very frequently appear together.
-    """
-    return (a * b) / (a + b)
-
-
 # This dict and inner function are used to implement a "drop everything" cache
 # for word_frequency(); the overheads of lru_cache() are comparable to the time
 # it takes to look up frequencies from scratch, so something faster is needed.
 _wf_cache = {}
 
 def _word_frequency(word, lang, wordlist, minimum):
-    freqs = get_frequency_dict(lang, wordlist)
-    combined_value = None
     tokens = tokenize(word, lang)
-
-    if len(tokens) == 0:
+    if not tokens:
         return minimum
 
+    # Frequencies for multiple tokens are combined using the formula
+    #     1 / f = 1 / f1 + 1 / f2 + ...
+    # Thus the resulting frequency is less than any individual frequency, and
+    # the smallest frequency dominates the sum.
+    freqs = get_frequency_dict(lang, wordlist)
+    one_over_result = 0.0
     for token in tokens:
         if token not in freqs:
             # If any word is missing, just return the default value
             return minimum
-        value = freqs[token]
-        if combined_value is None:
-            combined_value = value
-        else:
-            # Combine word values using the half-harmonic-mean formula,
-            # (a * b) / (a + b). This operation is associative.
-            combined_value = half_harmonic_mean(combined_value, value)
-    return max(combined_value, minimum)
+        one_over_result += 1.0 / freqs[token]
+
+    return max(1.0 / one_over_result, minimum)
 
 def word_frequency(word, lang, wordlist='combined', minimum=0.):
     """

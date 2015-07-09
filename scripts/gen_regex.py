@@ -38,8 +38,8 @@ def cache_regex_from_func(filename, func):
     Generates a regex from a function that accepts a single unicode character,
     and caches it in the data path at filename.
     """
-    with (DATA_PATH / filename).open(mode='w') as f:
-        f.write(func_to_regex(func))
+    with (DATA_PATH / filename).open(mode='w') as file:
+        file.write(func_to_regex(func))
 
 
 def _is_emoji_codepoint(i):

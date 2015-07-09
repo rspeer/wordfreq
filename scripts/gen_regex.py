@@ -14,21 +14,21 @@ def func_to_regex(func):
     return a regex character class accepting the characters resulting in True.
     Ranges separated only by unassigned characters are merged for efficiency.
     """
-    # A list of [start, end (accepted), end (accepted or unassigned)] lists
+    # Where the last range would end if it also included unassigned codepoints.
+    # If we need to add a codepoint right after this point, we extend the
+    # range; otherwise we start a new one.
+    tentative_end = None
     ranges = []
 
     for i, cat in enumerate(CATEGORIES):
         if func(i):
-            # If the last range can be extended, do so; else start a new one
-            if ranges and ranges[-1][2] == i - 1:
+            if tentative_end == i - 1:
                 ranges[-1][1] = i
-                ranges[-1][2] = i
             else:
-                ranges.append([i, i, i])
-        elif cat == 'Cn':
-            # If the last range can be extended, do so
-            if ranges and ranges[-1][2] == i - 1:
-                ranges[-1][2] = i
+                ranges.append([i, i])
+            tentative_end = i
+        elif cat == 'Cn' and tentative_end == i - 1:
+            tentative_end = i
 
     return '[%s]' % ''.join(chr(r[0]) + '-' + chr(r[1]) for r in ranges)
 

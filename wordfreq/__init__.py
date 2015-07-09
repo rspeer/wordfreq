@@ -114,13 +114,13 @@ def read_cBpack(filename):
     """
     with gzip.open(filename, 'rb') as infile:
         data = msgpack.load(infile, encoding='utf-8')
-        header = data[0]
-        if (
-            not isinstance(header, dict) or header.get('format') != 'cB'
-            or header.get('version') != 1
-        ):
-            raise ValueError("Unexpected header: %r" % header)
-        return data[1:]
+    header = data[0]
+    if (
+        not isinstance(header, dict) or header.get('format') != 'cB'
+        or header.get('version') != 1
+    ):
+        raise ValueError("Unexpected header: %r" % header)
+    return data[1:]
 
 
 def available_languages(wordlist='combined'):

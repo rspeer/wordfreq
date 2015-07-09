@@ -220,7 +220,32 @@ def half_harmonic_mean(a, b):
     return (a * b) / (a + b)
 
 
-@lru_cache(maxsize=CACHE_SIZE)
+# This dict and inner function are used to implement a "drop everything" cache
+# for word_frequency(); the overheads of lru_cache() are comparable to the time
+# it takes to look up frequencies from scratch, so something faster is needed.
+_wf_cache = {}
+
+def _word_frequency(word, lang, wordlist, minimum):
+    freqs = get_frequency_dict(lang, wordlist)
+    combined_value = None
+    tokens = tokenize(word, lang)
+
+    if len(tokens) == 0:
+        return minimum
+
+    for token in tokens:
+        if token not in freqs:
+            # If any word is missing, just return the default value
+            return minimum
+        value = freqs[token]
+        if combined_value is None:
+            combined_value = value
+        else:
+            # Combine word values using the half-harmonic-mean formula,
+            # (a * b) / (a + b). This operation is associative.
+            combined_value = half_harmonic_mean(combined_value, value)
+    return max(combined_value, minimum)
+
 def word_frequency(word, lang, wordlist='combined', minimum=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
@@ -246,25 +271,14 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
     of the word frequency that is no greater than the frequency of any of its
     individual tokens.
     """
-    freqs = get_frequency_dict(lang, wordlist)
-    combined_value = None
-    tokens = tokenize(word, lang)
-
-    if len(tokens) == 0:
-        return minimum
-
-    for token in tokens:
-        if token not in freqs:
-            # If any word is missing, just return the default value
-            return minimum
-        value = freqs[token]
-        if combined_value is None:
-            combined_value = value
-        else:
-            # Combine word values using the half-harmonic-mean formula,
-            # (a * b) / (a + b). This operation is associative.
-            combined_value = half_harmonic_mean(combined_value, value)
-    return max(combined_value, minimum)
+    args = (word, lang, wordlist, minimum)
+    try:
+        return _wf_cache[args]
+    except KeyError:
+        if len(_wf_cache) >= CACHE_SIZE:
+            _wf_cache.clear()
+        _wf_cache[args] = _word_frequency(*args)
+        return _wf_cache[args]
 
 
 @lru_cache(maxsize=100)

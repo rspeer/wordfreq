@@ -14,22 +14,18 @@ def func_to_regex(accept):
     return a regex character class accepting the characters resulting in True.
     Ranges separated only by unassigned characters are merged for efficiency.
     """
-    # start and end of the range we are currently parsing. `start` is None if
-    # we are not parsing a range.
-    start = end = None
+    parsing_range = False
     ranges = []
 
     for codepoint, category in enumerate(CATEGORIES):
         if accept(codepoint):
-            if start is None:
-                start = codepoint
-            end = codepoint
-        elif category != 'Cn' and start is not None:
-            ranges.append((start, end))
-            start = end = None
-
-    if start is not None:
-        ranges.append((start, end))
+            if not parsing_range:
+                ranges.append([codepoint, codepoint])
+                parsing_range = True
+            else:
+                ranges[-1][1] = codepoint
+        elif category != 'Cn':
+            parsing_range = False
 
     return '[%s]' % ''.join('%s-%s' % (chr(r[0]), chr(r[1])) for r in ranges)
 

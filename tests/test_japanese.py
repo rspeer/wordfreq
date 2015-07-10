@@ -1,5 +1,5 @@
 from nose.tools import eq_, assert_almost_equal
-from wordfreq import tokenize, word_frequency, half_harmonic_mean
+from wordfreq import tokenize, word_frequency
 
 
 def test_tokens():
@@ -17,10 +17,7 @@ def test_combination():
         ohayou_freq / 2
     )
     assert_almost_equal(
-        word_frequency('おはようございます', 'ja'),
-        half_harmonic_mean(
-            half_harmonic_mean(ohayou_freq, gozai_freq),
-            masu_freq
-        )
+        1.0 / word_frequency('おはようございます', 'ja'),
+        1.0 / ohayou_freq + 1.0 / gozai_freq + 1.0 / masu_freq
     )
 

@@ -4,7 +4,32 @@ import pathlib
 from pkg_resources import resource_filename
 
 
+CATEGORIES = [unicodedata.category(chr(i)) for i in range(0x110000)]
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
+
+
+def func_to_regex(accept_func):
+    """
+    Given a function that returns True or False for a numerical codepoint,
+    return a regex character class accepting the characters resulting in True.
+    Ranges separated only by unassigned characters are merged for efficiency.
+    """
+    # parsing_range is True if the current codepoint might be in a range that
+    # the regex will accept
+    parsing_range = False
+    ranges = []
+
+    for codepoint, category in enumerate(CATEGORIES):
+        if accept_func(codepoint):
+            if not parsing_range:
+                ranges.append([codepoint, codepoint])
+                parsing_range = True
+            else:
+                ranges[-1][1] = codepoint
+        elif category != 'Cn':
+            parsing_range = False
+
+    return '[%s]' % ''.join('%c-%c' % tuple(r) for r in ranges)
 
 
 def cache_regex_from_func(filename, func):
@@ -16,77 +41,36 @@ def cache_regex_from_func(filename, func):
         file.write(func_to_regex(func))
 
 
-def _emoji_char_class():
+def _is_emoji_codepoint(i):
     """
-    Build a regex for emoji substitution.  We create a regex character set
-    (like "[a-cv-z]") matching characters we consider emoji.
+    Report whether a numerical codepoint is (likely) an emoji: a Unicode 'So'
+    character (as future-proofed by the ftfy chardata module) but excluding
+    symbols like © and ™ below U+2600 and the replacement character U+FFFD.
     """
-    cache_regex_from_func(
-        'emoji.txt',
-        lambda c:
-            chardata.CHAR_CLASS_STRING[ord(c)] == '3' and
-            c >= '\u2600' and c != '\ufffd'
-    )
+    return chardata.CHAR_CLASS_STRING[i] == '3' and i >= 0x2600 and i != 0xfffd
 
 
-def _non_punct_class():
+def _is_non_punct_codepoint(i):
     """
-    Builds a regex that matches anything that is not one of the following
-    classes:
+    Report whether a numerical codepoint is not one of the following classes:
     - P: punctuation
     - S: symbols
     - Z: separators
     - C: control characters
-    This will classify symbols, including emoji, as punctuation; callers that
-    want to treat emoji separately should filter them out first.
+    This will classify symbols, including emoji, as punctuation; users that
+    want to accept emoji should add them separately.
     """
-    cache_regex_from_func(
-        'non_punct.txt',
-        lambda c: unicodedata.category(c)[0] not in 'PSZC'
-    )
+    return CATEGORIES[i][0] not in 'PSZC'
 
 
-def _combining_mark_class():
+def _is_combining_mark_codepoint(i):
     """
-    Builds a regex that matches anything that is a combining mark
+    Report whether a numerical codepoint is a combining mark (Unicode 'M').
     """
-    cache_regex_from_func(
-        'combining_mark.txt',
-        lambda c: unicodedata.category(c)[0] == 'M'
-    )
-
-
-def func_to_regex(accept):
-    """
-    Converts a function that accepts a single unicode character into a regex.
-    Unassigned unicode characters are treated like their neighbors.
-    """
-    ranges = []
-    start = None
-    has_accepted = False
-    for x in range(0x110000):
-        c = chr(x)
-
-        if accept(c):
-            has_accepted = True
-            if start is None:
-                start = c
-        elif unicodedata.category(c) == 'Cn':
-            if start is None:
-                start = c
-        elif start is not None:
-            if has_accepted:
-                ranges.append('-'.join([start, chr(x-1)]))
-                has_accepted = False
-            start = None
-    else:
-        if has_accepted and start is not None:
-            ranges.append('-'.join([start, chr(x-1)]))
-
-    return '[%s]' % ''.join(ranges)
+    return CATEGORIES[i][0] == 'M'
 
 
 if __name__ == '__main__':
-    _combining_mark_class()
-    _non_punct_class()
-    _emoji_char_class()
+    cache_regex_from_func('emoji.txt', _is_emoji_codepoint)
+    cache_regex_from_func('non_punct.txt', _is_non_punct_codepoint)
+    cache_regex_from_func('combining_mark.txt', _is_combining_mark_codepoint)

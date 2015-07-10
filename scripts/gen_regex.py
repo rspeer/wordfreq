@@ -8,7 +8,7 @@ CATEGORIES = [unicodedata.category(chr(i)) for i in range(0x110000)]
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 
-def func_to_regex(accept):
+def func_to_regex(accept_func):
     """
     Given a function that returns True or False for a numerical codepoint,
     return a regex character class accepting the characters resulting in True.
@@ -18,7 +18,7 @@ def func_to_regex(accept):
     ranges = []
 
     for codepoint, category in enumerate(CATEGORIES):
-        if accept(codepoint):
+        if accept_func(codepoint):
             if not parsing_range:
                 ranges.append([codepoint, codepoint])
                 parsing_range = True

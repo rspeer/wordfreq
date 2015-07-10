@@ -27,7 +27,7 @@ def func_to_regex(accept_func):
         elif category != 'Cn':
             parsing_range = False
 
-    return '[%s]' % ''.join('%s-%s' % (chr(r[0]), chr(r[1])) for r in ranges)
+    return '[%s]' % ''.join('%c-%c' % tuple(r) for r in ranges)
 
 
 def cache_regex_from_func(filename, func):

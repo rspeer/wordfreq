@@ -8,29 +8,30 @@ CATEGORIES = [unicodedata.category(chr(i)) for i in range(0x110000)]
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 
-def func_to_regex(func):
+def func_to_regex(accept):
     """
     Given a function that returns True or False for a numerical codepoint,
     return a regex character class accepting the characters resulting in True.
     Ranges separated only by unassigned characters are merged for efficiency.
     """
-    # A list of [start, end (accepted), end (accepted or unassigned)] lists
+    # start and end of the range we are currently parsing. `start` is None if
+    # we are not parsing a range.
+    start = end = None
     ranges = []
 
-    for i, cat in enumerate(CATEGORIES):
-        if func(i):
-            # If the last range can be extended, do so; else start a new one
-            if ranges and ranges[-1][2] == i - 1:
-                ranges[-1][1] = i
-                ranges[-1][2] = i
-            else:
-                ranges.append([i, i, i])
-        elif cat == 'Cn':
-            # If the last range can be extended, do so
-            if ranges and ranges[-1][2] == i - 1:
-                ranges[-1][2] = i
+    for codepoint, category in enumerate(CATEGORIES):
+        if accept(codepoint):
+            if start is None:
+                start = codepoint
+            end = codepoint
+        elif category != 'Cn' and start is not None:
+            ranges.append((start, end))
+            start = end = None
 
-    return '[%s]' % ''.join(chr(r[0]) + '-' + chr(r[1]) for r in ranges)
+    if start is not None:
+        ranges.append((start, end))
+
+    return '[%s]' % ''.join('%s-%s' % (chr(r[0]), chr(r[1])) for r in ranges)
 
 
 def cache_regex_from_func(filename, func):

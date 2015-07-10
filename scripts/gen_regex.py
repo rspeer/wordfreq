@@ -14,23 +14,22 @@ def func_to_regex(accept_func):
     return a regex character class accepting the characters resulting in True.
     Ranges separated only by unassigned characters are merged for efficiency.
     """
-    # Where the last range would end if it also included unassigned codepoints.
-    # If we need to add a codepoint right after this point, we extend the
-    # range; otherwise we start a new one.
-    tentative_end = None
+    # parsing_range is True if the current codepoint might be in a range that
+    # the regex will accept
+    parsing_range = False
     ranges = []
 
     for codepoint, category in enumerate(CATEGORIES):
         if accept_func(codepoint):
-            if tentative_end == codepoint - 1:
-                ranges[-1][1] = codepoint
-            else:
+            if not parsing_range:
                 ranges.append([codepoint, codepoint])
-            tentative_end = codepoint
-        elif category == 'Cn' and tentative_end == codepoint - 1:
-            tentative_end = codepoint
+                parsing_range = True
+            else:
+                ranges[-1][1] = codepoint
+        elif category != 'Cn':
+            parsing_range = False
 
-    return '[%s]' % ''.join(chr(r[0]) + '-' + chr(r[1]) for r in ranges)
+    return '[%s]' % ''.join('%c-%c' % tuple(r) for r in ranges)
 
 
 def cache_regex_from_func(filename, func):

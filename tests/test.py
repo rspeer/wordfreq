@@ -1,7 +1,6 @@
 from wordfreq import (
     word_frequency, available_languages, cB_to_freq,
-    top_n_list, random_words, random_ascii_words, tokenize,
-    half_harmonic_mean
+    top_n_list, random_words, random_ascii_words, tokenize
 )
 from nose.tools import (
     eq_, assert_almost_equal, assert_greater, raises
@@ -114,12 +113,9 @@ def test_phrase_freq():
     plant = word_frequency("plan.t", 'en')
     assert_greater(plant, 0)
     assert_almost_equal(
-        plant,
-        half_harmonic_mean(
-            word_frequency('plan', 'en'),
-            word_frequency('t', 'en')
-            )
-        )
+        1.0 / plant,
+        1.0 / word_frequency('plan', 'en') + 1.0 / word_frequency('t', 'en')
+    )
 
 
 def test_not_really_random():

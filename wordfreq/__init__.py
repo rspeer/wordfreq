@@ -10,13 +10,13 @@ import random
 import logging
 logger = logging.getLogger(__name__)
 
-DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 CACHE_SIZE = 100000
+DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
 def load_range(filename):
     """
-    Loads a file from the data path
+    Load a file from the data path.
     """
     with (DATA_PATH / filename).open() as file:
         return file.read()
@@ -26,7 +26,6 @@ NON_PUNCT_RANGE = load_range('non_punct.txt')
 COMBINING_MARK_RANGE = load_range('combining_mark.txt')
 
 COMBINING_MARK_RE = re.compile(COMBINING_MARK_RANGE)
-
 TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
 
 
@@ -45,6 +44,7 @@ def simple_tokenize(text):
     but "cat's" is.
     """
     return [token.casefold() for token in TOKEN_RE.findall(text)]
+
 
 mecab_tokenize = None
 def tokenize(text, lang):
@@ -114,13 +114,13 @@ def read_cBpack(filename):
     """
     with gzip.open(filename, 'rb') as infile:
         data = msgpack.load(infile, encoding='utf-8')
-        header = data[0]
-        if (
-            not isinstance(header, dict) or header.get('format') != 'cB'
-            or header.get('version') != 1
-        ):
-            raise ValueError("Unexpected header: %r" % header)
-        return data[1:]
+    header = data[0]
+    if (
+        not isinstance(header, dict) or header.get('format') != 'cB'
+        or header.get('version') != 1
+    ):
+        raise ValueError("Unexpected header: %r" % header)
+    return data[1:]
 
 
 def available_languages(wordlist='combined'):
@@ -209,18 +209,30 @@ def iter_wordlist(lang, wordlist='combined'):
     return itertools.chain(*get_frequency_list(lang, wordlist))
 
 
-def half_harmonic_mean(a, b):
-    """
-    An associative, commutative, monotonic function that returns a value
-    less than or equal to both a and b.
+# This dict and inner function are used to implement a "drop everything" cache
+# for word_frequency(); the overheads of lru_cache() are comparable to the time
+# it takes to look up frequencies from scratch, so something faster is needed.
+_wf_cache = {}
 
-    Used for estimating the frequency of terms made of multiple tokens, given
-    the assumption that the tokens very frequently appear together.
-    """
-    return (a * b) / (a + b)
+def _word_frequency(word, lang, wordlist, minimum):
+    tokens = tokenize(word, lang)
+    if not tokens:
+        return minimum
 
+    # Frequencies for multiple tokens are combined using the formula
+    #     1 / f = 1 / f1 + 1 / f2 + ...
+    # Thus the resulting frequency is less than any individual frequency, and
+    # the smallest frequency dominates the sum.
+    freqs = get_frequency_dict(lang, wordlist)
+    one_over_result = 0.0
+    for token in tokens:
+        if token not in freqs:
+            # If any word is missing, just return the default value
+            return minimum
+        one_over_result += 1.0 / freqs[token]
 
-@lru_cache(maxsize=CACHE_SIZE)
+    return max(1.0 / one_over_result, minimum)
+
 def word_frequency(word, lang, wordlist='combined', minimum=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
@@ -246,25 +258,14 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
     of the word frequency that is no greater than the frequency of any of its
     individual tokens.
     """
-    freqs = get_frequency_dict(lang, wordlist)
-    combined_value = None
-    tokens = tokenize(word, lang)
-
-    if len(tokens) == 0:
-        return minimum
-
-    for token in tokens:
-        if token not in freqs:
-            # If any word is missing, just return the default value
-            return minimum
-        value = freqs[token]
-        if combined_value is None:
-            combined_value = value
-        else:
-            # Combine word values using the half-harmonic-mean formula,
-            # (a * b) / (a + b). This operation is associative.
-            combined_value = half_harmonic_mean(combined_value, value)
-    return max(combined_value, minimum)
+    args = (word, lang, wordlist, minimum)
+    try:
+        return _wf_cache[args]
+    except KeyError:
+        if len(_wf_cache) >= CACHE_SIZE:
+            _wf_cache.clear()
+        _wf_cache[args] = _word_frequency(*args)
+        return _wf_cache[args]
 
 
 @lru_cache(maxsize=100)
@@ -305,8 +306,7 @@ def random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12,
             "There aren't enough words in the wordlist to provide %d bits of "
             "entropy per word." % bits_per_word
         )
-    selected = [random.choice(choices) for i in range(nwords)]
-    return ' '.join(selected)
+    return ' '.join([random.choice(choices) for i in range(nwords)])
 
 
 def random_ascii_words(lang='en', wordlist='combined', nwords=5,

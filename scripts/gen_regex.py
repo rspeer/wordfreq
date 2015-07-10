@@ -14,6 +14,8 @@ def func_to_regex(accept_func):
     return a regex character class accepting the characters resulting in True.
     Ranges separated only by unassigned characters are merged for efficiency.
     """
+    # parsing_range is True if the current codepoint might be in a range that
+    # the regex will accept
     parsing_range = False
     ranges = []
 

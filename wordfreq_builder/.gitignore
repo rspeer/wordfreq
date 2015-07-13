@@ -1,0 +1,12 @@
+*.pyc
+__pycache__
+.coverage
+.idea
+dist
+*.egg-info
+build
+_build
+build.ninja
+data
+.ninja_deps
+.ninja_log

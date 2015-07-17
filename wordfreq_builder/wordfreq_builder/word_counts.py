@@ -27,7 +27,7 @@ def read_freqs(filename, cutoff=0):
     """
     Read words and their frequencies from a CSV file.
 
-    Only words with a frequency greater than `cutoff` are returned.
+    Only words with a frequency greater than or equal to `cutoff` are returned.
 
     If `cutoff` is greater than 0, the csv file must be sorted by frequency
     in descending order.

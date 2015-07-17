@@ -40,7 +40,7 @@ def cld2_detect_language(text):
     return pycld2.detect(text)[2][0][1]
 
 
-def tokenize_file(in_filename, out_prefix, tokenizer, last_tab=True):
+def tokenize_twitter(in_filename, out_prefix, tokenizer):
     """
     Process a file by running it through the given tokenizer, sorting the
     results by the language of each line, and inserting newlines

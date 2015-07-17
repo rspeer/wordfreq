@@ -119,17 +119,15 @@ def google_books_deps(dirname_in):
     return lines
 
 
-def twitter_deps(input_filename, slice_prefix,
-                            combined_prefix, slices, languages):
+def twitter_deps(input_filename, slice_prefix, combined_prefix, slices, languages):
+
     lines = []
 
     slice_files = ['{prefix}.part{num:0>2d}'.format(prefix=slice_prefix, num=num)
                    for num in range(slices)]
     # split the input into slices
-    add_dep(lines,
-            'split', input_filename, slice_files,
-            params={'prefix': '{}.part'.format(slice_prefix),
-             'slices': slices})
+    add_dep(lines, 'split', input_filename, slice_files,
+            params={'prefix': '{}.part'.format(slice_prefix), 'slices': slices})
 
     for slicenum in range(slices):
         slice_file = slice_files[slicenum]

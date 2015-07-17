@@ -257,6 +257,9 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
     If a word decomposes into multiple tokens, we'll return a smoothed estimate
     of the word frequency that is no greater than the frequency of any of its
     individual tokens.
+
+    It should be noted that the current tokenizer does not support
+    multi-character Chinese terms.
     """
     args = (word, lang, wordlist, minimum)
     try:

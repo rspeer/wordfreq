@@ -94,7 +94,7 @@ def test_failed_cB_conversion():
 
 def test_tokenization():
     # We preserve apostrophes within words, so "can't" is a single word in the
-    # data, while the fake word "plan't" can't be found.
+    # data
     eq_(tokenize("can't", 'en'), ["can't"])
 
     eq_(tokenize('😂test', 'en'), ['😂', 'test'])

@@ -47,17 +47,6 @@ def last_tab(line):
     return line.split('\t')[-1].strip()
 
 
-def lowercase_text_filter(token):
-    """
-    If this looks like a token that we want to count, return it, lowercased.
-    If not, filter it out by returning None.
-    """
-    if TOKEN_RE.search(token):
-        return token.lower()
-    else:
-        return None
-
-
 def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     """
     Process a file by running it through the given tokenizer, sorting the
@@ -91,27 +80,3 @@ def fix_entities(text):
     def replace_entity(match):
         return chr(name2codepoint[match.group(1)])
     return ENTITY_RE.sub(replace_entity, text)
-
-
-def monolingual_tokenize_file(in_filename, out_filename, language,
-                              tokenizer, line_reader=last_tab,
-                              sample_proportion=1):
-    """
-    Process a file by running it through the given tokenizer, only keeping
-    lines of the language we're asking for, and inserting newlines
-    to mark the token boundaries.
-
-    `line_reader` is applied to each line before it given to the tokenizer
-
-    Only the first line out of every `sample_proportion` lines are run through
-    then tokenizer.
-    """
-    with open(in_filename, encoding='utf-8', errors='replace') as in_file:
-        with open(out_filename, 'w', encoding='utf-8') as out_file:
-            for i, line in enumerate(in_file):
-                if i % sample_proportion == 0:
-                    text = line_reader(line)
-                    tokens, line_language = tokenizer(text)
-                    if line_language == language:
-                        for token in tokens:
-                            print(token, file=out_file)

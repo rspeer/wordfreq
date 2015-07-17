@@ -151,9 +151,10 @@ def twitter_deps(input_filename, slice_prefix, combined_prefix, slices, language
         if language == 'ja':
             mecab_token_file = wordlist_filename('twitter', language, 'mecab-tokens.txt')
             add_dep(lines, 'tokenize_japanese', combined_output, mecab_token_file)
-            add_dep(lines, 'count', mecab_token_file, count_file, extra='wordfreq_builder/tokenizers.py')
-        else:
-            add_dep(lines, 'count', combined_output, count_file, extra='wordfreq_builder/tokenizers.py')
+            combined_output = mecab_token_file
+            
+        add_dep(lines, 'count', combined_output, count_file, extra='wordfreq_builder/tokenizers.py',
+                params={'lang': language})
 
     return lines
 

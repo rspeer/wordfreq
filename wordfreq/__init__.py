@@ -66,9 +66,16 @@ def tokenize(text, lang):
         return mecab_tokenize(text)
 
     if lang == 'ar':
-        text = COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
+        text = standardize_arabic(text)
 
     return simple_tokenize(text)
+
+
+def standardize_arabic(text):
+    """
+    Standardizes arabic text by removing combining marks and tatweels.
+    """
+    return COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
 
 
 def read_cBpack(filename):

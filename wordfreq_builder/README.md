@@ -83,6 +83,17 @@ The specific rules are described by the comments in `rules.ninja`.
 
 ## Data sources
 
+### Wikipedia
+
+Wikipedia is a "free-access, free-content Internet encyclopedia".
+
+These files can be downloaded from [wikimedia dump][wikipedia]
+
+The original files are in `data/raw-input/wikipedia`, and they're processed
+by the `wiki2text` rule in `rules.ninja`.
+
+[wikipedia]: https://dumps.wikimedia.org/backup-index.html
+
 ### Leeds Internet Corpus
 
 Also known as the "Web as Corpus" project, this is a University of Leeds
@@ -119,7 +130,7 @@ because it's cleaner. The data comes in the form of 99 gzipped text files in
 
 ### OpenSubtitles
 
-[Some guy](https://invokeit.wordpress.com/frequency-word-lists/) made word
+[Hermit Dave](https://invokeit.wordpress.com/frequency-word-lists/) made word
 frequency lists out of the subtitle text on OpenSubtitles. This data was
 used to make Wiktionary word frequency lists at one point, but it's been
 updated significantly since the version Wiktionary got.
@@ -145,4 +156,3 @@ longer represents the words 'don' and 'won', as we assume most of their
 frequency comes from "don't" and "won't". Words that turned into similarly
 common words, however, were left alone: this list doesn't represent "can't"
 because the word was left as "can".
-

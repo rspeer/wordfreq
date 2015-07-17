@@ -66,11 +66,10 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600):
     cBpack = []
     for token, freq in freqs.items():
         cB = round(math.log10(freq) * 100)
-        if cB >= cutoff:
-            neg_cB = -cB
-            while neg_cB >= len(cBpack):
-                cBpack.append([])
-            cBpack[neg_cB].append(token)
+        neg_cB = -cB
+        while neg_cB >= len(cBpack):
+            cBpack.append([])
+        cBpack[neg_cB].append(token)
 
     for sublist in cBpack:
         sublist.sort()

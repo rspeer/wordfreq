@@ -1,11 +1,11 @@
-from wordfreq_builder.tokenizers import cld2_surface_tokenizer, tokenize_file
+from wordfreq_builder.tokenizers import cld2_surface_tokenizer, tokenize_twitter
 import argparse
 
 
 def tokenize_twitter(in_filename, out_prefix):
-    tokenize_file(in_filename, out_prefix,
-                  tokenizer=cld2_surface_tokenizer
-                  )
+    tokenize_twitter(in_filename, out_prefix,
+                     tokenizer=cld2_surface_tokenizer
+                    )
 
 
 def main():

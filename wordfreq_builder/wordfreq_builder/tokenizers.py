@@ -17,7 +17,7 @@ CLD2_BAD_CHAR_RANGE = "[%s]" % "".join(
 CLD2_BAD_CHARS_RE = re.compile(CLD2_BAD_CHAR_RANGE)
 
 TWITTER_HANDLE_RE = re.compile('@{0}+'.format(NON_PUNCT_RANGE))
-TCO_RE = re.compile('http(?:s)?://t.co/[a-zA-Z0-9]+'.format(NON_PUNCT_RANGE))
+TCO_RE = re.compile('http(?:s)?://t.co/[a-zA-Z0-9]+')
 
 
 def cld2_surface_tokenizer(text):

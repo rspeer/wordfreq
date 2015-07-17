@@ -1,5 +1,6 @@
 from html.entities import name2codepoint
 from wordfreq import tokenize, TOKEN_RE, NON_PUNCT_RANGE
+from ftfy.fixes import unescape_html
 import re
 import pycld2
 
@@ -24,7 +25,7 @@ def cld2_surface_tokenizer(text):
     """
     Uses CLD2 to detect the language and wordfreq tokenizer to create tokens
     """
-    text = fix_entities(text)
+    text = unescape_html(text)
     text = TWITTER_HANDLE_RE.sub('', text)
     text = TCO_RE.sub('', text)
     lang = cld2_detect_language(text)
@@ -36,6 +37,15 @@ def cld2_detect_language(text):
     """
     Uses CLD2 to detect the language
     """
+    # Format of pycld2.detect:
+    #   (Confident in result: bool,
+    #   Number of bytes of text: Int,
+    #   Triples of detected languages in order of certainty:
+    #       (Language name: str,
+    #       Language code: str
+    #       Percent of text in this language: float
+    #       Confidence score: float))
+    
     text = CLD2_BAD_CHARS_RE.sub('', text)
     return pycld2.detect(text)[2][0][1]
 
@@ -62,14 +72,3 @@ def tokenize_twitter(in_filename, out_prefix, tokenizer):
                 print(tokenized, file=out_file)
     for out_file in out_files.values():
         out_file.close()
-
-
-ENTITY_RE = re.compile(r'& ?(amp|quot|lt|gt) ?;')
-def fix_entities(text):
-    """
-    Fix the few HTML entities that Twitter uses -- even if they've
-    already been tokenized.
-    """
-    def replace_entity(match):
-        return chr(name2codepoint[match.group(1)])
-    return ENTITY_RE.sub(replace_entity, text)

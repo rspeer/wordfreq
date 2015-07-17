@@ -47,9 +47,10 @@ def read_freqs(filename, cutoff=0):
                 # duplicates, it does the right thing
                 raw_counts[token] += val
 
-    freqs = {key: raw_count / total
-             for (key, raw_count) in raw_counts.items()}
-    return freqs
+    for word in raw_counts:
+        raw_counts[word] /= total
+
+    return raw_counts
 
 
 def freqs_to_cBpack(in_filename, out_filename, cutoff=-600):

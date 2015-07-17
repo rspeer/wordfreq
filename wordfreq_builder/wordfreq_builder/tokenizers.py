@@ -40,14 +40,7 @@ def cld2_detect_language(text):
     return pycld2.detect(text)[2][0][1]
 
 
-def last_tab(line):
-    """
-    Read lines by keeping only the last tab-separated value.
-    """
-    return line.split('\t')[-1].strip()
-
-
-def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
+def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=None):
     """
     Process a file by running it through the given tokenizer, sorting the
     results by the language of each line, and inserting newlines
@@ -56,7 +49,10 @@ def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     out_files = {}
     with open(in_filename, encoding='utf-8') as in_file:
         for line in in_file:
-            text = line_reader(line)
+            if line_reader is not None:
+                text = line_reader(line)
+            else:
+                text = line
             language, tokens = tokenizer(text)
             if language != 'un':
                 tokenized = '\n'.join(tokens)

@@ -24,10 +24,13 @@ def cld2_surface_tokenizer(text):
     """
     Uses CLD2 to detect the language and wordfreq tokenizer to create tokens
     """
-    text = remove_handles_and_urls(text)
+    text = fix_entities(text)
+    text = TWITTER_HANDLE_RE.sub('', text)
+    text = TCO_RE.sub('', text)
     lang = cld2_detect_language(text)
     tokens = tokenize(text, lang)
     return lang, tokens
+
 
 def cld2_detect_language(text):
     """
@@ -36,17 +39,13 @@ def cld2_detect_language(text):
     text = CLD2_BAD_CHARS_RE.sub('', text)
     return pycld2.detect(text)[2][0][1]
 
-def remove_handles_and_urls(text):
-    text = fix_entities(text)
-    text = TWITTER_HANDLE_RE.sub('', text)
-    text = TCO_RE.sub('', text)
-    return text
 
 def last_tab(line):
     """
     Read lines by keeping only the last tab-separated value.
     """
     return line.split('\t')[-1].strip()
+
 
 def lowercase_text_filter(token):
     """
@@ -57,6 +56,7 @@ def lowercase_text_filter(token):
         return token.lower()
     else:
         return None
+
 
 def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     """
@@ -81,8 +81,8 @@ def tokenize_file(in_filename, out_prefix, tokenizer, line_reader=last_tab):
     for out_file in out_files.values():
         out_file.close()
 
-ENTITY_RE = re.compile(r'& ?(amp|quot|lt|gt) ?;')
 
+ENTITY_RE = re.compile(r'& ?(amp|quot|lt|gt) ?;')
 def fix_entities(text):
     """
     Fix the few HTML entities that Twitter uses -- even if they've
@@ -91,6 +91,7 @@ def fix_entities(text):
     def replace_entity(match):
         return chr(name2codepoint[match.group(1)])
     return ENTITY_RE.sub(replace_entity, text)
+
 
 def monolingual_tokenize_file(in_filename, out_filename, language,
                               tokenizer, line_reader=last_tab,

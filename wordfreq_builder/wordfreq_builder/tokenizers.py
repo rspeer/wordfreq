@@ -3,16 +3,17 @@ from wordfreq import tokenize, TOKEN_RE, NON_PUNCT_RANGE
 import re
 import pycld2
 
-CLD2_BAD_CHAR_RANGE = "".join([
-    '[',
-    '\x00-\x08',
-    '\x0b',
-    '\x0e-\x1f',
-    '\x7f-\x9f',
-    '\ud800-\udfff',
-    '\ufdd0-\ufdef'] +
-    [chr(65534+65536*x+y) for x in range(17) for y in range(2)] +
-    [']'])
+CLD2_BAD_CHAR_RANGE = "[%s]" % "".join(
+    [
+        '\x00-\x08',
+        '\x0b',
+        '\x0e-\x1f',
+        '\x7f-\x9f',
+        '\ud800-\udfff',
+        '\ufdd0-\ufdef'
+    ] +
+    [chr(65534+65536*x+y) for x in range(17) for y in range(2)]
+)
 CLD2_BAD_CHARS_RE = re.compile(CLD2_BAD_CHAR_RANGE)
 
 TWITTER_HANDLE_RE = re.compile('@{0}+'.format(NON_PUNCT_RANGE))

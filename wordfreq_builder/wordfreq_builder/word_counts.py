@@ -18,7 +18,7 @@ def count_tokens(filename):
     counts = defaultdict(int)
     with open(filename, encoding='utf-8', errors='replace') as infile:
         for line in infile:
-            for token in simple_tokenize(line.strip()):
+            for token in simple_tokenize(line):
                 counts[token] += 1
     return counts
 

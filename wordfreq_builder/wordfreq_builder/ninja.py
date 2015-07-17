@@ -94,9 +94,9 @@ def wikipedia_deps(dirname_in, languages):
         if language == 'ja':
             mecab_token_file = wordlist_filename('wikipedia', language, 'mecab-tokens.txt')
             add_dep(lines, 'tokenize_japanese', plain_text_file, mecab_token_file)
-            add_dep(lines, 'count', mecab_token_file, count_file)
+            add_dep(lines, 'count', mecab_token_file, count_file, params={'lang': language})
         else:
-            add_dep(lines, 'count', plain_text_file, count_file)
+            add_dep(lines, 'count', plain_text_file, count_file, params={'lang': language})
 
     return lines
 
@@ -152,7 +152,7 @@ def twitter_deps(input_filename, slice_prefix, combined_prefix, slices, language
             mecab_token_file = wordlist_filename('twitter', language, 'mecab-tokens.txt')
             add_dep(lines, 'tokenize_japanese', combined_output, mecab_token_file)
             combined_output = mecab_token_file
-            
+
         add_dep(lines, 'count', combined_output, count_file, extra='wordfreq_builder/tokenizers.py',
                 params={'lang': language})
 

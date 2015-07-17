@@ -1,4 +1,4 @@
-from wordfreq import simple_tokenize
+from wordfreq import simple_tokenize, standardize_arabic
 from collections import defaultdict
 from operator import itemgetter
 from ftfy import fix_text
@@ -8,7 +8,7 @@ import msgpack
 import gzip
 
 
-def count_tokens(filename):
+def count_tokens(filename, lang):
     """
     Count tokens that appear in a file, running each line through our
     simple tokenizer.
@@ -17,9 +17,14 @@ def count_tokens(filename):
     """
     counts = defaultdict(int)
     with open(filename, encoding='utf-8', errors='replace') as infile:
-        for line in infile:
-            for token in simple_tokenize(line):
-                counts[token] += 1
+        if lang == 'ar':
+            for line in infile:
+                for token in simple_tokenize(line):
+                    counts[standardize_arabic(token)] += 1
+        else:
+            for line in infile:
+                for token in simple_tokenize(line):
+                    counts[token] += 1
     return counts
 
 

@@ -117,9 +117,26 @@ because it's cleaner. The data comes in the form of 99 gzipped text files in
 
 [gbsn]: http://commondatastorage.googleapis.com/books/syntactic-ngrams/index.html
 
+### Wikipedia
+
+Another source we use is the full text of Wikipedia in various languages. This
+text can be difficult to extract efficiently, and for this purpose we use a
+custom tool written in Nim 0.11, called [wiki2text][]. To build the Wikipedia
+data, you need to separately install Nim and wiki2text.
+
+The input data files are the XML dumps that can be found on the [Wikimedia
+backup index][wikidumps]. For example, to get the latest Spanish data, go to
+https://dumps.wikimedia.org/frwiki/latest and look for the filename of the form
+`*.pages-articles.xml.bz2`. If this file isn't there, look for an older dump
+where it is. You'll need to download such a file for each language that's
+configured for Wikipedia in `wordfreq_builder/config.py`.
+
+[wiki2text]: https://github.com/rspeer/wiki2text
+[wikidumps]: https://dumps.wikimedia.org/backup-index.html
+
 ### OpenSubtitles
 
-[Some guy](https://invokeit.wordpress.com/frequency-word-lists/) made word
+[Hermit Dave](https://invokeit.wordpress.com/frequency-word-lists/) made word
 frequency lists out of the subtitle text on OpenSubtitles. This data was
 used to make Wiktionary word frequency lists at one point, but it's been
 updated significantly since the version Wiktionary got.

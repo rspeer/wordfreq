@@ -85,7 +85,6 @@ def wikipedia_deps(dirname_in, languages):
     path_in = pathlib.Path(dirname_in)
     for language in languages:
         # Find the most recent file for this language
-        # Skip over files that do not exist
         input_file = max(path_in.glob(
             '{}wiki*.bz2'.format(language)
         ))

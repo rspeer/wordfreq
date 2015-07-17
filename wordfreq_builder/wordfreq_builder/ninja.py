@@ -52,6 +52,7 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
             slices=40,
             languages=CONFIG['sources']['twitter']
         )
+    )
     lines.extend(
         wikipedia_deps(
             data_filename('raw-input/wikipedia'),

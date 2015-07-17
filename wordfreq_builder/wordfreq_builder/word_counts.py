@@ -88,7 +88,7 @@ def merge_freqs(freq_dicts):
     """
     vocab = set()
     for freq_dict in freq_dicts:
-        vocab |= set(freq_dict)
+        vocab.update(freq_dict)
 
     merged = defaultdict(float)
     N = len(freq_dicts)

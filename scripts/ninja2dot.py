@@ -1,5 +1,4 @@
-""" This file generates a graph of the dependencies for the ninja build.
-"""
+""" This file generates a graph of the dependencies for the ninja build."""
 
 import sys
 

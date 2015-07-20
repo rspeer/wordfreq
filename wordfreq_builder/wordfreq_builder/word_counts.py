@@ -17,14 +17,16 @@ def count_tokens(filename, lang):
     """
     counts = defaultdict(int)
     with open(filename, encoding='utf-8', errors='replace') as infile:
-        if lang == 'ar':
-            for line in infile:
-                for token in simple_tokenize(line):
-                    counts[standardize_arabic(token)] += 1
-        else:
-            for line in infile:
-                for token in simple_tokenize(line):
-                    counts[token] += 1
+        for line in infile:
+            for token in simple_tokenize(line):
+                if lang == 'ar':
+                    token = standardize_arabic(token)
+                    if not token:
+                        # skip empty strings
+                        continue
+
+                counts[token] += 1
+
     return counts
 
 

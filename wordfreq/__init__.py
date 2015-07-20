@@ -266,7 +266,7 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
     individual tokens.
 
     It should be noted that the current tokenizer does not support
-    multi-character Chinese terms.
+    multi-word Chinese phrases.
     """
     args = (word, lang, wordlist, minimum)
     try:

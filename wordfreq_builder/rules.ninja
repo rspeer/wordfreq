@@ -74,7 +74,7 @@ rule merge
   command = python -m wordfreq_builder.cli.combine_lists -o $out $in
 
 rule freqs2cB
-  command = python -m wordfreq_builder.cli.freqs_to_cB $in $out
+  command = python -m wordfreq_builder.cli.freqs_to_cB $in $lang $out
 
 rule cat
   command = cat $in > $out

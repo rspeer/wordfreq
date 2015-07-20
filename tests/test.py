@@ -135,12 +135,20 @@ def test_not_enough_ascii():
     random_ascii_words(lang='zh')
 
 def test_ar():
+
+    # Remove tatweels
     eq_(
         tokenize('متــــــــعب', 'ar'),
         ['متعب']
     )
 
+    # Remove combining marks
     eq_(
         tokenize('حَرَكَات', 'ar'),
         ['حركات']
+    )
+
+    eq_(
+        tokenize('إﻻ', 'ar'),
+        ['إلا']
     )

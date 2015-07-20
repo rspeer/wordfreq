@@ -1,4 +1,4 @@
-from wordfreq import simple_tokenize, standardize_arabic
+from wordfreq import simple_tokenize, tokenize
 from collections import defaultdict
 from operator import itemgetter
 from ftfy import fix_text
@@ -8,7 +8,7 @@ import msgpack
 import gzip
 
 
-def count_tokens(filename, lang):
+def count_tokens(filename):
     """
     Count tokens that appear in a file, running each line through our
     simple tokenizer.
@@ -19,18 +19,12 @@ def count_tokens(filename, lang):
     with open(filename, encoding='utf-8', errors='replace') as infile:
         for line in infile:
             for token in simple_tokenize(line):
-                if lang == 'ar':
-                    token = standardize_arabic(token)
-                    if not token:
-                        # skip empty strings
-                        continue
-
                 counts[token] += 1
 
     return counts
 
 
-def read_freqs(filename, cutoff=0):
+def read_freqs(filename, cutoff=0, lang=None):
     """
     Read words and their frequencies from a CSV file.
 
@@ -47,7 +41,9 @@ def read_freqs(filename, cutoff=0):
             val = float(strval)
             if val < cutoff:
                 break
-            for token in simple_tokenize(key):
+                
+            tokens = tokenize(key, lang) if lang is not None else simple_tokenize(lang)
+            for token in tokens:
                 token = fix_text(token)
                 total += val
                 # Use += so that, if we give the reader concatenated files with
@@ -60,7 +56,7 @@ def read_freqs(filename, cutoff=0):
     return raw_counts
 
 
-def freqs_to_cBpack(in_filename, out_filename, cutoff=-600):
+def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
     """
     Convert a csv file of words and their frequencies to a file in the
     idiosyncratic 'cBpack' format.
@@ -69,7 +65,7 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600):
     written to the new file.
     """
     freq_cutoff = 10 ** (cutoff / 100.)
-    freqs = read_freqs(in_filename, freq_cutoff)
+    freqs = read_freqs(in_filename, lang, freq_cutoff)
     cBpack = []
     for token, freq in freqs.items():
         cB = round(math.log10(freq) * 100)

@@ -8,6 +8,8 @@ import itertools
 import pathlib
 import random
 import logging
+import unicodedata
+
 logger = logging.getLogger(__name__)
 
 
@@ -75,7 +77,10 @@ def standardize_arabic(text):
     """
     Standardizes arabic text by removing combining marks and tatweels.
     """
-    return COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
+    return unicodedata.normalize(
+        'NFKC',
+        COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
+    )
 
 
 def read_cBpack(filename):

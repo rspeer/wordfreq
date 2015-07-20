@@ -96,11 +96,9 @@ def wikipedia_deps(dirname_in, languages):
                 'wikipedia', language, 'mecab-tokens.txt')
             add_dep(
                 lines, 'tokenize_japanese', plain_text_file, mecab_token_file)
-            add_dep(lines, 'count', mecab_token_file,
-                    count_file, params={'lang': language})
+            add_dep(lines, 'count', mecab_token_file, count_file)
         else:
-            add_dep(lines, 'count', plain_text_file,
-                    count_file, params={'lang': language})
+            add_dep(lines, 'count', plain_text_file, count_file})
 
     return lines
 
@@ -165,8 +163,7 @@ def twitter_deps(input_filename, slice_prefix, combined_prefix, slices,
             combined_output = mecab_token_file
 
         add_dep(lines, 'count', combined_output, count_file,
-                extra='wordfreq_builder/tokenizers.py',
-                params={'lang': language})
+                extra='wordfreq_builder/tokenizers.py')
 
     return lines
 
@@ -211,7 +208,8 @@ def combine_lists(languages):
         output_cBpack = wordlist_filename(
             'combined-dist', language, 'msgpack.gz')
         add_dep(lines, 'freqs2cB', output_file, output_cBpack,
-                extra='wordfreq_builder/word_counts.py')
+                extra='wordfreq_builder/word_counts.py',
+                params={'lang': language})
 
         lines.append('default {}'.format(output_cBpack))
 
@@ -221,7 +219,8 @@ def combine_lists(languages):
             output_cBpack = wordlist_filename(
                 'twitter-dist', language, 'msgpack.gz')
             add_dep(lines, 'freqs2cB', input_file, output_cBpack,
-                    extra='wordfreq_builder/word_counts.py')
+                    extra='wordfreq_builder/word_counts.py',
+                    params={'lang': language})
 
             lines.append('default {}'.format(output_cBpack))
 

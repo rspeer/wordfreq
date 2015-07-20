@@ -92,11 +92,15 @@ def wikipedia_deps(dirname_in, languages):
 
         add_dep(lines, 'wiki2text', input_file, plain_text_file)
         if language == 'ja':
-            mecab_token_file = wordlist_filename('wikipedia', language, 'mecab-tokens.txt')
-            add_dep(lines, 'tokenize_japanese', plain_text_file, mecab_token_file)
-            add_dep(lines, 'count', mecab_token_file, count_file, params={'lang': language})
+            mecab_token_file = wordlist_filename(
+                'wikipedia', language, 'mecab-tokens.txt')
+            add_dep(
+                lines, 'tokenize_japanese', plain_text_file, mecab_token_file)
+            add_dep(lines, 'count', mecab_token_file,
+                    count_file, params={'lang': language})
         else:
-            add_dep(lines, 'count', plain_text_file, count_file, params={'lang': language})
+            add_dep(lines, 'count', plain_text_file,
+                    count_file, params={'lang': language})
 
     return lines
 
@@ -117,15 +121,18 @@ def google_books_deps(dirname_in):
     return lines
 
 
-def twitter_deps(input_filename, slice_prefix, combined_prefix, slices, languages):
+def twitter_deps(input_filename, slice_prefix, combined_prefix, slices,
+                 languages):
 
     lines = []
 
-    slice_files = ['{prefix}.part{num:0>2d}'.format(prefix=slice_prefix, num=num)
+    slice_files = ['{prefix}.part{num:0>2d}'.format(prefix=slice_prefix,
+                                                    num=num)
                    for num in range(slices)]
     # split the input into slices
     add_dep(lines, 'split', input_filename, slice_files,
-            params={'prefix': '{}.part'.format(slice_prefix), 'slices': slices})
+            params={'prefix': '{}.part'.format(slice_prefix),
+                    'slices': slices})
 
     for slicenum in range(slices):
         slice_file = slice_files[slicenum]
@@ -140,7 +147,9 @@ def twitter_deps(input_filename, slice_prefix, combined_prefix, slices, language
         combined_output = wordlist_filename('twitter', language, 'tokens.txt')
 
         language_inputs = [
-            '{prefix}.{lang}.txt'.format(prefix=slice_files[slicenum], lang=language)
+            '{prefix}.{lang}.txt'.format(
+                prefix=slice_files[slicenum], lang=language
+            )
             for slicenum in range(slices)
         ]
 
@@ -149,11 +158,14 @@ def twitter_deps(input_filename, slice_prefix, combined_prefix, slices, language
         count_file = wordlist_filename('twitter', language, 'counts.txt')
 
         if language == 'ja':
-            mecab_token_file = wordlist_filename('twitter', language, 'mecab-tokens.txt')
-            add_dep(lines, 'tokenize_japanese', combined_output, mecab_token_file)
+            mecab_token_file = wordlist_filename(
+                'twitter', language, 'mecab-tokens.txt')
+            add_dep(
+                lines, 'tokenize_japanese', combined_output, mecab_token_file)
             combined_output = mecab_token_file
 
-        add_dep(lines, 'count', combined_output, count_file, extra='wordfreq_builder/tokenizers.py',
+        add_dep(lines, 'count', combined_output, count_file,
+                extra='wordfreq_builder/tokenizers.py',
                 params={'lang': language})
 
     return lines
@@ -177,7 +189,8 @@ def opensubtitles_deps(dirname_in, languages):
         input_file = '{prefix}/{lang}.txt'.format(
             prefix=dirname_in, lang=language
         )
-        reformatted_file = wordlist_filename('opensubtitles', language, 'counts.txt')
+        reformatted_file = wordlist_filename(
+            'opensubtitles', language, 'counts.txt')
         add_dep(lines, 'convert_opensubtitles', input_file, reformatted_file)
 
     return lines
@@ -195,7 +208,8 @@ def combine_lists(languages):
         add_dep(lines, 'merge', input_files, output_file,
                 extra='wordfreq_builder/word_counts.py')
 
-        output_cBpack = wordlist_filename('combined-dist', language, 'msgpack.gz')
+        output_cBpack = wordlist_filename(
+            'combined-dist', language, 'msgpack.gz')
         add_dep(lines, 'freqs2cB', output_file, output_cBpack,
                 extra='wordfreq_builder/word_counts.py')
 
@@ -204,7 +218,8 @@ def combine_lists(languages):
         # Write standalone lists for Twitter frequency
         if language in CONFIG['sources']['twitter']:
             input_file = wordlist_filename('twitter', language, 'counts.txt')
-            output_cBpack = wordlist_filename('twitter-dist', language, 'msgpack.gz')
+            output_cBpack = wordlist_filename(
+                'twitter-dist', language, 'msgpack.gz')
             add_dep(lines, 'freqs2cB', input_file, output_cBpack,
                     extra='wordfreq_builder/word_counts.py')
 

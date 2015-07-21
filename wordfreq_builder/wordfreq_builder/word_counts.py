@@ -38,11 +38,12 @@ def read_freqs(filename, cutoff=0, lang=None):
     with open(filename, encoding='utf-8', newline='') as infile:
         reader = csv.reader(infile)
         for key, strval in reader:
+
             val = float(strval)
             if val < cutoff:
                 break
-                
-            tokens = tokenize(key, lang) if lang is not None else simple_tokenize(lang)
+
+            tokens = tokenize(key, lang) if lang is not None else simple_tokenize(key)
             for token in tokens:
                 token = fix_text(token)
                 total += val
@@ -65,7 +66,7 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
     written to the new file.
     """
     freq_cutoff = 10 ** (cutoff / 100.)
-    freqs = read_freqs(in_filename, lang, freq_cutoff)
+    freqs = read_freqs(in_filename, freq_cutoff, lang=lang)
     cBpack = []
     for token, freq in freqs.items():
         cB = round(math.log10(freq) * 100)

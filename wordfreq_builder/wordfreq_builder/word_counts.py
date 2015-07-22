@@ -1,4 +1,4 @@
-from wordfreq import simple_tokenize
+from wordfreq import simple_tokenize, tokenize
 from collections import defaultdict
 from operator import itemgetter
 from ftfy import fix_text
@@ -18,41 +18,49 @@ def count_tokens(filename):
     counts = defaultdict(int)
     with open(filename, encoding='utf-8', errors='replace') as infile:
         for line in infile:
-            for token in simple_tokenize(line.strip()):
+            for token in simple_tokenize(line):
                 counts[token] += 1
+
     return counts
 
 
-def read_freqs(filename, cutoff=0):
+def read_freqs(filename, cutoff=0, lang=None):
     """
     Read words and their frequencies from a CSV file.
 
-    Only words with a frequency greater than `cutoff` are returned.
+    Only words with a frequency greater than or equal to `cutoff` are returned.
 
     If `cutoff` is greater than 0, the csv file must be sorted by frequency
     in descending order.
+
+    If lang is given, read_freqs will apply language specific preprocessing
+    operations.
     """
     raw_counts = defaultdict(float)
     total = 0.
     with open(filename, encoding='utf-8', newline='') as infile:
         reader = csv.reader(infile)
         for key, strval in reader:
+
             val = float(strval)
             if val < cutoff:
                 break
-            for token in simple_tokenize(key):
+
+            tokens = tokenize(key, lang) if lang is not None else simple_tokenize(key)
+            for token in tokens:
                 token = fix_text(token)
                 total += val
                 # Use += so that, if we give the reader concatenated files with
                 # duplicates, it does the right thing
                 raw_counts[token] += val
 
-    freqs = {key: raw_count / total
-             for (key, raw_count) in raw_counts.items()}
-    return freqs
+    for word in raw_counts:
+        raw_counts[word] /= total
+
+    return raw_counts
 
 
-def freqs_to_cBpack(in_filename, out_filename, cutoff=-600):
+def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
     """
     Convert a csv file of words and their frequencies to a file in the
     idiosyncratic 'cBpack' format.
@@ -61,15 +69,14 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600):
     written to the new file.
     """
     freq_cutoff = 10 ** (cutoff / 100.)
-    freqs = read_freqs(in_filename, freq_cutoff)
+    freqs = read_freqs(in_filename, freq_cutoff, lang=lang)
     cBpack = []
     for token, freq in freqs.items():
         cB = round(math.log10(freq) * 100)
-        if cB >= cutoff:
-            neg_cB = -cB
-            while neg_cB >= len(cBpack):
-                cBpack.append([])
-            cBpack[neg_cB].append(token)
+        neg_cB = -cB
+        while neg_cB >= len(cBpack):
+            cBpack.append([])
+        cBpack[neg_cB].append(token)
 
     for sublist in cBpack:
         sublist.sort()
@@ -88,7 +95,7 @@ def merge_freqs(freq_dicts):
     """
     vocab = set()
     for freq_dict in freq_dicts:
-        vocab |= set(freq_dict)
+        vocab.update(freq_dict)
 
     merged = defaultdict(float)
     N = len(freq_dicts)

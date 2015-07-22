@@ -93,9 +93,11 @@ def wikipedia_deps(dirname_in, languages):
         add_dep(lines, 'wiki2text', input_file, plain_text_file)
         if language == 'ja':
             mecab_token_file = wordlist_filename(
-                'wikipedia', language, 'mecab-tokens.txt')
+                'wikipedia', language, 'mecab-tokens.txt'
+            )
             add_dep(
-                lines, 'tokenize_japanese', plain_text_file, mecab_token_file)
+                lines, 'tokenize_japanese', plain_text_file, mecab_token_file
+            )
             add_dep(lines, 'count', mecab_token_file, count_file)
         else:
             add_dep(lines, 'count', plain_text_file, count_file)

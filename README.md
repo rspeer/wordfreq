@@ -23,8 +23,8 @@ install them on Ubuntu:
 
 ## Unicode data
 
-The tokenizers used to split non-Japanese phrases use regexes built using the
-`unicodedata` module from Python 3.4, which uses Unicode version 6.3.0.  To
+The tokenizers that split non-Japanese phrases utilize regexes built using the
+`unicodedata` module from Python 3.4, which supports Unicode version 6.3.0.  To
 update these regexes, run `scripts/gen_regex.py`.
 
 ## License
@@ -58,4 +58,3 @@ Some additional data was collected by a custom application that watches the
 streaming Twitter API, in accordance with Twitter's Developer Agreement &
 Policy. This software only gives statistics about words that are very commonly
 used on Twitter; it does not display or republish any Twitter content.
-

@@ -47,8 +47,7 @@ Start the build, and find something else to do for a few hours:
 
     ninja -v
 
-You can copy the results into wordfreq with this command (supposing that
-$WORDFREQ points to your wordfreq repo):
+You can copy the results into wordfreq with this command:
 
     cp data/dist/*.msgpack.gz ../wordfreq/data/
 
@@ -83,6 +82,19 @@ The specific rules are described by the comments in `rules.ninja`.
 
 ## Data sources
 
+### Wikipedia
+
+Wikipedia is a "free-access, free-content Internet encyclopedia".
+
+These files can be downloaded from [wikimedia dump][wikipedia]
+
+The original files are in `data/raw-input/wikipedia`, and they're processed
+by the `wiki2text` rule in `rules.ninja`. Parsing wikipedia requires the
+[wiki2text][] package.
+
+[wikipedia]: https://dumps.wikimedia.org/backup-index.html
+[wiki2text]: https://github.com/rspeer/wiki2text
+
 ### Leeds Internet Corpus
 
 Also known as the "Web as Corpus" project, this is a University of Leeds
@@ -102,7 +114,7 @@ by the `convert_leeds` rule in `rules.ninja`.
 The file `data/raw-input/twitter/all-2014.txt` contains about 72 million tweets
 collected by the `ftfy.streamtester` package in 2014.
 
-It's not possible to distribute the text of tweets. However, this process could
+We are not allowed to distribute the text of tweets. However, this process could
 be reproduced by running `ftfy.streamtester`, part of the [ftfy][] package, for
 a couple of weeks.
 
@@ -162,4 +174,3 @@ longer represents the words 'don' and 'won', as we assume most of their
 frequency comes from "don't" and "won't". Words that turned into similarly
 common words, however, were left alone: this list doesn't represent "can't"
 because the word was left as "can".
-

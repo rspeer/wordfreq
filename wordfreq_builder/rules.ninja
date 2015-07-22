@@ -29,12 +29,12 @@ rule split
 # Wikipedia dumps obtained from dumps.wikimedia.org.  The code is at
 # https://github.com/rspeer/wiki2text.
 rule wiki2text
-  command = mkdir -p $$(dirname $out) && bunzip2 -c $in | wiki2text > $out
+  command = bunzip2 -c $in | wiki2text > $out
 
 # To tokenize Japanese, we run it through Mecab and take the first column.
 # We don't have a plan for tokenizing Chinese yet.
 rule tokenize_japanese
-  command = mkdir -p $$(dirname $out) && mecab -b 1048576 < $in | cut -f 1 | grep -v "EOS" > $out
+  command = mecab -b 1048576 < $in | cut -f 1 | grep -v "EOS" > $out
 
 # Tokenizing text from Twitter requires us to language-detect and tokenize
 # in the same step.
@@ -49,12 +49,12 @@ rule tokenize_twitter
 # Grep out the term "EOS", an indication that Leeds used MeCab and didn't
 # strip out the EOS lines.
 rule convert_leeds
-  command = mkdir -p $$(dirname $out) && sed -rn 's/([0-9]+) ([0-9.]+) (.*)/\3,\2/p' < $in | grep -v 'EOS,' > $out
+  command = sed -rn 's/([0-9]+) ([0-9.]+) (.*)/\3,\2/p' < $in | grep -v 'EOS,' > $out
 
 # To convert the OpenSubtitles frequency data, simply replace spaces with
 # commas.
 rule convert_opensubtitles
-  command = mkdir -p $$(dirname $out) && tr ' ' ',' < $in > $out
+  command = tr ' ' ',' < $in > $out
 
 # Convert and clean up the Google Books Syntactic N-grams data. Concatenate all
 # the input files, keep only the single words and their counts, and only keep
@@ -65,16 +65,16 @@ rule convert_opensubtitles
 # source data was already filtered to only show words in roles with at least
 # two-digit counts of occurences.)
 rule convert_google_syntactic_ngrams
-  command = mkdir -p $$(dirname $out) && zcat $in | cut -f 1,3 | grep -v '[,"]' | sed -rn 's/(.*)\s(...+)/\1,\2/p' > $out
+  command = zcat $in | cut -f 1,3 | grep -v '[,"]' | sed -rn 's/(.*)\s(...+)/\1,\2/p' > $out
 
 rule count
-  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.count_tokens $in $out
+  command = python -m wordfreq_builder.cli.count_tokens $in $out
 
 rule merge
-  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.combine_lists -o $out $in
+  command = python -m wordfreq_builder.cli.combine_lists -o $out $in
 
 rule freqs2cB
-  command = mkdir -p $$(dirname $out) && python -m wordfreq_builder.cli.freqs_to_cB $in $out
+  command = python -m wordfreq_builder.cli.freqs_to_cB $lang $in $out
 
 rule cat
   command = cat $in > $out

@@ -8,6 +8,8 @@ import itertools
 import pathlib
 import random
 import logging
+import unicodedata
+
 logger = logging.getLogger(__name__)
 
 
@@ -66,9 +68,19 @@ def tokenize(text, lang):
         return mecab_tokenize(text)
 
     if lang == 'ar':
-        text = COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
+        text = standardize_arabic(text)
 
     return simple_tokenize(text)
+
+
+def standardize_arabic(text):
+    """
+    Standardizes arabic text by removing combining marks and tatweels.
+    """
+    return unicodedata.normalize(
+        'NFKC',
+        COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
+    )
 
 
 def read_cBpack(filename):
@@ -257,6 +269,9 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
     If a word decomposes into multiple tokens, we'll return a smoothed estimate
     of the word frequency that is no greater than the frequency of any of its
     individual tokens.
+
+    It should be noted that the current tokenizer does not support
+    multi-word Chinese phrases.
     """
     args = (word, lang, wordlist, minimum)
     try:

@@ -32,6 +32,9 @@ def read_freqs(filename, cutoff=0, lang=None):
 
     If `cutoff` is greater than 0, the csv file must be sorted by frequency
     in descending order.
+
+    If lang is given, read_freqs will apply language specific preprocessing
+    operations.
     """
     raw_counts = defaultdict(float)
     total = 0.

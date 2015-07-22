@@ -1,3 +1,5 @@
+""" This file generates a graph of the dependencies for the ninja build."""
+
 import sys
 
 
@@ -26,4 +28,3 @@ def ninja_to_dot():
 
 if __name__ == '__main__':
     ninja_to_dot()
-

@@ -13,4 +13,3 @@ if __name__ == '__main__':
     parser.add_argument('filename_out', help='name of output file')
     args = parser.parse_args()
     handle_counts(args.filename_in, args.filename_out)
-

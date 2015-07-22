@@ -68,13 +68,13 @@ rule convert_google_syntactic_ngrams
   command = zcat $in | cut -f 1,3 | grep -v '[,"]' | sed -rn 's/(.*)\s(...+)/\1,\2/p' > $out
 
 rule count
-  command = python -m wordfreq_builder.cli.count_tokens $in $out $lang
+  command = python -m wordfreq_builder.cli.count_tokens $in $out
 
 rule merge
   command = python -m wordfreq_builder.cli.combine_lists -o $out $in
 
 rule freqs2cB
-  command = python -m wordfreq_builder.cli.freqs_to_cB $in $lang $out
+  command = python -m wordfreq_builder.cli.freqs_to_cB $lang $in $out
 
 rule cat
   command = cat $in > $out

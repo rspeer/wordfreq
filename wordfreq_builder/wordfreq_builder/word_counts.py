@@ -69,10 +69,16 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
     written to the new file.
     """
     freq_cutoff = 10 ** (cutoff / 100.)
+    # freq_cutoff will only be effective here if the data we're reading
+    # is already normalized to frequencies. If we're reading counts,
+    # it just won't matter. This is why we check for cB <= cutoff again
+    # below.
     freqs = read_freqs(in_filename, freq_cutoff, lang=lang)
     cBpack = []
     for token, freq in freqs.items():
         cB = round(math.log10(freq) * 100)
+        if cB <= cutoff:
+            continue
         neg_cB = -cB
         while neg_cB >= len(cBpack):
             cBpack.append([])

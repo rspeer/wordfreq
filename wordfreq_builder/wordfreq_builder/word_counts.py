@@ -67,13 +67,11 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
 
     Only words with a frequency greater than `cutoff` centibels will be
     written to the new file.
+
+    This cutoff should not be stacked with a cutoff in `read_freqs`; doing
+    so would skew the resulting frequencies.
     """
-    freq_cutoff = 10 ** (cutoff / 100.)
-    # freq_cutoff will only be effective here if the data we're reading
-    # is already normalized to frequencies. If we're reading counts,
-    # it just won't matter. This is why we check for cB <= cutoff again
-    # below.
-    freqs = read_freqs(in_filename, freq_cutoff, lang=lang)
+    freqs = read_freqs(in_filename, cutoff=0, lang=lang)
     cBpack = []
     for token, freq in freqs.items():
         cB = round(math.log10(freq) * 100)

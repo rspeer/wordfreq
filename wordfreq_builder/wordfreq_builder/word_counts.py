@@ -39,20 +39,16 @@ def read_freqs(filename, cutoff=0, lang=None):
     raw_counts = defaultdict(float)
     total = 0.
     with open(filename, encoding='utf-8', newline='') as infile:
-        reader = csv.reader(infile)
-        for key, strval in reader:
-
+        for key, strval in csv.reader(infile):
             val = float(strval)
             if val < cutoff:
                 break
-
             tokens = tokenize(key, lang) if lang is not None else simple_tokenize(key)
             for token in tokens:
-                token = fix_text(token)
-                total += val
                 # Use += so that, if we give the reader concatenated files with
                 # duplicates, it does the right thing
-                raw_counts[token] += val
+                raw_counts[fix_text(token)] += val
+                total += val
 
     for word in raw_counts:
         raw_counts[word] /= total

@@ -149,6 +149,6 @@ def test_ar():
     )
 
     eq_(
-        tokenize('إﻻ', 'ar'),
-        ['إلا']
+        tokenize('\ufefb', 'ar'),
+        ['\u0644\u0627']
     )

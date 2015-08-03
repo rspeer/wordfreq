@@ -82,19 +82,6 @@ The specific rules are described by the comments in `rules.ninja`.
 
 ## Data sources
 
-### Wikipedia
-
-Wikipedia is a "free-access, free-content Internet encyclopedia".
-
-These files can be downloaded from [wikimedia dump][wikipedia]
-
-The original files are in `data/raw-input/wikipedia`, and they're processed
-by the `wiki2text` rule in `rules.ninja`. Parsing wikipedia requires the
-[wiki2text][] package.
-
-[wikipedia]: https://dumps.wikimedia.org/backup-index.html
-[wiki2text]: https://github.com/rspeer/wiki2text
-
 ### Leeds Internet Corpus
 
 Also known as the "Web as Corpus" project, this is a University of Leeds

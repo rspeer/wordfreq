@@ -95,13 +95,17 @@ def test_failed_cB_conversion():
 def test_tokenization():
     # We preserve apostrophes within words, so "can't" is a single word in the
     # data
-    eq_(tokenize("can't", 'en'), ["can't"])
+    eq_(tokenize("I don't split at apostrophes, you see.", 'en'),
+        ['i', "don't", 'split', 'at', 'apostrophes', 'you', 'see'])
 
+    # Certain punctuation does not inherently split a word.
+    eq_(tokenize("Anything is possible at zombo.com", 'en'),
+        ['anything', 'is', 'possible', 'at', 'zombo.com'])
+
+    # Splits occur after symbols, and at splitting punctuation such as hyphens.
     eq_(tokenize('😂test', 'en'), ['😂', 'test'])
 
-    # We do split at other punctuation, causing the word-combining rule to
-    # apply.
-    eq_(tokenize("can.t", 'en'), ['can', 't'])
+    eq_(tokenize("flip-flop", 'en'), ['flip', 'flop'])
 
 
 def test_casefolding():
@@ -110,11 +114,11 @@ def test_casefolding():
 
 
 def test_phrase_freq():
-    plant = word_frequency("plan.t", 'en')
-    assert_greater(plant, 0)
+    ff = word_frequency("flip-flop", 'en')
+    assert_greater(ff, 0)
     assert_almost_equal(
-        1.0 / plant,
-        1.0 / word_frequency('plan', 'en') + 1.0 / word_frequency('t', 'en')
+        1.0 / ff,
+        1.0 / word_frequency('flip', 'en') + 1.0 / word_frequency('flop', 'en')
     )
 
 
@@ -134,8 +138,8 @@ def test_not_really_random():
 def test_not_enough_ascii():
     random_ascii_words(lang='zh')
 
-def test_ar():
 
+def test_ar():
     # Remove tatweels
     eq_(
         tokenize('متــــــــعب', 'ar'),
@@ -151,4 +155,17 @@ def test_ar():
     eq_(
         tokenize('\ufefb', 'ar'),  # An Arabic ligature...
         ['\u0644\u0627']  # ...that is affected by NFKC normalization
+    )
+
+
+def test_ideographic_fallback():
+    # Try tokenizing Chinese text -- it should remain stuck together.
+    eq_(tokenize('中国文字', 'zh'), ['中国文字'])
+
+    # When Japanese is tagged with the wrong language, it will be split
+    # at script boundaries.
+    ja_text = 'ひらがなカタカナromaji'
+    eq_(
+        tokenize(ja_text, 'en'),
+        ['ひらがな', 'カタカナ', 'romaji']
     )

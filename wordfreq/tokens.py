@@ -38,7 +38,7 @@ def simple_tokenize(text):
     by the regex package, except that it leaves Chinese and Japanese
     relatively untokenized.
     """
-    text = unicodedata.normalize('NFKC', text)
+    text = unicodedata.normalize('NFC', text)
     return [token.casefold() for token in TOKEN_RE.findall(text)]
 
 
@@ -70,7 +70,8 @@ def tokenize(text, lang):
     - All other languages will be tokenized according to UTR #29.
 
     Additionally, the text will be case-folded to lowercase, and text marked
-    as Arabic will have combining marks and tatweels removed.
+    as Arabic will be normalized more strongly and have combining marks and
+    tatweels removed.
 
     Strings that are looked up in wordfreq will be run through this function
     first, so that they can be expected to match the data.
@@ -82,7 +83,7 @@ def tokenize(text, lang):
         return mecab_tokenize(text)
 
     if lang == 'ar':
-        text = remove_arabic_marks(text)
+        text = remove_arabic_marks(unicodedata.normalize('NFKC', text))
 
     return simple_tokenize(text)
 

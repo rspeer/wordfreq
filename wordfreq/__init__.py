@@ -1,14 +1,13 @@
+from wordfreq.tokens import tokenize, simple_tokenize
 from pkg_resources import resource_filename
 from functools import lru_cache
 import langcodes
 import msgpack
-import re
 import gzip
 import itertools
 import pathlib
 import random
 import logging
-import unicodedata
 
 logger = logging.getLogger(__name__)
 
@@ -16,71 +15,10 @@ logger = logging.getLogger(__name__)
 CACHE_SIZE = 100000
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
-def load_range(filename):
-    """
-    Load a file from the data path.
-    """
-    with (DATA_PATH / filename).open() as file:
-        return file.read()
 
-EMOJI_RANGE = load_range('emoji.txt')
-NON_PUNCT_RANGE = load_range('non_punct.txt')
-COMBINING_MARK_RANGE = load_range('combining_mark.txt')
-
-COMBINING_MARK_RE = re.compile(COMBINING_MARK_RANGE)
-TOKEN_RE = re.compile("{0}|{1}+(?:'{1}+)*".format(EMOJI_RANGE, NON_PUNCT_RANGE))
-
-
-def simple_tokenize(text):
-    """
-    A simple tokenizer that can be applied to most languages.
-
-    It considers a word to be made of a sequence of 'token characters', an
-    overly inclusive range that includes letters, Han characters, emoji, and a
-    bunch of miscellaneous whatnot, but excludes most punctuation and
-    whitespace.
-
-    The single complication for the sake of English is that apostrophes are not
-    considered part of the token if they appear on the edge of the character
-    sequence, but they are if they appear internally. "cats'" is not a token,
-    but "cat's" is.
-    """
-    return [token.casefold() for token in TOKEN_RE.findall(text)]
-
-
-mecab_tokenize = None
-def tokenize(text, lang):
-    """
-    Tokenize this text in a way that's straightforward but appropriate for
-    the language.
-
-    So far, this means that Japanese is handled by mecab_tokenize, and
-    everything else is handled by simple_tokenize. Additionally, Arabic commas
-    and combining marks are removed.
-
-    Strings that are looked up in wordfreq will be run through this function
-    first, so that they can be expected to match the data.
-    """
-    if lang == 'ja':
-        global mecab_tokenize
-        if mecab_tokenize is None:
-            from wordfreq.mecab import mecab_tokenize
-        return mecab_tokenize(text)
-
-    if lang == 'ar':
-        text = standardize_arabic(text)
-
-    return simple_tokenize(text)
-
-
-def standardize_arabic(text):
-    """
-    Standardizes arabic text by removing combining marks and tatweels.
-    """
-    return unicodedata.normalize(
-        'NFKC',
-        COMBINING_MARK_RE.sub('', text.replace('ـ', ''))
-    )
+# simple_tokenize is imported so that other things can import it from here.
+# Suppress the pyflakes warning.
+simple_tokenize = simple_tokenize
 
 
 def read_cBpack(filename):

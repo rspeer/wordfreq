@@ -1,7 +1,7 @@
 from html.entities import name2codepoint
-from wordfreq import tokenize, TOKEN_RE, NON_PUNCT_RANGE
+from wordfreq import tokenize
 from ftfy.fixes import unescape_html
-import re
+import regex
 import pycld2
 
 CLD2_BAD_CHAR_RANGE = "[%s]" % "".join(
@@ -18,10 +18,10 @@ CLD2_BAD_CHAR_RANGE = "[%s]" % "".join(
     ] +
     [chr(65534+65536*x+y) for x in range(17) for y in range(2)]
 )
-CLD2_BAD_CHARS_RE = re.compile(CLD2_BAD_CHAR_RANGE)
+CLD2_BAD_CHARS_RE = regex.compile(CLD2_BAD_CHAR_RANGE)
 
-TWITTER_HANDLE_RE = re.compile('@{0}+'.format(NON_PUNCT_RANGE))
-TCO_RE = re.compile('http(?:s)?://t.co/[a-zA-Z0-9]+')
+TWITTER_HANDLE_RE = regex.compile(r'@[\S--\p{punct}]+')
+TCO_RE = regex.compile('http(?:s)?://t.co/[a-zA-Z0-9]+')
 
 
 def cld2_surface_tokenizer(text):

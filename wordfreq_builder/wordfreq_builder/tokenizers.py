@@ -11,7 +11,10 @@ CLD2_BAD_CHAR_RANGE = "[%s]" % "".join(
         '\x0e-\x1f',
         '\x7f-\x9f',
         '\ud800-\udfff',
-        '\ufdd0-\ufdef'
+        '\ufdd0-\ufdef',
+        '\N{HANGUL FILLER}',
+        '\N{HANGUL CHOSEONG FILLER}',
+        '\N{HANGUL JUNGSEONG FILLER}'
     ] +
     [chr(65534+65536*x+y) for x in range(17) for y in range(2)]
 )
@@ -45,7 +48,7 @@ def cld2_detect_language(text):
     #       Language code: str
     #       Percent of text in this language: float
     #       Confidence score: float))
-    
+
     text = CLD2_BAD_CHARS_RE.sub('', text)
     return pycld2.detect(text)[2][0][1]
 

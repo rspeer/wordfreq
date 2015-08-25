@@ -4,10 +4,11 @@ import unicodedata
 
 # Here's what the following regular expression is looking for:
 #
-# At the start, it looks for a character in the set [\S--\p{punct}]. \S
-# contains non-space characters, and then it subtracts the set of Unicode
-# punctuation characters from that set. This is slightly different from \w,
-# because it leaves symbols (such as emoji) as tokens.
+# At the start, it looks for a character in the set \S -- the set of
+# non-punctuation -- with various characters subtracted out, including punctuation
+# and most of the 'symbol' categories. (We leave So, "Symbol - Other", because
+# it contains things like emoji that have interesting frequencies. This is why
+# we don't just insist on the token starting with a "word" character, \w.)
 #
 # After it has found one such character, the rest of the token is (?:\B\S)*,
 # which continues to consume characters as long as the next character does not
@@ -26,7 +27,7 @@ import unicodedata
 # correct behavior for word-wrapping, but it's an ugly failure mode for NLP
 # tokenization.
 
-TOKEN_RE = regex.compile(r'[\S--\p{punct}](?:\B\S|[\p{IsIdeo}\p{Script=Hiragana}])*', regex.V1 | regex.WORD)
+TOKEN_RE = regex.compile(r'[\S--[\p{punct}\p{Sm}\p{Sc}\p{Sk}]](?:\B\S|[\p{IsIdeo}\p{Script=Hiragana}])*', regex.V1 | regex.WORD)
 ARABIC_MARK_RE = regex.compile(r'[[\p{Mn}&&\p{Block=Arabic}]\N{ARABIC TATWEEL}]', regex.V1)
 
 

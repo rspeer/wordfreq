@@ -2,6 +2,7 @@ Tools for working with word frequencies from various corpora.
 
 Author: Rob Speer
 
+
 ## Installation
 
 wordfreq requires Python 3 and depends on a few other Python modules
@@ -21,11 +22,25 @@ install them on Ubuntu:
     sudo apt-get install mecab-ipadic-utf8 libmecab-dev
     pip3 install mecab-python3
 
-## Unicode data
 
-The tokenizers that split non-Japanese phrases utilize regexes built using the
-`unicodedata` module from Python 3.4, which supports Unicode version 6.3.0.  To
-update these regexes, run `scripts/gen_regex.py`.
+## Tokenization
+
+wordfreq uses the Python package `regex`, which is a more advanced
+implementation of regular expressions than the standard library, to
+separate text into tokens that can be counted consistently. `regex`
+produces tokens that follow the recommendations in [Unicode
+Annex #29, Text Segmentation][uax29].
+
+There are language-specific exceptions:
+
+- In Arabic, it additionally normalizes ligatures and removes combining marks.
+- In Japanese, instead of using the regex library, it uses the external library
+  `mecab-python3`. This is an optional dependency of wordfreq, and compiling
+  it requires the `libmecab-dev` system package to be installed.
+- It does not yet attempt to tokenize Chinese ideograms.
+
+[uax29]: http://unicode.org/reports/tr29/
+
 
 ## License
 
@@ -56,5 +71,5 @@ sources:
 
 Some additional data was collected by a custom application that watches the
 streaming Twitter API, in accordance with Twitter's Developer Agreement &
-Policy. This software only gives statistics about words that are very commonly
-used on Twitter; it does not display or republish any Twitter content.
+Policy. This software gives statistics about words that are commonly used on
+Twitter; it does not display or republish any Twitter content.

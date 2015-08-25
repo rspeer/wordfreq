@@ -49,7 +49,7 @@ def simple_tokenize(text):
     relatively untokenized.
     """
     text = unicodedata.normalize('NFC', text)
-    return [token.casefold() for token in TOKEN_RE.findall(text)]
+    return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
 
 
 def remove_arabic_marks(text):

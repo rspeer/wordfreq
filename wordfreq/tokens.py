@@ -5,30 +5,39 @@ import unicodedata
 # Here's what the following regular expression is looking for:
 #
 # At the start, it looks for a character in the set \S -- the set of
-# non-punctuation -- with various characters subtracted out, including punctuation
-# and most of the 'symbol' categories. (We leave So, "Symbol - Other", because
-# it contains things like emoji that have interesting frequencies. This is why
-# we don't just insist on the token starting with a "word" character, \w.)
+# non-punctuation -- with various characters subtracted out, including
+# punctuation and most of the 'symbol' categories. (We leave So, "Symbol -
+# Other", because it contains things like emoji that have interesting
+# frequencies. This is why we don't just insist on the token starting with a
+# "word" character, \w.)
 #
-# After it has found one such character, the rest of the token is (?:\B\S)*,
-# which continues to consume characters as long as the next character does not
-# cause a word break (\B) and is not a space (\S). The individual characters in
-# this portion can be punctuation, allowing tokens such as "can't" or
-# "google.com".
+# WB=Extend is a Unicode property that says, for the purpose of word breaking,
+# that this character should get the word-breaking properties of the previous
+# character. It's used for combining marks and stuff. If it shows up at the
+# beginning of the token, something has gone wrong, so exclude it as a token.
+#
+# After it has found a starting character, the rest of the token matches
+# (?:\B\S)*, which continues to consume characters as long as the next
+# character does not cause a word break (\B) and is not a space (\S). The
+# individual characters in this portion can be punctuation, allowing tokens
+# such as "can't" or "google.com".
 #
 # As a complication, the rest of the token can match a glob of Han ideographs
 # (\p{IsIdeo}) and hiragana (\p{Script=Hiragana}). Chinese words are made of
-# Han ideographs (but we don't know how many). Japanese words are either made
-# of Han ideographs and hiragana (which will be matched by this expression), or
-# katakana (which will be matched by the standard Unicode rule).
+# Han ideographs (but we don't know where the breaks between them are).
+# Similarly, Japanese words are either made of Han ideographs and hiragana
+# (which will be matched by this expression), or katakana (which will be
+# matched by the standard Unicode rule).
 #
 # Without this special case for ideographs and hiragana, the standard Unicode
 # rule would put each character in its own token. This actually would be the
 # correct behavior for word-wrapping, but it's an ugly failure mode for NLP
 # tokenization.
 
-TOKEN_RE = regex.compile(r'[\S--[\p{punct}\p{Sm}\p{Sc}\p{Sk}]](?:\B\S|[\p{IsIdeo}\p{Script=Hiragana}])*', regex.V1 | regex.WORD)
-ARABIC_MARK_RE = regex.compile(r'[[\p{Mn}&&\p{Block=Arabic}]\N{ARABIC TATWEEL}]', regex.V1)
+TOKEN_RE = regex.compile(
+    r'[\S--[\p{punct}\p{Sm}\p{Sc}\p{Sk}\p{WB=Extend}]]'
+    r'(?:\B\S|[\p{IsIdeo}\p{Script=Hiragana}])*', regex.V1 | regex.WORD)
+ARABIC_MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 
 
 def simple_tokenize(text):

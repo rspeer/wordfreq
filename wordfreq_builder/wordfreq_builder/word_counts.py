@@ -6,6 +6,10 @@ import math
 import csv
 import msgpack
 import gzip
+import regex
+
+
+URL_RE = regex.compile(r'https?://(?:\B\S)+')
 
 
 def count_tokens(filename):
@@ -18,6 +22,7 @@ def count_tokens(filename):
     counts = defaultdict(int)
     with open(filename, encoding='utf-8', errors='replace') as infile:
         for line in infile:
+            line = URL_RE.sub('', line.strip())
             for token in simple_tokenize(line):
                 counts[token] += 1
 

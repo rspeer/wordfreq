@@ -2,51 +2,64 @@ import regex
 import unicodedata
 
 
-# Here's what the following regular expression is looking for:
-#
-# At the start, it looks for a character in the set \S -- the set of
-# non-punctuation -- with various characters subtracted out, including
-# punctuation and most of the 'symbol' categories. (We leave So, "Symbol -
-# Other", because it contains things like emoji that have interesting
-# frequencies. This is why we don't just insist on the token starting with a
-# "word" character, \w.)
-#
-# WB=Extend is a Unicode property that says, for the purpose of word breaking,
-# that this character should get the word-breaking properties of the previous
-# character. It's used for combining marks and stuff. If it shows up at the
-# beginning of the token, something has gone wrong, so exclude it as a token.
-#
-# After it has found a starting character, the rest of the token matches
-# (?:\B\S)*, which continues to consume characters as long as the next
-# character does not cause a word break (\B) and is not a space (\S). The
-# individual characters in this portion can be punctuation, allowing tokens
-# such as "can't" or "google.com".
-#
-# As a complication, the rest of the token can match a glob of Han ideographs
-# (\p{IsIdeo}) and hiragana (\p{Script=Hiragana}). Chinese words are made of
-# Han ideographs (but we don't know where the breaks between them are).
-# Similarly, Japanese words are either made of Han ideographs and hiragana
-# (which will be matched by this expression), or katakana (which will be
-# matched by the standard Unicode rule).
-#
-# Without this special case for ideographs and hiragana, the standard Unicode
-# rule would put each character in its own token. This actually would be the
-# correct behavior for word-wrapping, but it's an ugly failure mode for NLP
-# tokenization.
+TOKEN_RE = regex.compile(r"""
+    # Case 1: a special case for Chinese and Japanese
+    # -----------------------------------------------
 
-TOKEN_RE = regex.compile(
-    r'[\S--[\p{punct}\p{Sm}\p{Sc}\p{Sk}\p{WB=Extend}]]'
-    r'(?:\B\S|[\p{IsIdeo}\p{Script=Hiragana}])*', regex.V1 | regex.WORD)
+    # When we see characters that are Han ideographs (\p{IsIdeo}) or hiragana
+    # \p{Script=Hiragana}, we allow a sequence of those characters to be glued
+    # together as a single token. Without this case, the standard rule (case 2)
+    # would make each characte a separate token. This would be the correct
+    # behavior for word-wrapping, but a messy failure mode for NLP
+    # tokenization.
+    #
+    # It is, of course, better to use a tokenizer that is designed for Chinese
+    # or Japanese text. This is effectively a fallback for when the wrong
+    # tokenizer is used.
+    #
+    # This rule is listed first so that it takes precedence.
+
+    [\p{IsIdeo}\p{Script=Hiragana}]+ |
+
+    # Case 2: standard Unicode segmentation
+    # -------------------------------------
+
+    # The start of the token must be 'word-like', not punctuation or whitespace
+    # or various other things. However, we allow characters of category So
+    # because many of these are emoji, which can convey meaning.
+
+    [\w\p{So}]
+
+    # The rest of the token matches characters that are not any sort of space
+    # (\S) and do not cause word breaks according to the Unicode word
+    # segmentation heuristic (\B).
+
+    (?:\B\S)*
+""", regex.V1 | regex.WORD | regex.VERBOSE)
+
 ARABIC_MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 
 
 def simple_tokenize(text):
     """
     Tokenize the given text using a straightforward, Unicode-aware token
-    expression. It returns non-whitespace tokens that are split at the
-    word boundaries defined by Unicode Tech Report #29, as implemented
-    by the regex package, except that it leaves Chinese and Japanese
-    relatively untokenized.
+    expression.
+
+    The expression mostly implements the rules of Unicode Annex #29 that
+    are contained in the `regex` module's word boundary matching, including
+    the refinement that splits words between apostrophes and vowels in order
+    to separate tokens such as the French article «l'». Our customizations
+    to the expression are:
+
+    - It leaves sequences of Chinese or Japanese characters (specifically, Han
+      ideograms and hiragana) relatively untokenized, instead of splitting each
+      character into its own token.
+
+    - It excludes punctuation, many classes of symbols, and "extenders" with
+      nothing to extend, from being tokens, but it allows miscellaneous symbols
+      such as emoji.
+
+    - It breaks on all spaces, even the "non-breaking" ones.
     """
     text = unicodedata.normalize('NFC', text)
     return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
@@ -77,7 +90,9 @@ def tokenize(text, lang):
     - Chinese or Japanese texts that aren't identified as the appropriate
       language will only split on punctuation and script boundaries, giving
       you untokenized globs of characters that probably represent many words.
-    - All other languages will be tokenized according to UTR #29.
+    - All other languages will be tokenized using a regex that mostly
+      implements the Word Segmentation section of Unicode Annex #29.
+      See `simple_tokenize` for details.
 
     Additionally, the text will be case-folded to lowercase, and text marked
     as Arabic will be normalized more strongly and have combining marks and

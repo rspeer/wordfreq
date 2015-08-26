@@ -55,9 +55,8 @@ def simple_tokenize(text):
       ideograms and hiragana) relatively untokenized, instead of splitting each
       character into its own token.
 
-    - It excludes punctuation, many classes of symbols, and "extenders" with
-      nothing to extend, from being tokens, but it allows miscellaneous symbols
-      such as emoji.
+    - It outputs only the tokens that start with a word-like character, or
+      miscellaneous symbols such as emoji.
 
     - It breaks on all spaces, even the "non-breaking" ones.
     """

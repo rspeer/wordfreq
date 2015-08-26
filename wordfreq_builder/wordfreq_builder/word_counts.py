@@ -9,7 +9,9 @@ import gzip
 import regex
 
 
-URL_RE = regex.compile(r'https?://(?:\B\S)+')
+# Match common cases of URLs: the schema http:// or https:// followed by
+# non-whitespace characters.
+URL_RE = regex.compile(r'https?://(?:\S)+')
 
 
 def count_tokens(filename):
@@ -17,7 +19,8 @@ def count_tokens(filename):
     Count tokens that appear in a file, running each line through our
     simple tokenizer.
 
-    Unicode errors in the input data will become token boundaries.
+    URLs will be skipped, and Unicode errors will become separate tokens
+    containing '�'.
     """
     counts = defaultdict(int)
     with open(filename, encoding='utf-8', errors='replace') as infile:

@@ -9,7 +9,7 @@ TOKEN_RE = regex.compile(r"""
     # When we see characters that are Han ideographs (\p{IsIdeo}) or hiragana
     # \p{Script=Hiragana}, we allow a sequence of those characters to be glued
     # together as a single token. Without this case, the standard rule (case 2)
-    # would make each characte a separate token. This would be the correct
+    # would make each character a separate token. This would be the correct
     # behavior for word-wrapping, but a messy failure mode for NLP
     # tokenization.
     #

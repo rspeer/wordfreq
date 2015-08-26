@@ -1,4 +1,3 @@
-from html.entities import name2codepoint
 from wordfreq import tokenize
 from ftfy.fixes import unescape_html
 import regex
@@ -26,7 +25,7 @@ TCO_RE = regex.compile('http(?:s)?://t.co/[a-zA-Z0-9]+')
 
 def cld2_surface_tokenizer(text):
     """
-    Uses CLD2 to detect the language and wordfreq tokenizer to create tokens
+    Uses CLD2 to detect the language and wordfreq tokenizer to create tokens.
     """
     text = unescape_html(text)
     text = TWITTER_HANDLE_RE.sub('', text)
@@ -38,7 +37,7 @@ def cld2_surface_tokenizer(text):
 
 def cld2_detect_language(text):
     """
-    Uses CLD2 to detect the language
+    Uses CLD2 to detect the language.
     """
     # Format of pycld2.detect:
     #   (Confident in result: bool,
@@ -55,9 +54,12 @@ def cld2_detect_language(text):
 
 def tokenize_twitter(in_filename, out_prefix, tokenizer):
     """
-    Process a file by running it through the given tokenizer, sorting the
-    results by the language of each line, and inserting newlines
-    to mark the token boundaries.
+    Process a file by running it through the Twitter-specific tokenizer,
+    which uses cld2 for language detection, and removes Twitter handles
+    and t.co URLs.
+
+    Produces output files that are separated by language, with newlines
+    between the tokens.
     """
     out_files = {}
     with open(in_filename, encoding='utf-8') as in_file:

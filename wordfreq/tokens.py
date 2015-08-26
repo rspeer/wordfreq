@@ -7,10 +7,10 @@ TOKEN_RE = regex.compile(r"""
     # -----------------------------------------------
 
     # When we see characters that are Han ideographs (\p{IsIdeo}) or hiragana
-    # \p{Script=Hiragana}, we allow a sequence of those characters to be glued
-    # together as a single token. Without this case, the standard rule (case 2)
-    # would make each character a separate token. This would be the correct
-    # behavior for word-wrapping, but a messy failure mode for NLP
+    # (\p{Script=Hiragana}), we allow a sequence of those characters to be
+    # glued together as a single token. Without this case, the standard rule
+    # (case 2) would make each character a separate token. This would be the
+    # correct behavior for word-wrapping, but a messy failure mode for NLP
     # tokenization.
     #
     # It is, of course, better to use a tokenizer that is designed for Chinese
@@ -26,7 +26,8 @@ TOKEN_RE = regex.compile(r"""
 
     # The start of the token must be 'word-like', not punctuation or whitespace
     # or various other things. However, we allow characters of category So
-    # because many of these are emoji, which can convey meaning.
+    # (Symbol - Other) because many of these are emoji, which can convey
+    # meaning.
 
     [\w\p{So}]
 

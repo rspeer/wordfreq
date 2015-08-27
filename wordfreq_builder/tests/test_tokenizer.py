@@ -6,7 +6,7 @@ def test_tokenizer_1():
     text = '"This is a test," she said, "and I\'ll bet y\'all $3.50 that it won\'t fail."'
     tokens = [
         'this', 'is', 'a', 'test', 'she', 'said',
-        'and', "i'll", 'bet', "y'all", '3', '50', 'that',
+        'and', "i'll", 'bet', "y", "all", '3.50', 'that',
         'it', "won't", 'fail',
     ]
     result = cld2_surface_tokenizer(text)

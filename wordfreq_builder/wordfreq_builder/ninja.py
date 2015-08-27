@@ -123,7 +123,6 @@ def google_books_deps(dirname_in):
 
 def twitter_deps(input_filename, slice_prefix, combined_prefix, slices,
                  languages):
-
     lines = []
 
     slice_files = ['{prefix}.part{num:0>2d}'.format(prefix=slice_prefix,

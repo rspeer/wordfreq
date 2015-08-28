@@ -11,18 +11,20 @@ def ninja_to_dot():
     print('rankdir="LR";')
     for line in sys.stdin:
         line = line.rstrip()
-        parts = line.split(' ')
-        if parts[0] == 'build':
+        if line.startswith('build'):
             # the output file is the first argument; strip off the colon that
             # comes from ninja syntax
-            outfile = last_component(parts[1][:-1])
-            operation = parts[2]
-            infiles = [last_component(part) for part in parts[3:]]
+            output_text, input_text = line.split(':')
+            outfiles = [last_component(part) for part in output_text.split(' ')[1:]]
+            inputs = input_text.strip().split(' ')
+            infiles = [last_component(part) for part in inputs[1:]]
+            operation = inputs[0]
             for infile in infiles:
                 if infile == '|':
                     # external dependencies start here; let's not graph those
                     break
-                print('"%s" -> "%s" [label="%s"]' % (infile, outfile, operation))
+                for outfile in outfiles:
+                    print('"%s" -> "%s" [label="%s"]' % (infile, outfile, operation))
     print("}")
 
 

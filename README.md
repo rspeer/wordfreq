@@ -53,21 +53,21 @@ frequencies by a million (1e6) to get more readable numbers:
 
 The parameters are:
 
-    - `word`: a Unicode string containing the word to look up. Ideally the word
-      is a single token according to our tokenizer, but if not, there is still
-      hope -- see *Tokenization* below.
+- `word`: a Unicode string containing the word to look up. Ideally the word
+  is a single token according to our tokenizer, but if not, there is still
+  hope -- see *Tokenization* below.
 
-    - `lang`: the BCP 47 or ISO 639 code of the language to use, such as 'en'.
+- `lang`: the BCP 47 or ISO 639 code of the language to use, such as 'en'.
 
-    - `wordlist`: which set of word frequencies to use. Current options are
-      'combined', which combines up to five different sources, and
-      'twitter', which returns frequencies observed on Twitter alone.
+- `wordlist`: which set of word frequencies to use. Current options are
+  'combined', which combines up to five different sources, and
+  'twitter', which returns frequencies observed on Twitter alone.
 
-    - `minimum`: If the word is not in the list or has a frequency lower than
-      `minimum`, return `minimum` instead. In some applications, you'll want
-      to set `minimum=1e-6` to avoid a discontinuity where the list ends, because
-      a frequency of 1e-6 (1 per million) is the threshold for being included in
-      the list at all.
+- `minimum`: If the word is not in the list or has a frequency lower than
+  `minimum`, return `minimum` instead. In some applications, you'll want
+  to set `minimum=1e-6` to avoid a discontinuity where the list ends, because
+  a frequency of 1e-6 (1 per million) is the threshold for being included in
+  the list at all.
 
 Other functions:
 

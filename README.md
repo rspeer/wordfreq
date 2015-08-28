@@ -23,6 +23,135 @@ install them on Ubuntu:
     pip3 install mecab-python3
 
 
+## What it does
+
+wordfreq provides access to estimates of the frequency with which a word is
+used, in 15 languages (see *Supported languages* below). It loads
+efficiently-packed data structures that contain all words that appear at least
+once per million words.
+
+The most useful function is:
+
+    word_frequency(word, lang, wordlist='combined', minimum=0.0)
+
+This function looks up a word's frequency in the given language, returning its
+frequency as a decimal between 0 and 1. In these examples, we'll multiply the
+frequencies by a million (1e6) to get more readable numbers:
+
+    >>> from wordfreq import word_frequency
+    >>> word_frequency('cafe', 'en') * 1e6
+    14.45439770745928
+
+    >>> word_frequency('café', 'en') * 1e6
+    4.7863009232263805
+
+    >>> word_frequency('cafe', 'fr') * 1e6
+    2.0417379446695274
+
+    >>> word_frequency('café', 'fr') * 1e6
+    77.62471166286912
+
+The parameters are:
+
+    - `word`: a Unicode string containing the word to look up. Ideally the word
+      is a single token according to our tokenizer, but if not, there is still
+      hope -- see *Tokenization* below.
+
+    - `lang`: the BCP 47 or ISO 639 code of the language to use, such as 'en'.
+
+    - `wordlist`: which set of word frequencies to use. Current options are
+      'combined', which combines up to five different sources, and
+      'twitter', which returns frequencies observed on Twitter alone.
+
+    - `minimum`: If the word is not in the list or has a frequency lower than
+      `minimum`, return `minimum` instead. In some applications, you'll want
+      to set `minimum=1e-6` to avoid a discontinuity where the list ends, because
+      a frequency of 1e-6 (1 per million) is the threshold for being included in
+      the list at all.
+
+Other functions:
+
+`tokenize(text, lang)` splits text in the given language into words, in the same
+way that the words in wordfreq's data were counted in the first place. See
+*Tokenization*. Tokenizing Japanese requires the optional dependency `mecab-python3`
+to be installed.
+
+`top_n_list(lang, n, wordlist='combined')` returns the most common *n* words in
+the list, in descending frequency order.
+
+    >>> from wordfreq import top_n_list
+    >>> top_n_list('en', 10)
+    ['the', 'of', 'to', 'in', 'and', 'a', 'i', 'you', 'is', 'it']
+
+    >>> top_n_list('es', 10)
+    ['de', 'la', 'que', 'el', 'en', 'y', 'a', 'no', 'los', 'es']
+
+`iter_wordlist(lang, wordlist='combined')` iterates through all the words in a
+wordlist, in descending frequency order.
+
+`get_frequency_dict(lang, wordlist='combined')` returns all the frequencies in
+a wordlist as a dictionary, for cases where you'll want to look up a lot of
+words and don't need the wrapper that `word_frequency` provides.
+
+`supported_languages(wordlist='combined')` returns a dictionary whose keys are
+language codes, and whose values are the data file that will be loaded to
+provide the requested wordlist in each language.
+
+`random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12)`
+returns a selection of random words, separated by spaces. `bits_per_word=n`
+will select each random word from 2^n words.
+
+If you happen to want an easy way to get [a memorable, xkcd-style
+password][xkcd936] with 60 bits of entropy, this function will almost do the
+job. In this case, you should actually run the similar function `random_ascii_words`,
+limiting the selection to words that can be typed in ASCII.
+
+[xkcd936]: https://xkcd.com/936/
+
+
+## Sources and supported languages
+
+We compiled word frequencies from five different sources, providing us examples
+of word usage on different topics at different levels of formality. The sources
+(and the abbreviations we'll use for them) are:
+
+- **GBooks**: Google Books Ngrams 2013
+- **LeedsIC**: The Leeds Internet Corpus
+- **OpenSub**: OpenSubtitles
+- **Twitter**: Messages sampled from Twitter's public stream
+- **Wikipedia**: The full text of Wikipedia in 2015
+
+The following 12 languages are well-supported, using at least 3 different sources
+of word frequencies:
+
+    Language    Code    GBooks  LeedsIC OpenSub Twitter Wikipedia
+    ──────────────────┼──────────────────────────────────────────
+    Arabic      ar    │ -       Yes     Yes     Yes     Yes
+    German      de    │ -       Yes     Yes     Yes[1]  Yes
+    English     en    │ Yes     Yes     Yes     Yes     Yes
+    Spanish     es    │ -       Yes     Yes     Yes     Yes
+    French      fr    │ -       Yes     Yes     Yes     Yes
+    Indonesian  id    │ -       -       Yes     Yes     Yes
+    Italian     it    │ -       Yes     Yes     Yes     Yes
+    Japanese    ja    │ -       Yes     -       Yes     Yes
+    Malay       ms    │ -       -       Yes     Yes     Yes
+    Dutch       nl    │ -       -       Yes     Yes     Yes
+    Portuguese  pt    │ -       Yes     Yes     Yes     Yes
+    Russian     ru    │ -       Yes     Yes     Yes     Yes
+
+These 3 languages are only marginally supported so far:
+
+    Language    Code    GBooks  LeedsIC OpenSub Twitter Wikipedia
+    ──────────────────┼──────────────────────────────────────────
+    Greek       el    │ -       Yes     Yes     -       -
+    Korean      ko    │ -       -       -       Yes     Yes
+    Chinese     zh    │ -       Yes     Yes     -       -
+
+[1] We've counted the frequencies from tweets in German, such as they are, but
+you should be aware that German is not a frequently-used language on Twitter.
+Germans just don't tweet that much.
+
+
 ## Tokenization
 
 wordfreq uses the Python package `regex`, which is a more advanced
@@ -40,6 +169,27 @@ There are language-specific exceptions:
 - It does not yet attempt to tokenize Chinese ideograms.
 
 [uax29]: http://unicode.org/reports/tr29/
+
+When wordfreq's frequency lists are built in the first place, the words are
+tokenized according to this function.
+
+Because tokenization in the real world is far from consistent, wordfreq will
+also try to deal gracefully when you query it with texts that actually break
+into multiple tokens:
+
+    >>> word_frequency('New York', 'en')
+    0.0002632772081925718
+
+The word frequencies are combined with the half-harmonic-mean function in order
+to provide an estimate of what their combined frequency would be.
+
+This implicitly assumes that you're asking about words that frequently appear
+together. It's not multiplying the frequencies, because that would assume they
+are statistically unrelated. So if you give it an uncommon combination of
+tokens, it will hugely over-estimate their frequency:
+
+    >>> word_frequency('owl-flavored', 'en')
+    1.3557098723512335e-06
 
 
 ## License
@@ -64,7 +214,7 @@ sources:
 - The Leeds Internet Corpus, from the University of Leeds Centre for Translation
   Studies (http://corpus.leeds.ac.uk/list.html)
 
-- The OpenSubtitles Frequency Word Lists, by Invoke IT Limited
+- The OpenSubtitles Frequency Word Lists, compiled by Hermit Dave
   (https://invokeit.wordpress.com/frequency-word-lists/)
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)

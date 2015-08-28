@@ -23,7 +23,7 @@ install them on Ubuntu:
     pip3 install mecab-python3
 
 
-## What it does
+## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
 used, in 15 languages (see *Supported languages* below). It loads

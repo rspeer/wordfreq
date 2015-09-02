@@ -9,11 +9,9 @@ python:
  - 3.3
  - 3.4
 
-# Use container-based infrastructure
-sudo: false
-
 install:
- - pip install coverage ftfy msgpack-python langcodes regex
+ - sudo apt-get install mecab-ipadic-utf8 libmecab-dev
+ - pip install coverage ftfy langcodes mecab-python3 msgpack-python regex
 
 script:
  - coverage run --include=wordfreq/* -m nose -vx

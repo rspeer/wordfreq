@@ -1,0 +1,32 @@
+language: python
+
+python:
+ - pypy
+ - pypy3
+ - 2.6
+ - 2.7
+ - 3.2
+ - 3.3
+ - 3.4
+
+# Use container-based infrastructure
+sudo: false
+
+install:
+ - pip install coverage
+
+script:
+ - coverage run --include=wordfreq/* -m nose -vx
+
+after_success:
+ - pip install coveralls
+ - coveralls
+
+after_script:
+ - coverage report
+ - pip install pep8 pyflakes
+ - pep8 --statistics --count .
+ - pyflakes . | tee >(wc -l)
+
+matrix:
+  fast_finish: true

@@ -13,7 +13,7 @@ python:
 sudo: false
 
 install:
- - pip install coverage
+ - pip install coverage ftfy msgpack-python langcodes regex
 
 script:
  - coverage run --include=wordfreq/* -m nose -vx

@@ -6,13 +6,15 @@ python:
  - 3.3
  - 3.4
 
+# Use container-based infrastructure
+sudo: false
+
 install:
- - sudo apt-get install mecab-ipadic-utf8 libmecab-dev
- - pip install coverage ftfy langcodes mecab-python3 msgpack-python regex
+ - pip install coverage ftfy langcodes msgpack-python regex
  - if [ "$TRAVIS_PYTHON_VERSION" != "3.4" ]; then pip install pathlib; fi
 
 script:
- - coverage run --include=wordfreq/* -m nose -vx
+ - coverage run --include=wordfreq/* -m nose -vx tests/test.py
 
 after_success:
  - pip install coveralls

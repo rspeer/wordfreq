@@ -1,0 +1,30 @@
+language: python
+
+python:
+ - pypy3
+ - 3.2
+ - 3.3
+ - 3.4
+
+# Use container-based infrastructure
+sudo: false
+
+install:
+ - pip install coverage ftfy langcodes msgpack-python regex
+ - if [ "$TRAVIS_PYTHON_VERSION" != "3.4" ]; then pip install pathlib; fi
+
+script:
+ - coverage run --include=wordfreq/* -m nose -vx tests/test.py
+
+after_success:
+ - pip install coveralls
+ - coveralls
+
+after_script:
+ - coverage report
+ - pip install pep8 pyflakes
+ - pep8 --statistics --count .
+ - pyflakes . | tee >(wc -l)
+
+matrix:
+  fast_finish: true

@@ -121,31 +121,33 @@ of word usage on different topics at different levels of formality. The sources
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wikipedia**: The full text of Wikipedia in 2015
 
-The following 12 languages are well-supported, using at least 3 different sources
-of word frequencies:
+The following 12 languages are well-supported, with reasonable tokenization and
+at least 3 different sources of word frequencies:
 
-    Language    Code    GBooks  LeedsIC OpenSub Twitter Wikipedia
-    ──────────────────┼──────────────────────────────────────────
-    Arabic      ar    │ -       Yes     Yes     Yes     Yes
-    German      de    │ -       Yes     Yes     Yes[1]  Yes
-    English     en    │ Yes     Yes     Yes     Yes     Yes
-    Spanish     es    │ -       Yes     Yes     Yes     Yes
-    French      fr    │ -       Yes     Yes     Yes     Yes
-    Indonesian  id    │ -       -       Yes     Yes     Yes
-    Italian     it    │ -       Yes     Yes     Yes     Yes
-    Japanese    ja    │ -       Yes     -       Yes     Yes
-    Malay       ms    │ -       -       Yes     Yes     Yes
-    Dutch       nl    │ -       -       Yes     Yes     Yes
-    Portuguese  pt    │ -       Yes     Yes     Yes     Yes
-    Russian     ru    │ -       Yes     Yes     Yes     Yes
+    Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
+    ──────────────────┼──────────────────────────────────────────────────
+    Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
+    German      de    │ -       -       Yes     Yes     Yes[1]  Yes
+    English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
+    Spanish     es    │ -       -       Yes     Yes     Yes     Yes
+    French      fr    │ -       -       Yes     Yes     Yes     Yes
+    Indonesian  id    │ -       -       -       Yes     Yes     Yes
+    Italian     it    │ -       -       Yes     Yes     Yes     Yes
+    Japanese    ja    │ -       -       Yes     -       Yes     Yes
+    Malay       ms    │ -       -       -       Yes     Yes     Yes
+    Dutch       nl    │ -       -       -       Yes     Yes     Yes
+    Portuguese  pt    │ -       -       Yes     Yes     Yes     Yes
+    Russian     ru    │ -       -       Yes     Yes     Yes     Yes
 
-These 3 languages are only marginally supported so far:
+These 3 languages are only marginally supported so far, either because
+they have too few data sources, or in the case of Chinese because we are
+lacking tokenization support for it:
 
-    Language    Code    GBooks  LeedsIC OpenSub Twitter Wikipedia
-    ──────────────────┼──────────────────────────────────────────
-    Greek       el    │ -       Yes     Yes     -       -
-    Korean      ko    │ -       -       -       Yes     Yes
-    Chinese     zh    │ -       Yes     Yes     -       -
+    Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
+    ──────────────────┼──────────────────────────────────────────────────
+    Greek       el    │ -       -       Yes     Yes     -       -
+    Korean      ko    │ -       -       -       -       Yes     Yes
+    Chinese     zh    │ -       Yes     Yes     Yes     -       -
 
 [1] We've counted the frequencies from tweets in German, such as they are, but
 you should be aware that German is not a frequently-used language on Twitter.
@@ -218,6 +220,18 @@ sources:
   (https://invokeit.wordpress.com/frequency-word-lists/)
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
+
+It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK, and
+SUBTLEX-CH, created by Marc Brysbaert et al. and available at
+http://crr.ugent.be/programs-data/subtitle-frequencies. I (Robyn Speer) have
+obtained permission by e-mail from Marc Brysbaert to distribute these wordlists
+in wordfreq, to be used for any purpose, not just for academic use, under these
+conditions:
+
+- Wordfreq and code derived from it must credit the SUBTLEX authors.
+- It must remain clear that SUBTLEX is freely available data.
+
+These terms are similar to the Creative Commons Attribution-ShareAlike license.
 
 Some additional data was collected by a custom application that watches the
 streaming Twitter API, in accordance with Twitter's Developer Agreement &

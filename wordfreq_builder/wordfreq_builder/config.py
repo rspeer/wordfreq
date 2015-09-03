@@ -11,12 +11,12 @@ CONFIG = {
         'twitter': [
             'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
             'pt', 'ru',
-            # can be added later: 'th', 'tr'
+            # can be added later: 'el', 'tr'
         ],
         'wikipedia': [
             'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
             'pt', 'ru'
-            # many more can be added
+            # consider adding 'el' and 'tr'
         ],
         'opensubtitles': [
             # All languages where the most common word in OpenSubtitles
@@ -33,14 +33,19 @@ CONFIG = {
             'en',
             # Using the 2012 data, we could get French, German, Italian,
             # Russian, Spanish, and (Simplified) Chinese.
-        ]
+        ],
+        'subtlex-en': ['en'],
+        'subtlex-zh': ['zh'],
     },
+    # Subtlex languages that need to be pre-processed
     'wordlist_paths': {
         'twitter': 'generated/twitter/tweets-2014.{lang}.{ext}',
         'wikipedia': 'generated/wikipedia/wikipedia_{lang}.{ext}',
         'opensubtitles': 'generated/opensubtitles/opensubtitles_{lang}.{ext}',
         'leeds': 'generated/leeds/leeds_internet_{lang}.{ext}',
         'google-books': 'generated/google-books/google_books_{lang}.{ext}',
+        'subtlex-en': 'generated/subtlex/subtlex_{lang}.{ext}',
+        'subtlex-zh': 'generated/subtlex/subtlex_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}',
         'combined-dist': 'dist/combined_{lang}.{ext}',
         'twitter-dist': 'dist/twitter_{lang}.{ext}'

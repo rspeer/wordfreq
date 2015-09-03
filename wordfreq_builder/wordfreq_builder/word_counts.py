@@ -49,13 +49,14 @@ def read_freqs(filename, cutoff=0, lang=None):
     with open(filename, encoding='utf-8', newline='') as infile:
         for key, strval in csv.reader(infile):
             val = float(strval)
+            key = fix_text(key)
             if val < cutoff:
                 break
             tokens = tokenize(key, lang) if lang is not None else simple_tokenize(key)
             for token in tokens:
                 # Use += so that, if we give the reader concatenated files with
                 # duplicates, it does the right thing
-                raw_counts[fix_text(token)] += val
+                raw_counts[token] += val
                 total += val
 
     for word in raw_counts:
@@ -94,6 +95,17 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
 
     with gzip.open(out_filename, 'wb') as outfile:
         msgpack.dump(cBpack_data, outfile)
+
+
+def merge_counts(count_dicts):
+    """
+    Merge multiple dictionaries of counts by adding their entries.
+    """
+    merged = defaultdict(int)
+    for count_dict in count_dicts:
+        for term, count in count_dict.items():
+            merged[term] += count
+    return merged
 
 
 def merge_freqs(freq_dicts):

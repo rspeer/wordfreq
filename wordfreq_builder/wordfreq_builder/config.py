@@ -23,9 +23,10 @@ CONFIG = {
             'pt', 'ru', 'tr'
         ],
         'opensubtitles': [
-            # All languages where the most common word in OpenSubtitles
-            # appears at least 5000 times
-            'ar', 'bg', 'bs', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et',
+            # This list includes languages where the most common word in
+            # OpenSubtitles appears at least 5000 times. However, we exclude
+            # German, where SUBTLEX has done better processing of the same data.
+            'ar', 'bg', 'bs', 'ca', 'cs', 'da', 'el', 'en', 'es', 'et',
             'fa', 'fi', 'fr', 'he', 'hr', 'hu', 'id', 'is', 'it', 'lt', 'lv',
             'mk', 'ms', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq',
             'sr', 'sv', 'tr', 'uk', 'zh'
@@ -39,7 +40,7 @@ CONFIG = {
             # Russian, Spanish, and (Simplified) Chinese.
         ],
         'subtlex-en': ['en'],
-        'subtlex-other': ['de', 'el', 'nl', 'zh'],
+        'subtlex-other': ['de', 'nl', 'zh'],
     },
     # Subtlex languages that need to be pre-processed
     'wordlist_paths': {

@@ -84,9 +84,9 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
         )
     )
     lines.extend(
-        subtlex_zh_deps(
+        subtlex_other_deps(
             data_filename('source-lists/subtlex'),
-            CONFIG['sources']['subtlex-zh']
+            CONFIG['sources']['subtlex-other']
         )
     )
     lines.extend(combine_lists(all_languages()))
@@ -208,6 +208,17 @@ def opensubtitles_deps(dirname_in, languages):
     return lines
 
 
+# Which columns of the SUBTLEX data files do the word and its frequency appear
+# in?
+SUBTLEX_COLUMN_MAP = {
+    'de': (1, 3),
+    'el': (2, 3),
+    'en': (1, 2),
+    'nl': (1, 2),
+    'zh': (1, 5)
+}
+
+
 def subtlex_en_deps(dirname_in, languages):
     lines = []
     assert languages == ['en']
@@ -217,11 +228,12 @@ def subtlex_en_deps(dirname_in, languages):
         input_file = '{prefix}/subtlex.{region}.txt'.format(
             prefix=dirname_in, region=region
         )
+        textcol, freqcol = SUBTLEX_COLUMN_MAP['en']
         processed_file = wordlist_filename('subtlex-en', region, 'processed.txt')
         processed_files.append(processed_file)
         add_dep(
             lines, 'convert_subtlex', input_file, processed_file,
-            params={'col': 2}
+            params={'textcol': textcol, 'freqcol': freqcol, 'startrow': 2}
         )
 
     output_file = wordlist_filename('subtlex-en', 'en', 'counts.txt')
@@ -230,17 +242,25 @@ def subtlex_en_deps(dirname_in, languages):
     return lines
 
 
-def subtlex_zh_deps(dirname_in, languages):
+def subtlex_other_deps(dirname_in, languages):
     lines = []
     for language in languages:
         input_file = '{prefix}/subtlex.{lang}.txt'.format(
             prefix=dirname_in, lang=language
         )
-        processed_file = wordlist_filename('subtlex-zh', language, 'processed.txt')
-        output_file = wordlist_filename('subtlex-zh', language, 'counts.txt')
+        processed_file = wordlist_filename('subtlex-other', language, 'processed.txt')
+        output_file = wordlist_filename('subtlex-other', language, 'counts.txt')
+        textcol, freqcol = SUBTLEX_COLUMN_MAP[language]
+
+        # Greek has three extra header lines for no reason
+        if language == 'el':
+            startrow = 5
+        else:
+            startrow = 2
+
         add_dep(
             lines, 'convert_subtlex', input_file, processed_file,
-            params={'col': 5}
+            params={'textcol': textcol, 'freqcol': freqcol, 'startrow': startrow}
         )
         add_dep(
             lines, 'merge_counts', processed_file, output_file
@@ -259,7 +279,7 @@ def combine_lists(languages):
         output_file = wordlist_filename('combined', language)
         add_dep(lines, 'merge', input_files, output_file,
                 extra='wordfreq_builder/word_counts.py',
-                params={'cutoff': 2})
+                params={'cutoff': 0})
 
         output_cBpack = wordlist_filename(
             'combined-dist', language, 'msgpack.gz')

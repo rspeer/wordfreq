@@ -1,11 +1,12 @@
-from wordfreq_builder.word_counts import read_freqs, merge_counts, write_wordlist
+from wordfreq_builder.word_counts import read_values, merge_counts, write_wordlist
 import argparse
 
 
 def merge_lists(input_names, output_name):
     count_dicts = []
     for input_name in input_names:
-        count_dicts.append(read_freqs(input_name, cutoff=0))
+        values, total = read_values(input_name, cutoff=0)
+        count_dicts.append(values)
     merged = merge_counts(count_dicts)
     write_wordlist(merged, output_name)
 

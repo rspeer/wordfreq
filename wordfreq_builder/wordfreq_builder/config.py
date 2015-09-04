@@ -13,6 +13,7 @@ CONFIG = {
         # 'th' when we get tokenization for it
         # 'hi' when we stop messing up its tokenization
         # 'tl' because it's probably ready right now
+        # 'pl' because we have 3 sources for it
         'twitter': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
             'pt', 'ru', 'tr'
@@ -38,7 +39,7 @@ CONFIG = {
             # Russian, Spanish, and (Simplified) Chinese.
         ],
         'subtlex-en': ['en'],
-        'subtlex-zh': ['zh'],
+        'subtlex-other': ['de', 'el', 'nl', 'zh'],
     },
     # Subtlex languages that need to be pre-processed
     'wordlist_paths': {
@@ -48,7 +49,7 @@ CONFIG = {
         'leeds': 'generated/leeds/leeds_internet_{lang}.{ext}',
         'google-books': 'generated/google-books/google_books_{lang}.{ext}',
         'subtlex-en': 'generated/subtlex/subtlex_{lang}.{ext}',
-        'subtlex-zh': 'generated/subtlex/subtlex_{lang}.{ext}',
+        'subtlex-other': 'generated/subtlex/subtlex_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}',
         'combined-dist': 'dist/combined_{lang}.{ext}',
         'twitter-dist': 'dist/twitter_{lang}.{ext}'

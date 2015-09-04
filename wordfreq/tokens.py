@@ -65,6 +65,15 @@ def simple_tokenize(text):
     return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
 
 
+def turkish_tokenize(text):
+    """
+    Like `simple_tokenize`, but modifies i's so that they case-fold correctly
+    in Turkish.
+    """
+    text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
+    return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
+
+
 def remove_arabic_marks(text):
     """
     Remove decorations from Arabic words:
@@ -90,6 +99,8 @@ def tokenize(text, lang):
     - Chinese or Japanese texts that aren't identified as the appropriate
       language will only split on punctuation and script boundaries, giving
       you untokenized globs of characters that probably represent many words.
+    - Turkish will use a different case-folding procedure, so that capital
+      I and İ map to ı and i respectively.
     - All other languages will be tokenized using a regex that mostly
       implements the Word Segmentation section of Unicode Annex #29.
       See `simple_tokenize` for details.
@@ -106,6 +117,9 @@ def tokenize(text, lang):
         if mecab_tokenize is None:
             from wordfreq.mecab import mecab_tokenize
         return mecab_tokenize(text)
+
+    if lang == 'tr':
+        return turkish_tokenize(text)
 
     if lang == 'ar':
         text = remove_arabic_marks(unicodedata.normalize('NFKC', text))

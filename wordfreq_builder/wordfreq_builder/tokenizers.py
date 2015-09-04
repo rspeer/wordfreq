@@ -13,7 +13,8 @@ CLD2_BAD_CHAR_RANGE = "[%s]" % "".join(
         '\ufdd0-\ufdef',
         '\N{HANGUL FILLER}',
         '\N{HANGUL CHOSEONG FILLER}',
-        '\N{HANGUL JUNGSEONG FILLER}'
+        '\N{HANGUL JUNGSEONG FILLER}',
+        '<>'
     ] +
     [chr(65534+65536*x+y) for x in range(17) for y in range(2)]
 )

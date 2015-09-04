@@ -153,7 +153,8 @@ def twitter_deps(input_filename, slice_prefix, combined_prefix, slices,
             for language in languages
         ]
         add_dep(lines, 'tokenize_twitter', slice_file, language_outputs,
-                params={'prefix': slice_file})
+                params={'prefix': slice_file},
+                extra='wordfreq_builder/tokenizers.py')
 
     for language in languages:
         combined_output = wordlist_filename('twitter', language, 'tokens.txt')

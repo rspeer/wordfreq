@@ -12,15 +12,15 @@ CONFIG = {
         # Consider adding:
         # 'th' when we get tokenization for it
         # 'hi' when we stop messing up its tokenization
-        # 'tl' because it's probably ready right now
-        # 'pl' because we have 3 sources for it
+        # 'tl' with one more data source
+        # 'sv' because its data sources are ready
         'twitter': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru', 'tr'
+            'pl', 'pt', 'ru', 'sv', 'tr'
         ],
         'wikipedia': [
             'ar', 'de', 'en', 'el', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru', 'tr'
+            'pl', 'pt', 'ru', 'sv', 'tr'
         ],
         'opensubtitles': [
             # This list includes languages where the most common word in

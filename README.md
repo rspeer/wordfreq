@@ -118,6 +118,7 @@ of word usage on different topics at different levels of formality. The sources
 - **GBooks**: Google Books Ngrams 2013
 - **LeedsIC**: The Leeds Internet Corpus
 - **OpenSub**: OpenSubtitles
+- **SUBTLEX**: The SUBTLEX word frequency lists
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wikipedia**: The full text of Wikipedia in 2015
 
@@ -128,6 +129,7 @@ at least 3 different sources of word frequencies:
     ──────────────────┼──────────────────────────────────────────────────
     Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
     German      de    │ -       -       Yes     Yes     Yes[1]  Yes
+    Greek       el    │ -       -       Yes     Yes     Yes     Yes
     English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
     Spanish     es    │ -       -       Yes     Yes     Yes     Yes
     French      fr    │ -       -       Yes     Yes     Yes     Yes
@@ -138,14 +140,14 @@ at least 3 different sources of word frequencies:
     Dutch       nl    │ -       -       -       Yes     Yes     Yes
     Portuguese  pt    │ -       -       Yes     Yes     Yes     Yes
     Russian     ru    │ -       -       Yes     Yes     Yes     Yes
+    Turkish     tr    │ -       -       -       Yes     Yes     Yes
 
-These 3 languages are only marginally supported so far, either because
-they have too few data sources, or in the case of Chinese because we are
-lacking tokenization support for it:
+These languages are only marginally supported so far. We have too few data
+sources so far in Korean (feel free to suggest some), and we are lacking
+tokenization support for Chinese.
 
     Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
     ──────────────────┼──────────────────────────────────────────────────
-    Greek       el    │ -       -       Yes     Yes     -       -
     Korean      ko    │ -       -       -       -       Yes     Yes
     Chinese     zh    │ -       Yes     Yes     Yes     -       -
 

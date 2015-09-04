@@ -128,8 +128,8 @@ at least 3 different sources of word frequencies:
     Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
     ──────────────────┼──────────────────────────────────────────────────
     Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
-    German      de    │ -       -       Yes     Yes     Yes[1]  Yes
-    Greek       el    │ -       -       Yes     Yes     Yes     Yes
+    German      de    │ -       Yes     Yes     Yes     Yes[1]  Yes
+    Greek       el    │ -       Yes     Yes     Yes     Yes     Yes
     English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
     Spanish     es    │ -       -       Yes     Yes     Yes     Yes
     French      fr    │ -       -       Yes     Yes     Yes     Yes
@@ -137,7 +137,7 @@ at least 3 different sources of word frequencies:
     Italian     it    │ -       -       Yes     Yes     Yes     Yes
     Japanese    ja    │ -       -       Yes     -       Yes     Yes
     Malay       ms    │ -       -       -       Yes     Yes     Yes
-    Dutch       nl    │ -       -       -       Yes     Yes     Yes
+    Dutch       nl    │ -       Yes     -       Yes     Yes     Yes
     Portuguese  pt    │ -       -       Yes     Yes     Yes     Yes
     Russian     ru    │ -       -       Yes     Yes     Yes     Yes
     Turkish     tr    │ -       -       -       Yes     Yes     Yes

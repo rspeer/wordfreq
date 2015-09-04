@@ -8,6 +8,11 @@ CONFIG = {
     'sources': {
         # A list of language codes (possibly un-standardized) that we'll
         # look up in filenames for these various data sources.
+        #
+        # Consider adding:
+        # 'th' when we get tokenization for it
+        # 'hi' when we stop messing up its tokenization
+        # 'tl' because it's probably ready right now
         'twitter': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
             'pt', 'ru', 'tr'

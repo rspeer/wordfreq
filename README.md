@@ -129,7 +129,7 @@ at least 3 different sources of word frequencies:
     ──────────────────┼──────────────────────────────────────────────────
     Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
     German      de    │ -       Yes     Yes     Yes     Yes[1]  Yes
-    Greek       el    │ -       Yes     Yes     Yes     Yes     Yes
+    Greek       el    │ -       -       Yes     Yes     Yes     Yes
     English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
     Spanish     es    │ -       -       Yes     Yes     Yes     Yes
     French      fr    │ -       -       Yes     Yes     Yes     Yes
@@ -251,6 +251,10 @@ Twitter; it does not display or republish any Twitter content.
   Improved Word Frequency Measure for American English. Behavior Research
   Methods, 41 (4), 977-990.
   http://sites.google.com/site/borisnew/pub/BrysbaertNew2009.pdf
+
+- Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A. M., Bölte, J., & Böhl, A.
+  (2015). The word frequency effect. Experimental Psychology.
+  http://econtent.hogrefe.com/doi/abs/10.1027/1618-3169/a000123?journalCode=zea
 
 - Cai, Q., & Brysbaert, M. (2010). SUBTLEX-CH: Chinese word and character
   frequencies based on film subtitles. PLoS One, 5(6), e10729.

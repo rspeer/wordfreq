@@ -176,7 +176,6 @@ following reasonable conditions:
 
 - `subtlex.de.txt`, which was downloaded as [SUBTLEX-DE raw file.xlsx][subtlex-de],
   and exported from Excel format to tab-separated UTF-8 using LibreOffice
-- `subtlex.el.txt`, which was downloaded as [SUBTLEX-GR\_CD.txt][subtlex-gr]
 - `subtlex.en-US.txt`, which was downloaded as [subtlexus5.zip][subtlex-us],
   extracted, and converted from ISO-8859-1 to UTF-8
 - `subtlex.en-GB.txt`, which was downloaded as
@@ -188,7 +187,6 @@ following reasonable conditions:
   [subtlexch131210.zip][subtlex-ch] and extracted
 
 [subtlex-de]: http://crr.ugent.be/SUBTLEX-DE/SUBTLEX-DE%20raw%20file.xlsx
-[subtlex-gr]: http://www.bcbl.eu/bcbl-corporativa/wp-content/uploads/2013/01/SUBTLEX-GR_CD.txt
 [subtlex-us]: http://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexus/subtlexus5.zip
 [subtlex-uk]: http://crr.ugent.be/papers/SUBTLEX-UK_all.xlsx
 [subtlex-nl]: http://crr.ugent.be/subtlex-nl/SUBTLEX-NL.cd-above2.txt.zip

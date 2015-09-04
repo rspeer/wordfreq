@@ -56,10 +56,11 @@ rule convert_leeds
 rule convert_opensubtitles
   command = tr ' ' ',' < $in > $out
 
-# To convert SUBTLEX, we take the 1st and Nth columns, strip the header, convert
-# tabs to commas and commas to nothing, and remove obvious mojibake.
+# To convert SUBTLEX, we take the 1st and Nth columns, strip the header,
+# run it through ftfy, convert tabs to commas and spurious CSV formatting to
+# and remove lines with unfixable half-mojibake.
 rule convert_subtlex
-  command = cut -f 1,$col $in | tail -n +2 | tr '	,' ', ' | grep -v 'â,' > $out
+  command = cut -f $textcol,$freqcol $in | tail -n +$startrow | ftfy | tr '	",' ',  ' | grep -v 'â,' > $out
 
 # Convert and clean up the Google Books Syntactic N-grams data. Concatenate all
 # the input files, keep only the single words and their counts, and only keep

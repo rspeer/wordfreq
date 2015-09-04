@@ -32,19 +32,20 @@ def count_tokens(filename):
     return counts
 
 
-def read_freqs(filename, cutoff=0, lang=None):
+def read_values(filename, cutoff=0, lang=None):
     """
-    Read words and their frequencies from a CSV file.
+    Read words and their frequency or count values from a CSV file. Returns
+    a dictionary of values and the total of all values.
 
-    Only words with a frequency greater than or equal to `cutoff` are returned.
+    Only words with a value greater than or equal to `cutoff` are returned.
 
-    If `cutoff` is greater than 0, the csv file must be sorted by frequency
+    If `cutoff` is greater than 0, the csv file must be sorted by value
     in descending order.
 
-    If lang is given, read_freqs will apply language specific preprocessing
+    If lang is given, it will apply language specific preprocessing
     operations.
     """
-    raw_counts = defaultdict(float)
+    values = defaultdict(float)
     total = 0.
     with open(filename, encoding='utf-8', newline='') as infile:
         for key, strval in csv.reader(infile):
@@ -56,13 +57,29 @@ def read_freqs(filename, cutoff=0, lang=None):
             for token in tokens:
                 # Use += so that, if we give the reader concatenated files with
                 # duplicates, it does the right thing
-                raw_counts[token] += val
+                values[token] += val
                 total += val
+    return values, total
 
-    for word in raw_counts:
-        raw_counts[word] /= total
 
-    return raw_counts
+def read_freqs(filename, cutoff=0, lang=None):
+    """
+    Read words and their frequencies from a CSV file, normalizing the
+    frequencies to add up to 1.
+
+    Only words with a frequency greater than or equal to `cutoff` are returned.
+
+    If `cutoff` is greater than 0, the csv file must be sorted by frequency
+    in descending order.
+
+    If lang is given, read_freqs will apply language specific preprocessing
+    operations.
+    """
+    values, total = read_values(filename, cutoff, lang)
+    for word in values:
+        values[word] /= total
+
+    return values
 
 
 def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):

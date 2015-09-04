@@ -9,14 +9,13 @@ CONFIG = {
         # A list of language codes (possibly un-standardized) that we'll
         # look up in filenames for these various data sources.
         'twitter': [
-            'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru',
-            # can be added later: 'el', 'tr'
+            'ar', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
+            'pt', 'ru', 'tr'
         ],
         'wikipedia': [
-            'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
+            'ar', 'de', 'en', 'el', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
             'pt', 'ru'
-            # consider adding 'el' and 'tr'
+            # consider adding 'tr'
         ],
         'opensubtitles': [
             # All languages where the most common word in OpenSubtitles

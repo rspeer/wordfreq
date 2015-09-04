@@ -161,3 +161,27 @@ longer represents the words 'don' and 'won', as we assume most of their
 frequency comes from "don't" and "won't". Words that turned into similarly
 common words, however, were left alone: this list doesn't represent "can't"
 because the word was left as "can".
+
+### SUBTLEX
+
+Mark Brysbaert gave us permission by e-mail to use the SUBTLEX word lists in
+wordfreq and derived works without the "academic use" restriction, under the
+following reasonable conditions:
+
+- Wordfreq and code derived from it must credit the SUBTLEX authors.
+  (See the citations in the top-level `README.md` file.)
+- It must remain clear that SUBTLEX is freely available data.
+
+`data/source-lists/subtlex` contains the following files:
+
+- `subtlex.en-US.txt`, which was downloaded from [here][subtlex-us],
+  extracted, and converted from ISO-8859-1 to UTF-8
+- `subtlex.en-GB.txt`, which was exported as tab-separated UTF-8
+  from [this Excel file][subtlex-uk]
+- `subtlex.zh.txt`, which was downloaded and extracted from
+  [here][subtlex-ch]
+
+[subtlex-us]: http://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexus/subtlexus5.zip
+[subtlex-uk]: http://crr.ugent.be/papers/SUBTLEX-UK_all.xlsx
+[subtlex-ch]: http://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexch/subtlexch131210.zip
+

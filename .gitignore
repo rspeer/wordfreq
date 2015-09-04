@@ -7,3 +7,5 @@ pip-log.txt
 .coverage
 *~
 wordfreq-data.tar.gz
+.idea
+build.dot

@@ -223,7 +223,11 @@ sources:
 
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK, and
 SUBTLEX-CH, created by Marc Brysbaert et al. and available at
-http://crr.ugent.be/programs-data/subtitle-frequencies. I (Rob Speer) have
+http://crr.ugent.be/programs-data/subtitle-frequencies. SUBTLEX was first
+published in this paper:
+
+
+I (Rob Speer) have
 obtained permission by e-mail from Marc Brysbaert to distribute these wordlists
 in wordfreq, to be used for any purpose, not just for academic use, under these
 conditions:
@@ -237,3 +241,28 @@ Some additional data was collected by a custom application that watches the
 streaming Twitter API, in accordance with Twitter's Developer Agreement &
 Policy. This software gives statistics about words that are commonly used on
 Twitter; it does not display or republish any Twitter content.
+
+## Citations to work that wordfreq is built on
+
+- Brysbaert, M. & New, B. (2009). Moving beyond Kucera and Francis: A Critical
+  Evaluation of Current Word Frequency Norms and the Introduction of a New and
+  Improved Word Frequency Measure for American English. Behavior Research
+  Methods, 41 (4), 977-990.
+  http://sites.google.com/site/borisnew/pub/BrysbaertNew2009.pdf
+
+- Cai, Q., & Brysbaert, M. (2010). SUBTLEX-CH: Chinese word and character
+  frequencies based on film subtitles. PLoS One, 5(6), e10729.
+  http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0010729
+
+- Davis, M. (2012). Unicode text segmentation. Unicode Standard Annex, 29.
+  http://unicode.org/reports/tr29/
+
+- Kudo, T. (2005). Mecab: Yet another part-of-speech and morphological
+  analyzer.
+  http://mecab.sourceforge.net/
+
+- van Heuven, W. J., Mandera, P., Keuleers, E., & Brysbaert, M. (2014).
+  SUBTLEX-UK: A new and improved word frequency database for British English.
+  The Quarterly Journal of Experimental Psychology, 67(6), 1176-1190.
+  http://www.tandfonline.com/doi/pdf/10.1080/17470218.2013.850521
+

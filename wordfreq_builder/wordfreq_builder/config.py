@@ -14,8 +14,7 @@ CONFIG = {
         ],
         'wikipedia': [
             'ar', 'de', 'en', 'el', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru'
-            # consider adding 'tr'
+            'pt', 'ru', 'tr'
         ],
         'opensubtitles': [
             # All languages where the most common word in OpenSubtitles

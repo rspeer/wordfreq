@@ -117,32 +117,32 @@ of word usage on different topics at different levels of formality. The sources
 
 - **GBooks**: Google Books Ngrams 2013
 - **LeedsIC**: The Leeds Internet Corpus
-- **OpenSub**: OpenSubtitles
 - **SUBTLEX**: The SUBTLEX word frequency lists
+- **OpenSub**: Data derived from OpenSubtitles but not from SUBTLEX
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wikipedia**: The full text of Wikipedia in 2015
 
 The following 12 languages are well-supported, with reasonable tokenization and
 at least 3 different sources of word frequencies:
 
-    Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
+    Language    Code    GBooks  SUBTLEX OpenSub LeedsIC Twitter Wikipedia
     ──────────────────┼──────────────────────────────────────────────────
     Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
-    German      de    │ -       Yes     Yes     Yes     Yes[1]  Yes
+    German      de    │ -       Yes     -       Yes     Yes[1]  Yes
     Greek       el    │ -       -       Yes     Yes     Yes     Yes
     English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
     Spanish     es    │ -       -       Yes     Yes     Yes     Yes
     French      fr    │ -       -       Yes     Yes     Yes     Yes
-    Indonesian  id    │ -       -       -       Yes     Yes     Yes
+    Indonesian  id    │ -       -       Yes     -       Yes     Yes
     Italian     it    │ -       -       Yes     Yes     Yes     Yes
-    Japanese    ja    │ -       -       Yes     -       Yes     Yes
-    Malay       ms    │ -       -       -       Yes     Yes     Yes
-    Dutch       nl    │ -       Yes     -       Yes     Yes     Yes
-    Polish      pl    │ -       -       -       Yes     Yes     Yes
+    Japanese    ja    │ -       -       -       Yes     Yes     Yes
+    Malay       ms    │ -       -       Yes     -       Yes     Yes
+    Dutch       nl    │ -       Yes     Yes     -       Yes     Yes
+    Polish      pl    │ -       -       Yes     -       Yes     Yes
     Portuguese  pt    │ -       -       Yes     Yes     Yes     Yes
     Russian     ru    │ -       -       Yes     Yes     Yes     Yes
-    Swedish     sv    │ -       -       -       Yes     Yes     Yes
-    Turkish     tr    │ -       -       -       Yes     Yes     Yes
+    Swedish     sv    │ -       -       Yes     -       Yes     Yes
+    Turkish     tr    │ -       -       Yes     -       Yes     Yes
 
 These languages are only marginally supported so far. We have too few data
 sources so far in Korean (feel free to suggest some), and we are lacking

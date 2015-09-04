@@ -32,9 +32,14 @@ rule wiki2text
   command = bunzip2 -c $in | wiki2text > $out
 
 # To tokenize Japanese, we run it through Mecab and take the first column.
-# We don't have a plan for tokenizing Chinese yet.
 rule tokenize_japanese
   command = mecab -b 1048576 < $in | cut -f 1 | grep -v "EOS" > $out
+
+# Process Chinese by converting all Traditional Chinese characters to
+# Simplified equivalents -- not because that's a good way to get readable
+# text, but because that's how we're going to look them up.
+rule simplify_chinese
+  command = python -m wordfreq_builder.cli.simplify_chinese < $in > $out
 
 # Tokenizing text from Twitter requires us to language-detect and tokenize
 # in the same step.

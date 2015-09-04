@@ -260,8 +260,16 @@ Twitter; it does not display or republish any Twitter content.
   frequencies based on film subtitles. PLoS One, 5(6), e10729.
   http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0010729
 
+- Dave, H. (2011). Frequency word lists.
+  https://invokeit.wordpress.com/frequency-word-lists/
+
 - Davis, M. (2012). Unicode text segmentation. Unicode Standard Annex, 29.
   http://unicode.org/reports/tr29/
+
+- Keuleers, E., Brysbaert, M. & New, B. (2010). SUBTLEX-NL: A new frequency
+  measure for Dutch words based on film subtitles. Behavior Research Methods,
+  42(3), 643-650.
+  http://crr.ugent.be/papers/SUBTLEX-NL_BRM.pdf
 
 - Kudo, T. (2005). Mecab: Yet another part-of-speech and morphological
   analyzer.

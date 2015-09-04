@@ -138,8 +138,10 @@ at least 3 different sources of word frequencies:
     Japanese    ja    │ -       -       Yes     -       Yes     Yes
     Malay       ms    │ -       -       -       Yes     Yes     Yes
     Dutch       nl    │ -       Yes     -       Yes     Yes     Yes
+    Polish      pl    │ -       -       -       Yes     Yes     Yes
     Portuguese  pt    │ -       -       Yes     Yes     Yes     Yes
     Russian     ru    │ -       -       Yes     Yes     Yes     Yes
+    Swedish     sv    │ -       -       -       Yes     Yes     Yes
     Turkish     tr    │ -       -       -       Yes     Yes     Yes
 
 These languages are only marginally supported so far. We have too few data

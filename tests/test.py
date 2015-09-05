@@ -162,8 +162,8 @@ def test_ar():
 
 
 def test_ideographic_fallback():
-    # Try tokenizing Chinese text -- it should remain stuck together.
-    eq_(tokenize('中国文字', 'zh'), ['中国文字'])
+    # Try tokenizing Chinese text as English -- it should remain stuck together.
+    eq_(tokenize('中国文字', 'en'), ['中国文字'])
 
     # When Japanese is tagged with the wrong language, it will be split
     # at script boundaries.

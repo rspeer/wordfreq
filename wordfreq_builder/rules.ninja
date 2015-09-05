@@ -67,6 +67,13 @@ rule convert_opensubtitles
 rule convert_subtlex
   command = cut -f $textcol,$freqcol $in | tail -n +$startrow | ftfy | tr '	",' ',  ' | grep -v 'â,' > $out
 
+rule convert_jieba
+  command = cut -d ' ' -f 1,2 $in | grep -v '[,"]' | tr ' ' ',' > $out
+
+rule counts_to_jieba
+  command = python -m wordfreq_builder.cli.counts_to_jieba $in $out
+
+
 # Convert and clean up the Google Books Syntactic N-grams data. Concatenate all
 # the input files, keep only the single words and their counts, and only keep
 # lines with counts of 100 or more.

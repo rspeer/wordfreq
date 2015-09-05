@@ -33,7 +33,7 @@ if sys.version_info < (3, 4):
 
 setup(
     name="wordfreq",
-    version='1.1',
+    version='1.2',
     maintainer='Luminoso Technologies, Inc.',
     maintainer_email='info@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
@@ -50,8 +50,11 @@ setup(
     # turn, it depends on libmecab-dev being installed on the system. It's not
     # listed under 'install_requires' because wordfreq should be usable in
     # other languages without it.
+    #
+    # Similarly, jieba is required for Chinese word frequencies.
     extras_require={
-        'mecab': 'mecab-python3'
+        'mecab': 'mecab-python3',
+        'jieba': 'jieba'
     },
-    tests_require=['mecab-python3'],
+    tests_require=['mecab-python3', 'jieba'],
 )

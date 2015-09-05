@@ -12,6 +12,7 @@ import regex
 # Match common cases of URLs: the schema http:// or https:// followed by
 # non-whitespace characters.
 URL_RE = regex.compile(r'https?://(?:\S)+')
+HAN_RE = regex.compile(r'[\p{Script=Han}]+')
 
 
 def count_tokens(filename):
@@ -162,3 +163,19 @@ def write_wordlist(freqs, filename, cutoff=1e-8):
                 break
             if not ('"' in word or ',' in word):
                 writer.writerow([word, str(freq)])
+
+
+def write_jieba(freqs, filename):
+    """
+    Write a dictionary of frequencies in a format that can be used for Jieba
+    tokenization of Chinese.
+    """
+    with open(filename, 'w', encoding='utf-8', newline='\n') as outfile:
+        items = sorted(freqs.items(), key=itemgetter(1), reverse=True)
+        for word, freq in items:
+            if HAN_RE.search(word):
+                # Only store this word as a token if it contains at least one
+                # Han character.
+                fake_count = round(freq * 1e9)
+                print('%s %d' % (word, fake_count), file=outfile)
+

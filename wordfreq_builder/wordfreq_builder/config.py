@@ -41,6 +41,7 @@ CONFIG = {
         ],
         'subtlex-en': ['en'],
         'subtlex-other': ['de', 'nl', 'zh'],
+        'jieba': ['zh']
     },
     # Subtlex languages that need to be pre-processed
     'wordlist_paths': {
@@ -51,9 +52,11 @@ CONFIG = {
         'google-books': 'generated/google-books/google_books_{lang}.{ext}',
         'subtlex-en': 'generated/subtlex/subtlex_{lang}.{ext}',
         'subtlex-other': 'generated/subtlex/subtlex_{lang}.{ext}',
+        'jieba': 'generated/jieba/jieba_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}',
         'combined-dist': 'dist/combined_{lang}.{ext}',
-        'twitter-dist': 'dist/twitter_{lang}.{ext}'
+        'twitter-dist': 'dist/twitter_{lang}.{ext}',
+        'jieba-dist': 'dist/jieba_{lang}.{ext}'
     },
     'min_sources': 2
 }

@@ -3,17 +3,17 @@ from wordfreq._chinese_mapping import SIMPLIFIED_MAP
 import jieba
 
 
-jieba_initialized = False
+jieba_tokenizer = None
+DICT_FILENAME = resource_filename('wordfreq', 'data/jieba_zh.txt')
 
 
 def simplify_chinese(text):
     return text.translate(SIMPLIFIED_MAP).casefold()
 
 
-def chinese_tokenize(text):
-    global jieba_initialized
-    if not jieba_initialized:
-        jieba.set_dictionary(resource_filename('wordfreq', 'data/jieba.txt'))
-        jieba_initialized = True
-    return list(jieba.cut(simplify_chinese(text)))
+def jieba_tokenize(text):
+    global jieba_tokenizer
+    if jieba_tokenizer is None:
+        jieba_tokenizer = jieba.Tokenizer(dictionary=DICT_FILENAME)
+    return jieba_tokenizer.lcut(simplify_chinese(text), HMM=False)
 

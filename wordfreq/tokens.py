@@ -118,13 +118,16 @@ def tokenize(text, lang):
         global mecab_tokenize
         if mecab_tokenize is None:
             from wordfreq.japanese import mecab_tokenize
-        return mecab_tokenize(text)
+        tokens = mecab_tokenize(text)
+        return [token.casefold() for token in tokens if TOKEN_RE.match(token)]
 
     if lang == 'zh':
         global jieba_tokenize
         if jieba_tokenize is None:
             from wordfreq.chinese import jieba_tokenize
-        return jieba_tokenize(text)
+        tokens = jieba_tokenize(text)
+        return [token.casefold() for token in tokens if TOKEN_RE.match(token)]
+
 
     if lang == 'tr':
         return turkish_tokenize(text)

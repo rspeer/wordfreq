@@ -111,47 +111,50 @@ limiting the selection to words that can be typed in ASCII.
 
 ## Sources and supported languages
 
-We compiled word frequencies from five different sources, providing us examples
-of word usage on different topics at different levels of formality. The sources
-(and the abbreviations we'll use for them) are:
+We compiled word frequencies from seven different sources, providing us
+examples of word usage on different topics at different levels of formality.
+The sources (and the abbreviations we'll use for them) are:
 
-- **GBooks**: Google Books Ngrams 2013
 - **LeedsIC**: The Leeds Internet Corpus
 - **SUBTLEX**: The SUBTLEX word frequency lists
 - **OpenSub**: Data derived from OpenSubtitles but not from SUBTLEX
 - **Twitter**: Messages sampled from Twitter's public stream
-- **Wikipedia**: The full text of Wikipedia in 2015
+- **Wpedia**: The full text of Wikipedia in 2015
+- **Other**: We get additional English frequencies from Google Books Syntactic
+  Ngrams 2013, and Chinese frequencies from the frequency dictionary that
+  comes with the Jieba tokenizer.
 
-The following 12 languages are well-supported, with reasonable tokenization and
+
+The following 17 languages are well-supported, with reasonable tokenization and
 at least 3 different sources of word frequencies:
 
-    Language    Code    GBooks  SUBTLEX OpenSub LeedsIC Twitter Wikipedia
-    ──────────────────┼──────────────────────────────────────────────────
-    Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
-    German      de    │ -       Yes     -       Yes     Yes[1]  Yes
-    Greek       el    │ -       -       Yes     Yes     Yes     Yes
-    English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
-    Spanish     es    │ -       -       Yes     Yes     Yes     Yes
-    French      fr    │ -       -       Yes     Yes     Yes     Yes
-    Indonesian  id    │ -       -       Yes     -       Yes     Yes
-    Italian     it    │ -       -       Yes     Yes     Yes     Yes
-    Japanese    ja    │ -       -       -       Yes     Yes     Yes
-    Malay       ms    │ -       -       Yes     -       Yes     Yes
-    Dutch       nl    │ -       Yes     Yes     -       Yes     Yes
-    Polish      pl    │ -       -       Yes     -       Yes     Yes
-    Portuguese  pt    │ -       -       Yes     Yes     Yes     Yes
-    Russian     ru    │ -       -       Yes     Yes     Yes     Yes
-    Swedish     sv    │ -       -       Yes     -       Yes     Yes
-    Turkish     tr    │ -       -       Yes     -       Yes     Yes
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Other
+    ──────────────────┼─────────────────────────────────────────────────────
+    Arabic      ar    │ -       Yes     Yes     Yes     Yes     -
+    German      de    │ Yes     -       Yes     Yes[1]  Yes     -
+    Greek       el    │ -       Yes     Yes     Yes     Yes     -
+    English     en    │ Yes     Yes     Yes     Yes     Yes     Google Books
+    Spanish     es    │ -       Yes     Yes     Yes     Yes     -
+    French      fr    │ -       Yes     Yes     Yes     Yes     -
+    Indonesian  id    │ -       Yes     -       Yes     Yes     -
+    Italian     it    │ -       Yes     Yes     Yes     Yes     -
+    Japanese    ja    │ -       -       Yes     Yes     Yes     -
+    Malay       ms    │ -       Yes     -       Yes     Yes     -
+    Dutch       nl    │ Yes     Yes     -       Yes     Yes     -
+    Polish      pl    │ -       Yes     -       Yes     Yes     -
+    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -
+    Russian     ru    │ -       Yes     Yes     Yes     Yes     -
+    Swedish     sv    │ -       Yes     -       Yes     Yes     -
+    Turkish     tr    │ -       Yes     -       Yes     Yes     -
+    Chinese     zh    │ Yes     Yes     Yes     -       -       Jieba
 
-These languages are only marginally supported so far. We have too few data
-sources so far in Korean (feel free to suggest some), and we are lacking
-tokenization support for Chinese.
 
-    Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
-    ──────────────────┼──────────────────────────────────────────────────
-    Korean      ko    │ -       -       -       -       Yes     Yes
-    Chinese     zh    │ -       Yes     Yes     Yes     -       -
+Additionally, Korean is marginally supported. You can look up frequencies in
+it, but we have too few data sources for it so far:
+
+    Language    Code    SUBTLEX LeedsIC OpenSub Twitter Wpedia
+    ──────────────────┼───────────────────────────────────────
+    Korean      ko    │ -       -       -       Yes     Yes
 
 [1] We've counted the frequencies from tweets in German, such as they are, but
 you should be aware that German is not a frequently-used language on Twitter.
@@ -172,7 +175,8 @@ There are language-specific exceptions:
 - In Japanese, instead of using the regex library, it uses the external library
   `mecab-python3`. This is an optional dependency of wordfreq, and compiling
   it requires the `libmecab-dev` system package to be installed.
-- It does not yet attempt to tokenize Chinese ideograms.
+- In Chinese, it uses the external Python library `jieba`, another optional
+  dependency.
 
 [uax29]: http://unicode.org/reports/tr29/
 
@@ -184,7 +188,9 @@ also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> word_frequency('New York', 'en')
-    0.0002632772081925718
+    0.0002315934248950231
+    >>> word_frequency('北京地铁', 'zh')  # "Beijing Subway"
+    2.342123813395707e-05
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be.

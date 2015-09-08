@@ -146,7 +146,7 @@ at least 3 different sources of word frequencies:
     Russian     ru    │ -       Yes     Yes     Yes     Yes     -
     Swedish     sv    │ -       Yes     -       Yes     Yes     -
     Turkish     tr    │ -       Yes     -       Yes     Yes     -
-    Chinese     zh    │ Yes     Yes     Yes     -       -       Jieba
+    Chinese     zh    │ Yes     -       Yes     -       -       Jieba
 
 
 Additionally, Korean is marginally supported. You can look up frequencies in

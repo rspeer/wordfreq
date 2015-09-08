@@ -23,11 +23,12 @@ CONFIG = {
         'opensubtitles': [
             # This list includes languages where the most common word in
             # OpenSubtitles appears at least 5000 times. However, we exclude
-            # German, where SUBTLEX has done better processing of the same data.
+            # languages where SUBTLEX has apparently done a better job,
+            # specifically German and Chinese.
             'ar', 'bg', 'bs', 'ca', 'cs', 'da', 'el', 'en', 'es', 'et',
             'fa', 'fi', 'fr', 'he', 'hr', 'hu', 'id', 'is', 'it', 'lt', 'lv',
             'mk', 'ms', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq',
-            'sr', 'sv', 'tr', 'uk', 'zh'
+            'sr', 'sv', 'tr', 'uk'
         ],
         'leeds': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh'

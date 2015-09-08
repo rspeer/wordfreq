@@ -89,7 +89,7 @@ rule count
   command = python -m wordfreq_builder.cli.count_tokens $in $out
 
 rule merge
-  command = python -m wordfreq_builder.cli.merge_freqs -o $out -c $cutoff $in
+  command = python -m wordfreq_builder.cli.merge_freqs -o $out -c $cutoff -l $lang $in
 
 rule merge_counts
   command = python -m wordfreq_builder.cli.merge_counts -o $out $in

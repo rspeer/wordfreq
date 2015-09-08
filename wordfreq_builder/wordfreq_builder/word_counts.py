@@ -83,7 +83,7 @@ def read_freqs(filename, cutoff=0, lang=None):
     return values
 
 
-def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
+def freqs_to_cBpack(in_filename, out_filename, cutoff=-600):
     """
     Convert a csv file of words and their frequencies to a file in the
     idiosyncratic 'cBpack' format.
@@ -94,7 +94,7 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
     This cutoff should not be stacked with a cutoff in `read_freqs`; doing
     so would skew the resulting frequencies.
     """
-    freqs = read_freqs(in_filename, cutoff=0, lang=lang)
+    freqs = read_freqs(in_filename, cutoff=0, lang=None)
     cBpack = []
     for token, freq in freqs.items():
         cB = round(math.log10(freq) * 100)

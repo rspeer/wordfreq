@@ -4,8 +4,7 @@ import argparse
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('language', help='language of the input file')
     parser.add_argument('filename_in', help='name of input file containing tokens')
     parser.add_argument('filename_out', help='name of output file')
     args = parser.parse_args()
-    freqs_to_cBpack(args.filename_in, args.filename_out, lang=args.language)
+    freqs_to_cBpack(args.filename_in, args.filename_out)

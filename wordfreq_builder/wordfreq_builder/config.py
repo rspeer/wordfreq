@@ -1,19 +1,17 @@
 import os
 
 CONFIG = {
-    'version': '1.0b',
     # data_dir is a relative or absolute path to where the wordlist data
     # is stored
     'data_dir': 'data',
     'sources': {
-        # A list of language codes (possibly un-standardized) that we'll
-        # look up in filenames for these various data sources.
+        # A list of language codes that we'll look up in filenames for these
+        # various data sources.
         #
         # Consider adding:
         # 'th' when we get tokenization for it
         # 'hi' when we stop messing up its tokenization
         # 'tl' with one more data source
-        # 'sv' because its data sources are ready
         'twitter': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
             'pl', 'pt', 'ru', 'sv', 'tr'

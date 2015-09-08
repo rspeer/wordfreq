@@ -32,6 +32,12 @@ def cld2_surface_tokenizer(text):
     text = TWITTER_HANDLE_RE.sub('', text)
     text = TCO_RE.sub('', text)
     lang = cld2_detect_language(text)
+
+    # Don't allow tokenization in Chinese when language-detecting, because
+    # the Chinese tokenizer may not be built yet
+    if lang == 'zh':
+        lang = 'en'
+
     tokens = tokenize(text, lang)
     return lang, tokens
 

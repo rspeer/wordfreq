@@ -222,4 +222,4 @@ def correct_apostrophe_trimming(freqs):
                 freq = freqs[trim_word]
                 freqs[trim_word] = freq * (1 - trim_prob)
                 freqs[trim_word + "'t"] = freq * trim_prob
-        return freqs
+    return freqs

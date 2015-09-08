@@ -171,7 +171,7 @@ def write_jieba(freqs, filename):
     tokenization of Chinese.
     """
     with open(filename, 'w', encoding='utf-8', newline='\n') as outfile:
-        items = sorted(freqs.items(), key=itemgetter(1), reverse=True)
+        items = sorted(freqs.items(), key=lambda item: (-item[1], item[0]))
         for word, freq in items:
             if HAN_RE.search(word):
                 # Only store this word as a token if it contains at least one

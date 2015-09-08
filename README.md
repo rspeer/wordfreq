@@ -231,11 +231,9 @@ sources:
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
 
-It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK, and
-SUBTLEX-CH, created by Marc Brysbaert et al. and available at
-http://crr.ugent.be/programs-data/subtitle-frequencies. SUBTLEX was first
-published in this paper:
-
+It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
+SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al. (see citations below) and
+available at http://crr.ugent.be/programs-data/subtitle-frequencies.
 
 I (Robyn Speer) have
 obtained permission by e-mail from Marc Brysbaert to distribute these wordlists
@@ -263,6 +261,11 @@ Twitter; it does not display or republish any Twitter content.
 - Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A. M., Bölte, J., & Böhl, A.
   (2015). The word frequency effect. Experimental Psychology.
   http://econtent.hogrefe.com/doi/abs/10.1027/1618-3169/a000123?journalCode=zea
+
+- Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A.M., Bölte, J., & Böhl, A.
+  (2011). The word frequency effect: A review of recent developments and
+  implications for the choice of frequency estimates in German. Experimental
+  Psychology, 58, 412-424.
 
 - Cai, Q., & Brysbaert, M. (2010). SUBTLEX-CH: Chinese word and character
   frequencies based on film subtitles. PLoS One, 5(6), e10729.

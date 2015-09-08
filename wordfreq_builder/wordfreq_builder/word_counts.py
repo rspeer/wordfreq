@@ -133,3 +133,45 @@ def write_wordlist(freqs, filename, cutoff=1e-8):
                 break
             if not ('"' in word or ',' in word):
                 writer.writerow([word, str(freq)])
+
+
+# APOSTROPHE_TRIMMED_PROB represents the probability that this word has had
+# "'t" removed from it, based on counts from Twitter, which we know
+# accurate token counts for based on our own tokenizer.
+
+APOSTROPHE_TRIMMED_PROB = {
+    'don': 0.99,
+    'didn': 1.,
+    'can': 0.35,
+    'won': 0.74,
+    'isn': 1.,
+    'wasn': 1.,
+    'wouldn': 1.,
+    'doesn': 1.,
+    'couldn': 1.,
+    'ain': 0.99,
+    'aren': 1.,
+    'shouldn': 1.,
+    'haven': 0.96,
+    'weren': 1.,
+    'hadn': 1.,
+    'hasn': 1.,
+    'mustn': 1.,
+    'needn': 1.,
+}
+
+def correct_apostrophe_trimming(freqs):
+    """
+    If what we got was an English wordlist that has been tokenized with
+    apostrophes as token boundaries, correct the spurious tokens we get by
+    adding 't in about the proportion we expect to see in the wordlist.
+    """
+    if (freqs.get('wouldn', 0) > 1e-6 and freqs.get('couldn', 0) > 1e-6):
+        print("Applying apostrophe trimming")
+        for trim_word, trim_prob in APOSTROPHE_TRIMMED_PROB.items():
+            if trim_word in freqs:
+                freq = freqs[trim_word]
+                freqs[trim_word] = freq * (1 - trim_prob)
+                freqs[trim_word + "'t"] = freq * trim_prob
+        return freqs
+

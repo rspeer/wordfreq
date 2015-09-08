@@ -311,10 +311,11 @@ def combine_lists(languages):
         output_file = wordlist_filename('combined', language)
         add_dep(lines, 'merge', input_files, output_file,
                 extra='wordfreq_builder/word_counts.py',
-                params={'cutoff': 2})
+                params={'cutoff': 2, 'lang': language})
 
         output_cBpack = wordlist_filename(
-            'combined-dist', language, 'msgpack.gz')
+            'combined-dist', language, 'msgpack.gz'
+        )
         add_dep(lines, 'freqs2cB', output_file, output_cBpack,
                 extra='wordfreq_builder/word_counts.py',
                 params={'lang': language})

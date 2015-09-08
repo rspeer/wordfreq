@@ -42,9 +42,6 @@ def read_values(filename, cutoff=0, lang=None):
 
     If `cutoff` is greater than 0, the csv file must be sorted by value
     in descending order.
-
-    If lang is given, it will apply language specific preprocessing
-    operations.
     """
     values = defaultdict(float)
     total = 0.
@@ -80,7 +77,8 @@ def read_freqs(filename, cutoff=0, lang=None):
     for word in values:
         values[word] /= total
 
-    return values
+    if lang == 'en':
+        return correct_apostrophe_trimming(values)
 
 
 def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
@@ -205,11 +203,17 @@ APOSTROPHE_TRIMMED_PROB = {
     'needn': 1.,
 }
 
+
 def correct_apostrophe_trimming(freqs):
     """
     If what we got was an English wordlist that has been tokenized with
-    apostrophes as token boundaries, correct the spurious tokens we get by
-    adding 't in about the proportion we expect to see in the wordlist.
+    apostrophes as token boundaries, as indicated by the frequencies of the
+    words "wouldn" and "couldn", then correct the spurious tokens we get by
+    adding "'t" in about the proportion we expect to see in the wordlist.
+
+    We could also adjust the frequency of "t", but then we would be favoring
+    the token "s" over it, as "'s" leaves behind no indication when it's been
+    removed.
     """
     if (freqs.get('wouldn', 0) > 1e-6 and freqs.get('couldn', 0) > 1e-6):
         print("Applying apostrophe trimming")
@@ -219,4 +223,3 @@ def correct_apostrophe_trimming(freqs):
                 freqs[trim_word] = freq * (1 - trim_prob)
                 freqs[trim_word + "'t"] = freq * trim_prob
         return freqs
-

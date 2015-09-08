@@ -78,7 +78,9 @@ def read_freqs(filename, cutoff=0, lang=None):
         values[word] /= total
 
     if lang == 'en':
-        return correct_apostrophe_trimming(values)
+        values = correct_apostrophe_trimming(values)
+
+    return values
 
 
 def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):

@@ -26,7 +26,7 @@ install them on Ubuntu:
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 15 languages (see *Supported languages* below). It loads
+used, in 16 languages (see *Supported languages* below). It loads
 efficiently-packed data structures that contain all words that appear at least
 once per million words.
 
@@ -122,13 +122,13 @@ of word usage on different topics at different levels of formality. The sources
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wikipedia**: The full text of Wikipedia in 2015
 
-The following 12 languages are well-supported, with reasonable tokenization and
+The following 14 languages are well-supported, with reasonable tokenization and
 at least 3 different sources of word frequencies:
 
     Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
     ──────────────────┼──────────────────────────────────────────────────
     Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
-    German      de    │ -       Yes     Yes     Yes     Yes[1]  Yes
+    German      de    │ -       Yes     Yes     -       Yes[1]  Yes
     Greek       el    │ -       -       Yes     Yes     Yes     Yes
     English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
     Spanish     es    │ -       -       Yes     Yes     Yes     Yes
@@ -225,9 +225,7 @@ sources:
 
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK, and
 SUBTLEX-CH, created by Marc Brysbaert et al. and available at
-http://crr.ugent.be/programs-data/subtitle-frequencies. SUBTLEX was first
-published in this paper:
-
+http://crr.ugent.be/programs-data/subtitle-frequencies.
 
 I (Robyn Speer) have
 obtained permission by e-mail from Marc Brysbaert to distribute these wordlists

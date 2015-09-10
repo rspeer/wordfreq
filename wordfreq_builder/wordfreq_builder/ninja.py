@@ -255,11 +255,9 @@ def subtlex_other_deps(dirname_in, languages):
 
         # Skip one header line by setting 'startrow' to 2 (because tail is 1-based).
         # I hope we don't need to configure this by language anymore.
-        startrow = 2
-
         add_dep(
             lines, 'convert_subtlex', input_file, processed_file,
-            params={'textcol': textcol, 'freqcol': freqcol, 'startrow': startrow}
+            params={'textcol': textcol, 'freqcol': freqcol, 'startrow': 2}
         )
         add_dep(
             lines, 'merge_counts', processed_file, output_file

@@ -43,6 +43,5 @@ def test_combination():
     xiexie_freq = word_frequency('谢谢', 'zh')   # "Thanks"
     assert_almost_equal(
         word_frequency('谢谢谢谢', 'zh'),
-        xiexie_freq / 2
+        xiexie_freq / 20
     )
-

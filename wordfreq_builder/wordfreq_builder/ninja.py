@@ -278,21 +278,17 @@ def subtlex_other_deps(dirname_in, languages):
         output_file = wordlist_filename('subtlex-other', language, 'counts.txt')
         textcol, freqcol = SUBTLEX_COLUMN_MAP[language]
 
-        # Greek has three extra header lines for no reason
-        if language == 'el':
-            startrow = 5
-        else:
-            startrow = 2
-
         if language == 'zh':
             step2_file = wordlist_filename('subtlex-other', 'zh-Hans', 'converted.txt')
             add_dep(lines, 'simplify_chinese', input_file, step2_file)
         else:
             step2_file = input_file
 
+        # Skip one header line by setting 'startrow' to 2 (because tail is 1-based).
+        # I hope we don't need to configure this by language anymore.
         add_dep(
             lines, 'convert_subtlex', step2_file, processed_file,
-            params={'textcol': textcol, 'freqcol': freqcol, 'startrow': startrow}
+            params={'textcol': textcol, 'freqcol': freqcol, 'startrow': 2}
         )
         add_dep(
             lines, 'merge_counts', processed_file, output_file

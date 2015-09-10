@@ -26,7 +26,7 @@ install them on Ubuntu:
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 15 languages (see *Supported languages* below). It loads
+used, in 18 languages (see *Supported languages* below). It loads
 efficiently-packed data structures that contain all words that appear at least
 once per million words.
 
@@ -124,7 +124,6 @@ The sources (and the abbreviations we'll use for them) are:
   Ngrams 2013, and Chinese frequencies from the frequency dictionary that
   comes with the Jieba tokenizer.
 
-
 The following 17 languages are well-supported, with reasonable tokenization and
 at least 3 different sources of word frequencies:
 
@@ -152,7 +151,7 @@ at least 3 different sources of word frequencies:
 Additionally, Korean is marginally supported. You can look up frequencies in
 it, but we have too few data sources for it so far:
 
-    Language    Code    SUBTLEX LeedsIC OpenSub Twitter Wpedia
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia
     ──────────────────┼───────────────────────────────────────
     Korean      ko    │ -       -       -       Yes     Yes
 
@@ -233,9 +232,15 @@ sources:
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
 
+<<<<<<< HEAD
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
 SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al. (see citations below) and
 available at http://crr.ugent.be/programs-data/subtitle-frequencies.
+=======
+It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK, and
+SUBTLEX-CH, created by Marc Brysbaert et al. and available at
+http://crr.ugent.be/programs-data/subtitle-frequencies.
+>>>>>>> greek-and-turkish
 
 I (Robyn Speer) have
 obtained permission by e-mail from Marc Brysbaert to distribute these wordlists

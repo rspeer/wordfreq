@@ -56,6 +56,12 @@ rule convert_leeds
 rule convert_opensubtitles
   command = tr ' ' ',' < $in > $out
 
+# To convert SUBTLEX, we take the 1st and Nth columns, strip the header,
+# run it through ftfy, convert tabs to commas and spurious CSV formatting to
+# and remove lines with unfixable half-mojibake.
+rule convert_subtlex
+  command = cut -f $textcol,$freqcol $in | tail -n +$startrow | ftfy | tr '	",' ',  ' | grep -v 'â,' > $out
+
 # Convert and clean up the Google Books Syntactic N-grams data. Concatenate all
 # the input files, keep only the single words and their counts, and only keep
 # lines with counts of 100 or more.
@@ -71,7 +77,10 @@ rule count
   command = python -m wordfreq_builder.cli.count_tokens $in $out
 
 rule merge
-  command = python -m wordfreq_builder.cli.combine_lists -o $out $in
+  command = python -m wordfreq_builder.cli.merge_freqs -o $out -c $cutoff $in
+
+rule merge_counts
+  command = python -m wordfreq_builder.cli.merge_counts -o $out $in
 
 rule freqs2cB
   command = python -m wordfreq_builder.cli.freqs_to_cB $lang $in $out

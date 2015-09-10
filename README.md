@@ -26,7 +26,7 @@ install them on Ubuntu:
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 15 languages (see *Supported languages* below). It loads
+used, in 16 languages (see *Supported languages* below). It loads
 efficiently-packed data structures that contain all words that appear at least
 once per million words.
 
@@ -118,34 +118,38 @@ of word usage on different topics at different levels of formality. The sources
 - **GBooks**: Google Books Ngrams 2013
 - **LeedsIC**: The Leeds Internet Corpus
 - **OpenSub**: OpenSubtitles
+- **SUBTLEX**: The SUBTLEX word frequency lists
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wikipedia**: The full text of Wikipedia in 2015
 
-The following 12 languages are well-supported, using at least 3 different sources
-of word frequencies:
+The following 14 languages are well-supported, with reasonable tokenization and
+at least 3 different sources of word frequencies:
 
-    Language    Code    GBooks  LeedsIC OpenSub Twitter Wikipedia
-    ──────────────────┼──────────────────────────────────────────
-    Arabic      ar    │ -       Yes     Yes     Yes     Yes
-    German      de    │ -       Yes     Yes     Yes[1]  Yes
-    English     en    │ Yes     Yes     Yes     Yes     Yes
-    Spanish     es    │ -       Yes     Yes     Yes     Yes
-    French      fr    │ -       Yes     Yes     Yes     Yes
-    Indonesian  id    │ -       -       Yes     Yes     Yes
-    Italian     it    │ -       Yes     Yes     Yes     Yes
-    Japanese    ja    │ -       Yes     -       Yes     Yes
-    Malay       ms    │ -       -       Yes     Yes     Yes
-    Dutch       nl    │ -       -       Yes     Yes     Yes
-    Portuguese  pt    │ -       Yes     Yes     Yes     Yes
-    Russian     ru    │ -       Yes     Yes     Yes     Yes
+    Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
+    ──────────────────┼──────────────────────────────────────────────────
+    Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
+    German      de    │ -       Yes     Yes     -       Yes[1]  Yes
+    Greek       el    │ -       -       Yes     Yes     Yes     Yes
+    English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
+    Spanish     es    │ -       -       Yes     Yes     Yes     Yes
+    French      fr    │ -       -       Yes     Yes     Yes     Yes
+    Indonesian  id    │ -       -       -       Yes     Yes     Yes
+    Italian     it    │ -       -       Yes     Yes     Yes     Yes
+    Japanese    ja    │ -       -       Yes     -       Yes     Yes
+    Malay       ms    │ -       -       -       Yes     Yes     Yes
+    Dutch       nl    │ -       Yes     -       Yes     Yes     Yes
+    Portuguese  pt    │ -       -       Yes     Yes     Yes     Yes
+    Russian     ru    │ -       -       Yes     Yes     Yes     Yes
+    Turkish     tr    │ -       -       -       Yes     Yes     Yes
 
-These 3 languages are only marginally supported so far:
+These languages are only marginally supported so far. We have too few data
+sources so far in Korean (feel free to suggest some), and we are lacking
+tokenization support for Chinese.
 
-    Language    Code    GBooks  LeedsIC OpenSub Twitter Wikipedia
-    ──────────────────┼──────────────────────────────────────────
-    Greek       el    │ -       Yes     Yes     -       -
-    Korean      ko    │ -       -       -       Yes     Yes
-    Chinese     zh    │ -       Yes     Yes     -       -
+    Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
+    ──────────────────┼──────────────────────────────────────────────────
+    Korean      ko    │ -       -       -       -       Yes     Yes
+    Chinese     zh    │ -       Yes     Yes     Yes     -       -
 
 [1] We've counted the frequencies from tweets in German, such as they are, but
 you should be aware that German is not a frequently-used language on Twitter.
@@ -219,7 +223,58 @@ sources:
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
 
+It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK, and
+SUBTLEX-CH, created by Marc Brysbaert et al. and available at
+http://crr.ugent.be/programs-data/subtitle-frequencies.
+
+I (Rob Speer) have
+obtained permission by e-mail from Marc Brysbaert to distribute these wordlists
+in wordfreq, to be used for any purpose, not just for academic use, under these
+conditions:
+
+- Wordfreq and code derived from it must credit the SUBTLEX authors.
+- It must remain clear that SUBTLEX is freely available data.
+
+These terms are similar to the Creative Commons Attribution-ShareAlike license.
+
 Some additional data was collected by a custom application that watches the
 streaming Twitter API, in accordance with Twitter's Developer Agreement &
 Policy. This software gives statistics about words that are commonly used on
 Twitter; it does not display or republish any Twitter content.
+
+## Citations to work that wordfreq is built on
+
+- Brysbaert, M. & New, B. (2009). Moving beyond Kucera and Francis: A Critical
+  Evaluation of Current Word Frequency Norms and the Introduction of a New and
+  Improved Word Frequency Measure for American English. Behavior Research
+  Methods, 41 (4), 977-990.
+  http://sites.google.com/site/borisnew/pub/BrysbaertNew2009.pdf
+
+- Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A. M., Bölte, J., & Böhl, A.
+  (2015). The word frequency effect. Experimental Psychology.
+  http://econtent.hogrefe.com/doi/abs/10.1027/1618-3169/a000123?journalCode=zea
+
+- Cai, Q., & Brysbaert, M. (2010). SUBTLEX-CH: Chinese word and character
+  frequencies based on film subtitles. PLoS One, 5(6), e10729.
+  http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0010729
+
+- Dave, H. (2011). Frequency word lists.
+  https://invokeit.wordpress.com/frequency-word-lists/
+
+- Davis, M. (2012). Unicode text segmentation. Unicode Standard Annex, 29.
+  http://unicode.org/reports/tr29/
+
+- Keuleers, E., Brysbaert, M. & New, B. (2010). SUBTLEX-NL: A new frequency
+  measure for Dutch words based on film subtitles. Behavior Research Methods,
+  42(3), 643-650.
+  http://crr.ugent.be/papers/SUBTLEX-NL_BRM.pdf
+
+- Kudo, T. (2005). Mecab: Yet another part-of-speech and morphological
+  analyzer.
+  http://mecab.sourceforge.net/
+
+- van Heuven, W. J., Mandera, P., Keuleers, E., & Brysbaert, M. (2014).
+  SUBTLEX-UK: A new and improved word frequency database for British English.
+  The Quarterly Journal of Experimental Psychology, 67(6), 1176-1190.
+  http://www.tandfonline.com/doi/pdf/10.1080/17470218.2013.850521
+

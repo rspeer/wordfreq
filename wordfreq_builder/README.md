@@ -161,3 +161,34 @@ longer represents the words 'don' and 'won', as we assume most of their
 frequency comes from "don't" and "won't". Words that turned into similarly
 common words, however, were left alone: this list doesn't represent "can't"
 because the word was left as "can".
+
+### SUBTLEX
+
+Marc Brysbaert gave us permission by e-mail to use the SUBTLEX word lists in
+wordfreq and derived works without the "academic use" restriction, under the
+following reasonable conditions:
+
+- Wordfreq and code derived from it must credit the SUBTLEX authors.
+  (See the citations in the top-level `README.md` file.)
+- It must remain clear that SUBTLEX is freely available data.
+
+`data/source-lists/subtlex` contains the following files:
+
+- `subtlex.de.txt`, which was downloaded as [SUBTLEX-DE raw file.xlsx][subtlex-de],
+  and exported from Excel format to tab-separated UTF-8 using LibreOffice
+- `subtlex.en-US.txt`, which was downloaded as [subtlexus5.zip][subtlex-us],
+  extracted, and converted from ISO-8859-1 to UTF-8
+- `subtlex.en-GB.txt`, which was downloaded as
+  [SUBTLEX-UK\_all.xlsx][subtlex-uk], and exported from Excel format to
+  tab-separated UTF-8 using LibreOffice
+- `subtlex.nl.txt`, which was downloaded as
+  [SUBTLEX-NL.cd-above2.txt.zip][subtlex-nl] and extracted
+- `subtlex.zh.txt`, which was downloaded as
+  [subtlexch131210.zip][subtlex-ch] and extracted
+
+[subtlex-de]: http://crr.ugent.be/SUBTLEX-DE/SUBTLEX-DE%20raw%20file.xlsx
+[subtlex-us]: http://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexus/subtlexus5.zip
+[subtlex-uk]: http://crr.ugent.be/papers/SUBTLEX-UK_all.xlsx
+[subtlex-nl]: http://crr.ugent.be/subtlex-nl/SUBTLEX-NL.cd-above2.txt.zip
+[subtlex-ch]: http://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexch/subtlexch131210.zip
+

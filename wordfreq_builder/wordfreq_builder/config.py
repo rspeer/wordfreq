@@ -8,20 +8,25 @@ CONFIG = {
     'sources': {
         # A list of language codes (possibly un-standardized) that we'll
         # look up in filenames for these various data sources.
+        #
+        # Consider adding:
+        # 'th' when we get tokenization for it
+        # 'hi' when we stop messing up its tokenization
+        # 'tl' because it's probably ready right now
+        # 'pl' because we have 3 sources for it
         'twitter': [
-            'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru',
-            # can be added later: 'th', 'tr'
+            'ar', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
+            'pt', 'ru', 'tr'
         ],
         'wikipedia': [
-            'ar', 'de', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru'
-            # many more can be added
+            'ar', 'de', 'en', 'el', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
+            'pt', 'ru', 'tr'
         ],
         'opensubtitles': [
-            # All languages where the most common word in OpenSubtitles
-            # appears at least 5000 times
-            'ar', 'bg', 'bs', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et',
+            # This list includes languages where the most common word in
+            # OpenSubtitles appears at least 5000 times. However, we exclude
+            # German, where SUBTLEX has done better processing of the same data.
+            'ar', 'bg', 'bs', 'ca', 'cs', 'da', 'el', 'en', 'es', 'et',
             'fa', 'fi', 'fr', 'he', 'hr', 'hu', 'id', 'is', 'it', 'lt', 'lv',
             'mk', 'ms', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq',
             'sr', 'sv', 'tr', 'uk', 'zh'
@@ -33,14 +38,19 @@ CONFIG = {
             'en',
             # Using the 2012 data, we could get French, German, Italian,
             # Russian, Spanish, and (Simplified) Chinese.
-        ]
+        ],
+        'subtlex-en': ['en'],
+        'subtlex-other': ['de', 'nl', 'zh'],
     },
+    # Subtlex languages that need to be pre-processed
     'wordlist_paths': {
         'twitter': 'generated/twitter/tweets-2014.{lang}.{ext}',
         'wikipedia': 'generated/wikipedia/wikipedia_{lang}.{ext}',
         'opensubtitles': 'generated/opensubtitles/opensubtitles_{lang}.{ext}',
         'leeds': 'generated/leeds/leeds_internet_{lang}.{ext}',
         'google-books': 'generated/google-books/google_books_{lang}.{ext}',
+        'subtlex-en': 'generated/subtlex/subtlex_{lang}.{ext}',
+        'subtlex-other': 'generated/subtlex/subtlex_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}',
         'combined-dist': 'dist/combined_{lang}.{ext}',
         'twitter-dist': 'dist/twitter_{lang}.{ext}'

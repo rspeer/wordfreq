@@ -164,7 +164,7 @@ because the word was left as "can".
 
 ### SUBTLEX
 
-Mark Brysbaert gave us permission by e-mail to use the SUBTLEX word lists in
+Marc Brysbaert gave us permission by e-mail to use the SUBTLEX word lists in
 wordfreq and derived works without the "academic use" restriction, under the
 following reasonable conditions:
 

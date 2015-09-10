@@ -89,14 +89,16 @@ def remove_arabic_marks(text):
 
 mecab_tokenize = None
 jieba_tokenize = None
-def tokenize(text, lang):
+def tokenize(text, lang, external_wordlist=False):
     """
     Tokenize this text in a way that's relatively simple but appropriate for
     the language.
 
     So far, this means:
 
-    - Chinese is presumed to already be tokenized. (Sorry. It's hard.)
+    - Chinese will be mapped to Simplified Chinese characters and tokenized
+      using the jieba tokenizer, on a custom word list of words that can be
+      looked up in wordfreq.
     - Japanese will be delegated to the external mecab-python module.
     - Chinese or Japanese texts that aren't identified as the appropriate
       language will only split on punctuation and script boundaries, giving
@@ -110,6 +112,13 @@ def tokenize(text, lang):
     Additionally, the text will be case-folded to lowercase, and text marked
     as Arabic will be normalized more strongly and have combining marks and
     tatweels removed.
+
+    If `external_wordlist` is True, then the Chinese wordlist in wordfreq will
+    not be used for tokenization. Instead, it will use the large wordlist
+    packaged with the Jieba tokenizer, and it will leave Traditional Chinese
+    characters as is. This will probably give more accurate tokenization, but
+    the resulting tokens won't necessarily have word frequencies that can be
+    looked up.
 
     Strings that are looked up in wordfreq will be run through this function
     first, so that they can be expected to match the data.
@@ -125,9 +134,8 @@ def tokenize(text, lang):
         global jieba_tokenize
         if jieba_tokenize is None:
             from wordfreq.chinese import jieba_tokenize
-        tokens = jieba_tokenize(text)
+        tokens = jieba_tokenize(text, external_wordlist=external_wordlist)
         return [token.casefold() for token in tokens if TOKEN_RE.match(token)]
-
 
     if lang == 'tr':
         return turkish_tokenize(text)

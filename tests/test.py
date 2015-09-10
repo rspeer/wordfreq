@@ -19,7 +19,7 @@ def test_freq_examples():
 def test_languages():
     # Make sure the number of available languages doesn't decrease
     avail = available_languages()
-    assert_greater(len(avail), 14)
+    assert_greater(len(avail), 15)
 
     # Laughter is the universal language
     for lang in avail:
@@ -36,7 +36,7 @@ def test_languages():
 
 def test_twitter():
     avail = available_languages('twitter')
-    assert_greater(len(avail), 12)
+    assert_greater(len(avail), 14)
 
     for lang in avail:
         assert_greater(word_frequency('rt', lang, 'twitter'),
@@ -68,6 +68,7 @@ def test_most_common_words():
     eq_(get_most_common('nl'), 'de')
     eq_(get_most_common('pt'), 'de')
     eq_(get_most_common('ru'), 'в')
+    eq_(get_most_common('tr'), 'bir')
     eq_(get_most_common('zh'), '的')
 
 
@@ -111,6 +112,8 @@ def test_tokenization():
 def test_casefolding():
     eq_(tokenize('WEISS', 'de'), ['weiss'])
     eq_(tokenize('weiß', 'de'), ['weiss'])
+    eq_(tokenize('İstanbul', 'tr'), ['istanbul'])
+    eq_(tokenize('SIKISINCA', 'tr'), ['sıkısınca'])
 
 
 def test_phrase_freq():

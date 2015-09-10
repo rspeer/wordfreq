@@ -32,9 +32,40 @@ def count_tokens(filename):
     return counts
 
 
+def read_values(filename, cutoff=0, lang=None):
+    """
+    Read words and their frequency or count values from a CSV file. Returns
+    a dictionary of values and the total of all values.
+
+    Only words with a value greater than or equal to `cutoff` are returned.
+
+    If `cutoff` is greater than 0, the csv file must be sorted by value
+    in descending order.
+
+    If lang is given, it will apply language specific preprocessing
+    operations.
+    """
+    values = defaultdict(float)
+    total = 0.
+    with open(filename, encoding='utf-8', newline='') as infile:
+        for key, strval in csv.reader(infile):
+            val = float(strval)
+            key = fix_text(key)
+            if val < cutoff:
+                break
+            tokens = tokenize(key, lang) if lang is not None else simple_tokenize(key)
+            for token in tokens:
+                # Use += so that, if we give the reader concatenated files with
+                # duplicates, it does the right thing
+                values[token] += val
+                total += val
+    return values, total
+
+
 def read_freqs(filename, cutoff=0, lang=None):
     """
-    Read words and their frequencies from a CSV file.
+    Read words and their frequencies from a CSV file, normalizing the
+    frequencies to add up to 1.
 
     Only words with a frequency greater than or equal to `cutoff` are returned.
 
@@ -44,24 +75,11 @@ def read_freqs(filename, cutoff=0, lang=None):
     If lang is given, read_freqs will apply language specific preprocessing
     operations.
     """
-    raw_counts = defaultdict(float)
-    total = 0.
-    with open(filename, encoding='utf-8', newline='') as infile:
-        for key, strval in csv.reader(infile):
-            val = float(strval)
-            if val < cutoff:
-                break
-            tokens = tokenize(key, lang) if lang is not None else simple_tokenize(key)
-            for token in tokens:
-                # Use += so that, if we give the reader concatenated files with
-                # duplicates, it does the right thing
-                raw_counts[fix_text(token)] += val
-                total += val
+    values, total = read_values(filename, cutoff, lang)
+    for word in values:
+        values[word] /= total
 
-    for word in raw_counts:
-        raw_counts[word] /= total
-
-    return raw_counts
+    return values
 
 
 def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
@@ -94,6 +112,17 @@ def freqs_to_cBpack(in_filename, out_filename, cutoff=-600, lang=None):
 
     with gzip.open(out_filename, 'wb') as outfile:
         msgpack.dump(cBpack_data, outfile)
+
+
+def merge_counts(count_dicts):
+    """
+    Merge multiple dictionaries of counts by adding their entries.
+    """
+    merged = defaultdict(int)
+    for count_dict in count_dicts:
+        for term, count in count_dict.items():
+            merged[term] += count
+    return merged
 
 
 def merge_freqs(freq_dicts):

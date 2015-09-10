@@ -190,10 +190,12 @@ into multiple tokens:
     >>> word_frequency('New York', 'en')
     0.0002315934248950231
     >>> word_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    2.342123813395707e-05
+    3.2187603965715087e-06
 
 The word frequencies are combined with the half-harmonic-mean function in order
-to provide an estimate of what their combined frequency would be.
+to provide an estimate of what their combined frequency would be. In languages
+written without spaces, there is also a penalty to the word frequency for each
+word break that must be inferred.
 
 This implicitly assumes that you're asking about words that frequently appear
 together. It's not multiplying the frequencies, because that would assume they

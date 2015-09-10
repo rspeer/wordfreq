@@ -15,6 +15,11 @@ logger = logging.getLogger(__name__)
 CACHE_SIZE = 100000
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
+# Chinese and Japanese are written without spaces. This means we have to
+# run language-specific code to infer token boundaries on them, and also
+# that we need to adjust frequencies of multi-token phrases to account
+# for the fact that token boundaries were inferred.
+SPACELESS_LANGUAGES = {'zh', 'ja'}
 
 # simple_tokenize is imported so that other things can import it from here.
 # Suppress the pyflakes warning.
@@ -181,7 +186,18 @@ def _word_frequency(word, lang, wordlist, minimum):
             return minimum
         one_over_result += 1.0 / freqs[token]
 
-    return max(1.0 / one_over_result, minimum)
+    freq = 1.0 / one_over_result
+
+    if lang in SPACELESS_LANGUAGES:
+        # Divide the frequency by 10 for each token boundary that was inferred.
+        # (We determined the factor of 10 empirically by looking at words in
+        # the Chinese wordlist that weren't common enough to be identified by
+        # the tokenizer. These words would get split into multiple tokens, and
+        # their inferred frequency would be on average 9.77 times higher than
+        # their actual frequency.)
+        freq /= 10 ** (len(tokens) - 1)
+
+    return max(freq, minimum)
 
 def word_frequency(word, lang, wordlist='combined', minimum=0.):
     """

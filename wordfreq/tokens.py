@@ -39,10 +39,16 @@ TOKEN_RE = regex.compile(r"""
     (?:\B\S)*
 """, regex.V1 | regex.WORD | regex.VERBOSE)
 
+TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
+    [\p{IsIdeo}\p{Script=Hiragana}]+ |
+    [\p{punct}]+ |
+    \S(?:\B\S)*
+""", regex.V1 | regex.WORD | regex.VERBOSE)
+
 ARABIC_MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 
 
-def simple_tokenize(text):
+def simple_tokenize(text, include_punctuation=False):
     """
     Tokenize the given text using a straightforward, Unicode-aware token
     expression.
@@ -57,22 +63,44 @@ def simple_tokenize(text):
       ideograms and hiragana) relatively untokenized, instead of splitting each
       character into its own token.
 
-    - It outputs only the tokens that start with a word-like character, or
-      miscellaneous symbols such as emoji.
+    - If `include_punctuation` is False (the default), it outputs only the
+      tokens that start with a word-like character, or miscellaneous symbols
+      such as emoji. If `include_punctuation` is True, it outputs all non-space
+      tokens.
 
     - It breaks on all spaces, even the "non-breaking" ones.
     """
     text = unicodedata.normalize('NFC', text)
-    return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
+    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
+    return [token.strip("'").casefold() for token in token_expr.findall(text)]
 
 
-def turkish_tokenize(text):
+def turkish_tokenize(text, include_punctuation=False):
     """
     Like `simple_tokenize`, but modifies i's so that they case-fold correctly
     in Turkish.
     """
     text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
-    return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
+    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
+    return [token.strip("'").casefold() for token in token_expr.findall(text)]
+
+
+def japanese_tokenize(text, include_punctuation=False):
+    global mecab_tokenize
+    if mecab_tokenize is None:
+        from wordfreq.japanese import mecab_tokenize
+    tokens = mecab_tokenize(text)
+    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
+    return [token.casefold() for token in tokens if token_expr.match(token)]
+
+
+def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
+    global jieba_tokenize
+    if jieba_tokenize is None:
+        from wordfreq.chinese import jieba_tokenize
+    tokens = jieba_tokenize(text, external_wordlist=external_wordlist)
+    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
+    return [token.casefold() for token in tokens if token_expr.match(token)]
 
 
 def remove_arabic_marks(text):
@@ -89,7 +117,7 @@ def remove_arabic_marks(text):
 
 mecab_tokenize = None
 jieba_tokenize = None
-def tokenize(text, lang, external_wordlist=False):
+def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     """
     Tokenize this text in a way that's relatively simple but appropriate for
     the language.
@@ -124,24 +152,14 @@ def tokenize(text, lang, external_wordlist=False):
     first, so that they can be expected to match the data.
     """
     if lang == 'ja':
-        global mecab_tokenize
-        if mecab_tokenize is None:
-            from wordfreq.japanese import mecab_tokenize
-        tokens = mecab_tokenize(text)
-        return [token.casefold() for token in tokens if TOKEN_RE.match(token)]
-
-    if lang == 'zh':
-        global jieba_tokenize
-        if jieba_tokenize is None:
-            from wordfreq.chinese import jieba_tokenize
-        tokens = jieba_tokenize(text, external_wordlist=external_wordlist)
-        return [token.casefold() for token in tokens if TOKEN_RE.match(token)]
-
-    if lang == 'tr':
-        return turkish_tokenize(text)
-
-    if lang == 'ar':
+        return japanese_tokenize(text, include_punctuation)
+    elif lang == 'zh':
+        return chinese_tokenize(text, include_punctuation, external_wordlist)
+    elif lang == 'tr':
+        return turkish_tokenize(text, include_punctuation)
+    elif lang == 'ar':
         text = remove_arabic_marks(unicodedata.normalize('NFKC', text))
-
-    return simple_tokenize(text)
+        return simple_tokenize(text, include_punctuation)
+    else:
+        return simple_tokenize(text, include_punctuation)
 

@@ -85,10 +85,11 @@ def available_languages(wordlist='combined'):
     """
     available = {}
     for path in DATA_PATH.glob('*.msgpack.gz'):
-        list_name = path.name.split('.')[0]
-        name, lang = list_name.split('_')
-        if name == wordlist:
-            available[lang] = str(path)
+        if not path.name.startswith('_'):
+            list_name = path.name.split('.')[0]
+            name, lang = list_name.split('_')
+            if name == wordlist:
+                available[lang] = str(path)
     return available
 
 

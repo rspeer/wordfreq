@@ -42,6 +42,9 @@ def read_values(filename, cutoff=0, lang=None):
 
     If `cutoff` is greater than 0, the csv file must be sorted by value
     in descending order.
+
+    If `lang` is given, it will apply language-specific tokenization to the
+    words that it reads.
     """
     values = defaultdict(float)
     total = 0.

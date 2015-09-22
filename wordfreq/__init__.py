@@ -21,6 +21,14 @@ DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 # for the fact that token boundaries were inferred.
 SPACELESS_LANGUAGES = {'zh', 'ja'}
 
+# We'll divide the frequency by 10 for each token boundary that was inferred.
+# (We determined the factor of 10 empirically by looking at words in the
+# Chinese wordlist that weren't common enough to be identified by the
+# tokenizer. These words would get split into multiple tokens, and their
+# inferred frequency would be on average 9.77 times higher than their actual
+# frequency.)
+INFERRED_SPACE_FACTOR = 10.0
+
 # simple_tokenize is imported so that other things can import it from here.
 # Suppress the pyflakes warning.
 simple_tokenize = simple_tokenize
@@ -190,13 +198,7 @@ def _word_frequency(word, lang, wordlist, minimum):
     freq = 1.0 / one_over_result
 
     if lang in SPACELESS_LANGUAGES:
-        # Divide the frequency by 10 for each token boundary that was inferred.
-        # (We determined the factor of 10 empirically by looking at words in
-        # the Chinese wordlist that weren't common enough to be identified by
-        # the tokenizer. These words would get split into multiple tokens, and
-        # their inferred frequency would be on average 9.77 times higher than
-        # their actual frequency.)
-        freq /= 10 ** (len(tokens) - 1)
+        freq /= INFERRED_SPACE_FACTOR ** (len(tokens) - 1)
 
     return max(freq, minimum)
 

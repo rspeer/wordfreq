@@ -1,3 +1,16 @@
+"""
+Generate a Python file, _chinese_mapping.py, that maps Traditional Chinese
+characters to their Simplified Chinese equivalents.
+
+This is meant to be a normalization of text, somewhat like case-folding -- not
+an actual translator, a task for which this method would be unsuitable. We
+store word frequencies using Simplified Chinese characters so that, in the large
+number of cases where a Traditional Chinese word has an obvious Simplified Chinese
+mapping, we can get a frequency for it that's the same in Simplified and Traditional
+Chinese.
+
+Generating this mapping requires the external Chinese conversion tool OpenCC.
+"""
 import unicodedata
 import itertools
 import os

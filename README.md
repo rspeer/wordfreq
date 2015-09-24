@@ -26,7 +26,7 @@ install them on Ubuntu:
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 16 languages (see *Supported languages* below). It loads
+used, in 18 languages (see *Supported languages* below). It loads
 efficiently-packed data structures that contain all words that appear at least
 once per million words.
 
@@ -111,45 +111,49 @@ limiting the selection to words that can be typed in ASCII.
 
 ## Sources and supported languages
 
-We compiled word frequencies from five different sources, providing us examples
-of word usage on different topics at different levels of formality. The sources
-(and the abbreviations we'll use for them) are:
+We compiled word frequencies from seven different sources, providing us
+examples of word usage on different topics at different levels of formality.
+The sources (and the abbreviations we'll use for them) are:
 
-- **GBooks**: Google Books Ngrams 2013
 - **LeedsIC**: The Leeds Internet Corpus
-- **OpenSub**: OpenSubtitles
 - **SUBTLEX**: The SUBTLEX word frequency lists
+- **OpenSub**: Data derived from OpenSubtitles but not from SUBTLEX
 - **Twitter**: Messages sampled from Twitter's public stream
-- **Wikipedia**: The full text of Wikipedia in 2015
+- **Wpedia**: The full text of Wikipedia in 2015
+- **Other**: We get additional English frequencies from Google Books Syntactic
+  Ngrams 2013, and Chinese frequencies from the frequency dictionary that
+  comes with the Jieba tokenizer.
 
-The following 14 languages are well-supported, with reasonable tokenization and
+The following 17 languages are well-supported, with reasonable tokenization and
 at least 3 different sources of word frequencies:
 
-    Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
-    ──────────────────┼──────────────────────────────────────────────────
-    Arabic      ar    │ -       -       Yes     Yes     Yes     Yes
-    German      de    │ -       Yes     Yes     -       Yes[1]  Yes
-    Greek       el    │ -       -       Yes     Yes     Yes     Yes
-    English     en    │ Yes     Yes     Yes     Yes     Yes     Yes
-    Spanish     es    │ -       -       Yes     Yes     Yes     Yes
-    French      fr    │ -       -       Yes     Yes     Yes     Yes
-    Indonesian  id    │ -       -       -       Yes     Yes     Yes
-    Italian     it    │ -       -       Yes     Yes     Yes     Yes
-    Japanese    ja    │ -       -       Yes     -       Yes     Yes
-    Malay       ms    │ -       -       -       Yes     Yes     Yes
-    Dutch       nl    │ -       Yes     -       Yes     Yes     Yes
-    Portuguese  pt    │ -       -       Yes     Yes     Yes     Yes
-    Russian     ru    │ -       -       Yes     Yes     Yes     Yes
-    Turkish     tr    │ -       -       -       Yes     Yes     Yes
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Other
+    ──────────────────┼─────────────────────────────────────────────────────
+    Arabic      ar    │ -       Yes     Yes     Yes     Yes     -
+    German      de    │ Yes     -       Yes     Yes[1]  Yes     -
+    Greek       el    │ -       Yes     Yes     Yes     Yes     -
+    English     en    │ Yes     Yes     Yes     Yes     Yes     Google Books
+    Spanish     es    │ -       Yes     Yes     Yes     Yes     -
+    French      fr    │ -       Yes     Yes     Yes     Yes     -
+    Indonesian  id    │ -       Yes     -       Yes     Yes     -
+    Italian     it    │ -       Yes     Yes     Yes     Yes     -
+    Japanese    ja    │ -       -       Yes     Yes     Yes     -
+    Malay       ms    │ -       Yes     -       Yes     Yes     -
+    Dutch       nl    │ Yes     Yes     -       Yes     Yes     -
+    Polish      pl    │ -       Yes     -       Yes     Yes     -
+    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -
+    Russian     ru    │ -       Yes     Yes     Yes     Yes     -
+    Swedish     sv    │ -       Yes     -       Yes     Yes     -
+    Turkish     tr    │ -       Yes     -       Yes     Yes     -
+    Chinese     zh    │ Yes     -       Yes     -       -       Jieba
 
-These languages are only marginally supported so far. We have too few data
-sources so far in Korean (feel free to suggest some), and we are lacking
-tokenization support for Chinese.
 
-    Language    Code    GBooks  SUBTLEX LeedsIC OpenSub Twitter Wikipedia
-    ──────────────────┼──────────────────────────────────────────────────
-    Korean      ko    │ -       -       -       -       Yes     Yes
-    Chinese     zh    │ -       Yes     Yes     Yes     -       -
+Additionally, Korean is marginally supported. You can look up frequencies in
+it, but we have too few data sources for it so far:
+
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia
+    ──────────────────┼───────────────────────────────────────
+    Korean      ko    │ -       -       -       Yes     Yes
 
 [1] We've counted the frequencies from tweets in German, such as they are, but
 you should be aware that German is not a frequently-used language on Twitter.
@@ -170,7 +174,8 @@ There are language-specific exceptions:
 - In Japanese, instead of using the regex library, it uses the external library
   `mecab-python3`. This is an optional dependency of wordfreq, and compiling
   it requires the `libmecab-dev` system package to be installed.
-- It does not yet attempt to tokenize Chinese ideograms.
+- In Chinese, it uses the external Python library `jieba`, another optional
+  dependency.
 
 [uax29]: http://unicode.org/reports/tr29/
 
@@ -182,10 +187,14 @@ also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> word_frequency('New York', 'en')
-    0.0002632772081925718
+    0.0002315934248950231
+    >>> word_frequency('北京地铁', 'zh')  # "Beijing Subway"
+    3.2187603965715087e-06
 
 The word frequencies are combined with the half-harmonic-mean function in order
-to provide an estimate of what their combined frequency would be.
+to provide an estimate of what their combined frequency would be. In languages
+written without spaces, there is also a penalty to the word frequency for each
+word break that must be inferred.
 
 This implicitly assumes that you're asking about words that frequently appear
 together. It's not multiplying the frequencies, because that would assume they
@@ -223,14 +232,14 @@ sources:
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
 
-It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK, and
-SUBTLEX-CH, created by Marc Brysbaert et al. and available at
+It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
+SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al.
+(see citations below) and available at
 http://crr.ugent.be/programs-data/subtitle-frequencies.
 
-I (Rob Speer) have
-obtained permission by e-mail from Marc Brysbaert to distribute these wordlists
-in wordfreq, to be used for any purpose, not just for academic use, under these
-conditions:
+I (Rob Speer) have obtained permission by e-mail from Marc Brysbaert to
+distribute these wordlists in wordfreq, to be used for any purpose, not just
+for academic use, under these conditions:
 
 - Wordfreq and code derived from it must credit the SUBTLEX authors.
 - It must remain clear that SUBTLEX is freely available data.
@@ -253,6 +262,11 @@ Twitter; it does not display or republish any Twitter content.
 - Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A. M., Bölte, J., & Böhl, A.
   (2015). The word frequency effect. Experimental Psychology.
   http://econtent.hogrefe.com/doi/abs/10.1027/1618-3169/a000123?journalCode=zea
+
+- Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A.M., Bölte, J., & Böhl, A.
+  (2011). The word frequency effect: A review of recent developments and
+  implications for the choice of frequency estimates in German. Experimental
+  Psychology, 58, 412-424.
 
 - Cai, Q., & Brysbaert, M. (2010). SUBTLEX-CH: Chinese word and character
   frequencies based on film subtitles. PLoS One, 5(6), e10729.
@@ -277,4 +291,3 @@ Twitter; it does not display or republish any Twitter content.
   SUBTLEX-UK: A new and improved word frequency database for British English.
   The Quarterly Journal of Experimental Psychology, 67(6), 1176-1190.
   http://www.tandfonline.com/doi/pdf/10.1080/17470218.2013.850521
-

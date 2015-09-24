@@ -18,6 +18,6 @@ def test_combination():
     )
     assert_almost_equal(
         1.0 / word_frequency('おはようございます', 'ja'),
-        (1.0 / ohayou_freq + 1.0 / gozai_freq + 1.0 / masu_freq)
+        1.0 / ohayou_freq + 1.0 / gozai_freq + 1.0 / masu_freq
     )
 

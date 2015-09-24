@@ -34,7 +34,7 @@ def test_tokens():
         ]
     )
 
-    # Jieba's original tokenizer knows a lot of names, it sees.
+    # Jieba's original tokenizer knows a lot of names, it seems.
     eq_(
         tokenize(hobart, 'zh', external_wordlist=True),
         ['加勒特', '霍巴特']

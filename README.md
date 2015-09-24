@@ -15,12 +15,25 @@ or by getting the repository and running its setup.py:
 
     python3 setup.py install
 
-To handle word frequency lookups in Japanese, you need to additionally install
-mecab-python3, which itself depends on libmecab-dev. These commands will
-install them on Ubuntu:
+Japanese and Chinese have additional external dependencies so that they can be
+tokenized correctly.
+
+To be able to look up word frequencies in Japanese, you need to additionally
+install mecab-python3, which itself depends on libmecab-dev and its dictionary.
+These commands will install them on Ubuntu:
 
     sudo apt-get install mecab-ipadic-utf8 libmecab-dev
     pip3 install mecab-python3
+
+To be able to look up word frequencies in Chinese, you need Jieba, a
+pure-Python Chinese tokenizer:
+
+    pip3 install jieba
+
+These dependencies can also be requested as options when installing wordfreq.
+For example:
+
+    pip3 install wordfreq[mecab,jieba]
 
 
 ## Usage

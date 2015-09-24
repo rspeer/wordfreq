@@ -1,35 +1,34 @@
 import os
 
 CONFIG = {
-    'version': '1.0b',
     # data_dir is a relative or absolute path to where the wordlist data
     # is stored
     'data_dir': 'data',
     'sources': {
-        # A list of language codes (possibly un-standardized) that we'll
-        # look up in filenames for these various data sources.
+        # A list of language codes that we'll look up in filenames for these
+        # various data sources.
         #
         # Consider adding:
         # 'th' when we get tokenization for it
         # 'hi' when we stop messing up its tokenization
-        # 'tl' because it's probably ready right now
-        # 'pl' because we have 3 sources for it
+        # 'tl' with one more data source
         'twitter': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru', 'tr'
+            'pl', 'pt', 'ru', 'sv', 'tr'
         ],
         'wikipedia': [
             'ar', 'de', 'en', 'el', 'es', 'fr', 'id', 'it', 'ja', 'ko', 'ms', 'nl',
-            'pt', 'ru', 'tr'
+            'pl', 'pt', 'ru', 'sv', 'tr'
         ],
         'opensubtitles': [
             # This list includes languages where the most common word in
             # OpenSubtitles appears at least 5000 times. However, we exclude
-            # German, where SUBTLEX has done better processing of the same data.
+            # languages where SUBTLEX has apparently done a better job,
+            # specifically German and Chinese.
             'ar', 'bg', 'bs', 'ca', 'cs', 'da', 'el', 'en', 'es', 'et',
             'fa', 'fi', 'fr', 'he', 'hr', 'hu', 'id', 'is', 'it', 'lt', 'lv',
             'mk', 'ms', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq',
-            'sr', 'sv', 'tr', 'uk', 'zh'
+            'sr', 'sv', 'tr', 'uk'
         ],
         'leeds': [
             'ar', 'de', 'el', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'ru', 'zh'
@@ -41,6 +40,7 @@ CONFIG = {
         ],
         'subtlex-en': ['en'],
         'subtlex-other': ['de', 'nl', 'zh'],
+        'jieba': ['zh']
     },
     # Subtlex languages that need to be pre-processed
     'wordlist_paths': {
@@ -51,9 +51,11 @@ CONFIG = {
         'google-books': 'generated/google-books/google_books_{lang}.{ext}',
         'subtlex-en': 'generated/subtlex/subtlex_{lang}.{ext}',
         'subtlex-other': 'generated/subtlex/subtlex_{lang}.{ext}',
+        'jieba': 'generated/jieba/jieba_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}',
         'combined-dist': 'dist/combined_{lang}.{ext}',
-        'twitter-dist': 'dist/twitter_{lang}.{ext}'
+        'twitter-dist': 'dist/twitter_{lang}.{ext}',
+        'jieba-dist': 'dist/jieba_{lang}.{ext}'
     },
     'min_sources': 2
 }

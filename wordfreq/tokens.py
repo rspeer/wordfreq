@@ -1,5 +1,6 @@
 import regex
 import unicodedata
+from pkg_resources import resource_filename
 
 
 TOKEN_RE = regex.compile(r"""
@@ -87,6 +88,7 @@ def remove_arabic_marks(text):
 
 
 mecab_tokenize = None
+jieba_tokenize = None
 def tokenize(text, lang):
     """
     Tokenize this text in a way that's relatively simple but appropriate for
@@ -115,8 +117,17 @@ def tokenize(text, lang):
     if lang == 'ja':
         global mecab_tokenize
         if mecab_tokenize is None:
-            from wordfreq.mecab import mecab_tokenize
-        return mecab_tokenize(text)
+            from wordfreq.japanese import mecab_tokenize
+        tokens = mecab_tokenize(text)
+        return [token.casefold() for token in tokens if TOKEN_RE.match(token)]
+
+    if lang == 'zh':
+        global jieba_tokenize
+        if jieba_tokenize is None:
+            from wordfreq.chinese import jieba_tokenize
+        tokens = jieba_tokenize(text)
+        return [token.casefold() for token in tokens if TOKEN_RE.match(token)]
+
 
     if lang == 'tr':
         return turkish_tokenize(text)

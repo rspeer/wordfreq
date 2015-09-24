@@ -32,9 +32,14 @@ rule wiki2text
   command = bunzip2 -c $in | wiki2text > $out
 
 # To tokenize Japanese, we run it through Mecab and take the first column.
-# We don't have a plan for tokenizing Chinese yet.
 rule tokenize_japanese
   command = mecab -b 1048576 < $in | cut -f 1 | grep -v "EOS" > $out
+
+# Process Chinese by converting all Traditional Chinese characters to
+# Simplified equivalents -- not because that's a good way to get readable
+# text, but because that's how we're going to look them up.
+rule simplify_chinese
+  command = python -m wordfreq_builder.cli.simplify_chinese < $in > $out
 
 # Tokenizing text from Twitter requires us to language-detect and tokenize
 # in the same step.
@@ -62,6 +67,13 @@ rule convert_opensubtitles
 rule convert_subtlex
   command = cut -f $textcol,$freqcol $in | tail -n +$startrow | ftfy | tr '	",' ',  ' | grep -v 'â,' > $out
 
+rule convert_jieba
+  command = cut -d ' ' -f 1,2 $in | grep -v '[,"]' | tr ' ' ',' > $out
+
+rule counts_to_jieba
+  command = python -m wordfreq_builder.cli.counts_to_jieba $in $out
+
+
 # Convert and clean up the Google Books Syntactic N-grams data. Concatenate all
 # the input files, keep only the single words and their counts, and only keep
 # lines with counts of 100 or more.
@@ -77,13 +89,13 @@ rule count
   command = python -m wordfreq_builder.cli.count_tokens $in $out
 
 rule merge
-  command = python -m wordfreq_builder.cli.merge_freqs -o $out -c $cutoff $in
+  command = python -m wordfreq_builder.cli.merge_freqs -o $out -c $cutoff -l $lang $in
 
 rule merge_counts
   command = python -m wordfreq_builder.cli.merge_counts -o $out $in
 
 rule freqs2cB
-  command = python -m wordfreq_builder.cli.freqs_to_cB $lang $in $out
+  command = python -m wordfreq_builder.cli.freqs_to_cB $in $out
 
 rule cat
   command = cat $in > $out

@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 CACHE_SIZE = 100000
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
-# Chinese and Japanese are written without spaces. This means we have to
-# run language-specific code to infer token boundaries on them, and also
-# that we need to adjust frequencies of multi-token phrases to account
-# for the fact that token boundaries were inferred.
-SPACELESS_LANGUAGES = {'zh', 'ja'}
+# Chinese and Japanese are written without spaces. In Chinese, in particular,
+# we have to infer word boundaries from the frequencies of the words they
+# would create. When this happens, we should adjust the resulting frequency
+# to avoid creating a bias toward improbable word combinations.
+INFERRED_SPACE_LANGUAGES = {'zh'}
 
 # We'll divide the frequency by 10 for each token boundary that was inferred.
 # (We determined the factor of 10 empirically by looking at words in the
@@ -197,7 +197,7 @@ def _word_frequency(word, lang, wordlist, minimum):
 
     freq = 1.0 / one_over_result
 
-    if lang in SPACELESS_LANGUAGES:
+    if lang in INFERRED_SPACE_LANGUAGES:
         freq /= INFERRED_SPACE_FACTOR ** (len(tokens) - 1)
 
     return max(freq, minimum)

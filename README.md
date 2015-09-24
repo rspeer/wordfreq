@@ -232,20 +232,14 @@ sources:
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
 
-<<<<<<< HEAD
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
-SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al. (see citations below) and
-available at http://crr.ugent.be/programs-data/subtitle-frequencies.
-=======
-It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK, and
-SUBTLEX-CH, created by Marc Brysbaert et al. and available at
+SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al.
+(see citations below) and available at
 http://crr.ugent.be/programs-data/subtitle-frequencies.
->>>>>>> greek-and-turkish
 
-I (Rob Speer) have
-obtained permission by e-mail from Marc Brysbaert to distribute these wordlists
-in wordfreq, to be used for any purpose, not just for academic use, under these
-conditions:
+I (Rob Speer) have obtained permission by e-mail from Marc Brysbaert to
+distribute these wordlists in wordfreq, to be used for any purpose, not just
+for academic use, under these conditions:
 
 - Wordfreq and code derived from it must credit the SUBTLEX authors.
 - It must remain clear that SUBTLEX is freely available data.
@@ -297,4 +291,3 @@ Twitter; it does not display or republish any Twitter content.
   SUBTLEX-UK: A new and improved word frequency database for British English.
   The Quarterly Journal of Experimental Psychology, 67(6), 1176-1190.
   http://www.tandfonline.com/doi/pdf/10.1080/17470218.2013.850521
-

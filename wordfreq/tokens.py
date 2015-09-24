@@ -127,19 +127,25 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     - Chinese will be mapped to Simplified Chinese characters and tokenized
       using the jieba tokenizer, on a custom word list of words that can be
       looked up in wordfreq.
-    - Japanese will be delegated to the external mecab-python module.
+
+    - Japanese will be delegated to the external mecab-python module. It will
+      be NFKC normalized, which is stronger than NFC normalization.
+
     - Chinese or Japanese texts that aren't identified as the appropriate
       language will only split on punctuation and script boundaries, giving
       you untokenized globs of characters that probably represent many words.
+
+    - Arabic will be NFKC normalized, and will have Arabic-specific combining
+      marks and tatweels removed.
+
+    - Languages written in cased alphabets will be case-folded to lowercase.
+
     - Turkish will use a different case-folding procedure, so that capital
       I and İ map to ı and i respectively.
-    - All other languages will be tokenized using a regex that mostly
-      implements the Word Segmentation section of Unicode Annex #29.
-      See `simple_tokenize` for details.
 
-    Additionally, the text will be case-folded to lowercase, and text marked
-    as Arabic will be normalized more strongly and have combining marks and
-    tatweels removed.
+    - Languages besides Japanese and Chinese will be tokenized using a regex
+      that mostly implements the Word Segmentation section of Unicode Annex
+      #29. See `simple_tokenize` for details.
 
     If `external_wordlist` is True, then the Chinese wordlist in wordfreq will
     not be used for tokenization. Instead, it will use the large wordlist

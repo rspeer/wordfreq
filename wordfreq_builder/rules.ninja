@@ -63,7 +63,7 @@ rule convert_opensubtitles
 
 # To convert SUBTLEX, we take the 1st and Nth columns, strip the header,
 # run it through ftfy, convert tabs to commas and spurious CSV formatting to
-# and remove lines with unfixable half-mojibake.
+# spaces, and remove lines with unfixable half-mojibake.
 rule convert_subtlex
   command = cut -f $textcol,$freqcol $in | tail -n +$startrow | ftfy | tr '	",' ',  ' | grep -v 'â,' > $out
 

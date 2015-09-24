@@ -1,12 +1,14 @@
 from pkg_resources import resource_filename
-from wordfreq._chinese_mapping import SIMPLIFIED_MAP
 import jieba
+import msgpack
+import gzip
 
-
-jieba_tokenizer = None
-jieba_orig_tokenizer = None
 DICT_FILENAME = resource_filename('wordfreq', 'data/jieba_zh.txt')
 ORIG_DICT_FILENAME = resource_filename('wordfreq', 'data/jieba_zh_orig.txt')
+SIMP_MAP_FILENAME = resource_filename('wordfreq', 'data/_chinese_mapping.msgpack.gz')
+SIMPLIFIED_MAP = msgpack.load(gzip.open(SIMP_MAP_FILENAME), encoding='utf-8')
+jieba_tokenizer = None
+jieba_orig_tokenizer = None
 
 
 def simplify_chinese(text):

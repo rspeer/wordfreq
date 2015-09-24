@@ -215,7 +215,8 @@ def opensubtitles_deps(dirname_in, languages):
 
 def jieba_deps(dirname_in, languages):
     lines = []
-    # Either subtlex_zh is turned off, or it's just in Chinese
+    # Because there's Chinese-specific handling here, the valid options for
+    # 'languages' are [] and ['zh']. Make sure it's one of those.
     if not languages:
         return lines
     assert languages == ['zh']

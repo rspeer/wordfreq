@@ -1,6 +1,5 @@
 import regex
 import unicodedata
-from pkg_resources import resource_filename
 
 
 TOKEN_RE = regex.compile(r"""

@@ -192,14 +192,16 @@ into multiple tokens:
     3.2187603965715087e-06
 
 The word frequencies are combined with the half-harmonic-mean function in order
-to provide an estimate of what their combined frequency would be. In languages
-written without spaces, there is also a penalty to the word frequency for each
-word break that must be inferred.
+to provide an estimate of what their combined frequency would be. In Chinese,
+where the word breaks must be inferred from the frequency of the resulting
+words, there is also a penalty to the word frequency for each word break that
+must be inferred.
 
-This implicitly assumes that you're asking about words that frequently appear
-together. It's not multiplying the frequencies, because that would assume they
-are statistically unrelated. So if you give it an uncommon combination of
-tokens, it will hugely over-estimate their frequency:
+This method of combining word frequencies implicitly assumes that you're asking
+about words that frequently appear together. It's not multiplying the
+frequencies, because that would assume they are statistically unrelated. So if
+you give it an uncommon combination of tokens, it will hugely over-estimate
+their frequency:
 
     >>> word_frequency('owl-flavored', 'en')
     1.3557098723512335e-06

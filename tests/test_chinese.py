@@ -25,12 +25,33 @@ def test_tokens():
     eq_(
         tokenize(fact_simplified, 'zh'),
         [
-         # he / is / in history / #6 / counter for people
-         '他', '是',  '历史上', '第六', '位',
-         # during / term of office / in / die
-         '在', '任期', '内', '去世',
-         # of / U.S. / deputy / president
-         '的', '美国', '副', '总统'
+            # he / is / in history / #6 / counter for people
+            '他', '是',  '历史上', '第六', '位',
+            # during / term of office / in / die
+            '在', '任期', '内', '去世',
+            # of / U.S. / deputy / president
+            '的', '美国', '副', '总统'
+        ]
+    )
+
+    # Jieba's original tokenizer knows a lot of names, it seems.
+    eq_(
+        tokenize(hobart, 'zh', external_wordlist=True),
+        ['加勒特', '霍巴特']
+    )
+
+    # We get almost the same tokens from the sentence using Jieba's own
+    # wordlist, but it tokenizes "in history" as two words and
+    # "sixth person" as one.
+    eq_(
+        tokenize(fact_simplified, 'zh', external_wordlist=True),
+        [
+            # he / is / history / in / sixth person
+            '他', '是', '历史', '上', '第六位',
+            # during / term of office / in / die
+            '在', '任期', '内', '去世',
+            # of / U.S. / deputy / president
+            '的', '美国', '副', '总统'
         ]
     )
 

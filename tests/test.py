@@ -21,17 +21,19 @@ def test_languages():
     avail = available_languages()
     assert_greater(len(avail), 15)
 
-    # Laughter is the universal language
+    # Laughter is the universal language. Look up either 'lol' or '笑' in each
+    # language and make sure it has a non-zero frequency.
     for lang in avail:
-        if lang not in {'zh', 'ja'}:
-            # we do not have enough Chinese data
-            # Japanese people do not lol
-            assert_greater(word_frequency('lol', lang), 0)
+        if lang in {'zh', 'ja'}:
+            text = '笑'
+        else:
+            text = 'lol'
+        assert_greater(word_frequency(text, lang), 0)
 
-            # Make up a weirdly verbose language code and make sure
-            # we still get it
-            new_lang_code = '%s-001-x-fake-extension' % lang.upper()
-            assert_greater(word_frequency('lol', new_lang_code), 0)
+        # Make up a weirdly verbose language code and make sure
+        # we still get it
+        new_lang_code = '%s-001-x-fake-extension' % lang.upper()
+        assert_greater(word_frequency(text, new_lang_code), 0)
 
 
 def test_twitter():
@@ -98,6 +100,9 @@ def test_tokenization():
     # data
     eq_(tokenize("I don't split at apostrophes, you see.", 'en'),
         ['i', "don't", 'split', 'at', 'apostrophes', 'you', 'see'])
+    
+    eq_(tokenize("I don't split at apostrophes, you see.", 'en', include_punctuation=True),
+        ['i', "don't", 'split', 'at', 'apostrophes', ',', 'you', 'see', '.'])
 
     # Certain punctuation does not inherently split a word.
     eq_(tokenize("Anything is possible at zombo.com", 'en'),
@@ -107,6 +112,9 @@ def test_tokenization():
     eq_(tokenize('😂test', 'en'), ['😂', 'test'])
 
     eq_(tokenize("flip-flop", 'en'), ['flip', 'flop'])
+
+    eq_(tokenize('this text has... punctuation :)', 'en', include_punctuation=True),
+        ['this', 'text', 'has', '...', 'punctuation', ':)'])
 
 
 def test_casefolding():

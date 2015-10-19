@@ -84,6 +84,7 @@ def turkish_tokenize(text, include_punctuation=False):
     return [token.strip("'").casefold() for token in token_expr.findall(text)]
 
 
+mecab_tokenize = None
 def japanese_tokenize(text, include_punctuation=False):
     global mecab_tokenize
     if mecab_tokenize is None:
@@ -93,6 +94,7 @@ def japanese_tokenize(text, include_punctuation=False):
     return [token.casefold() for token in tokens if token_expr.match(token)]
 
 
+jieba_tokenize = None
 def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
     global jieba_tokenize
     if jieba_tokenize is None:
@@ -114,8 +116,6 @@ def remove_arabic_marks(text):
     return ARABIC_MARK_RE.sub('', text)
 
 
-mecab_tokenize = None
-jieba_tokenize = None
 def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     """
     Tokenize this text in a way that's relatively simple but appropriate for

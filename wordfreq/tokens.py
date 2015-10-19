@@ -119,13 +119,14 @@ jieba_tokenize = None
 def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     """
     Tokenize this text in a way that's relatively simple but appropriate for
-    the language.
+    the language. Strings that are looked up in wordfreq will be run through
+    this function first, so that they can be expected to match the data.
 
-    So far, this means:
+    Here is what the tokenizer will do, depending on the language:
 
     - Chinese will be mapped to Simplified Chinese characters and tokenized
-      using the jieba tokenizer, on a custom word list of words that can be
-      looked up in wordfreq.
+      using the Jieba tokenizer, trained on a custom word list of words that
+      can be looked up in wordfreq.
 
     - Japanese will be delegated to the external mecab-python module. It will
       be NFKC normalized, which is stronger than NFC normalization.
@@ -146,15 +147,12 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
       that mostly implements the Word Segmentation section of Unicode Annex
       #29. See `simple_tokenize` for details.
 
-    If `external_wordlist` is True, then the Chinese wordlist in wordfreq will
-    not be used for tokenization. Instead, it will use the large wordlist
-    packaged with the Jieba tokenizer, and it will leave Traditional Chinese
-    characters as is. This will probably give more accurate tokenization, but
-    the resulting tokens won't necessarily have word frequencies that can be
-    looked up.
-
-    Strings that are looked up in wordfreq will be run through this function
-    first, so that they can be expected to match the data.
+    The `external_wordlist` option only affects Chinese tokenization.  If it's
+    True, then wordfreq will not use its own Chinese wordlist for tokenization.
+    Instead, it will use the large wordlist packaged with the Jieba tokenizer,
+    and it will leave Traditional Chinese characters as is. This will probably
+    give more accurate tokenization, but the resulting tokens won't necessarily
+    have word frequencies that can be looked up.
     """
     if lang == 'ja':
         return japanese_tokenize(text, include_punctuation)

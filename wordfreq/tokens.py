@@ -86,6 +86,9 @@ def turkish_tokenize(text, include_punctuation=False):
 
 mecab_tokenize = None
 def japanese_tokenize(text, include_punctuation=False):
+    """
+    Tokenize Japanese text, initializing the MeCab tokenizer if necessary.
+    """
     global mecab_tokenize
     if mecab_tokenize is None:
         from wordfreq.japanese import mecab_tokenize
@@ -96,6 +99,9 @@ def japanese_tokenize(text, include_punctuation=False):
 
 jieba_tokenize = None
 def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
+    """
+    Tokenize Chinese text, initializing the Jieba tokenizer if necessary.
+    """
     global jieba_tokenize
     if jieba_tokenize is None:
         from wordfreq.chinese import jieba_tokenize

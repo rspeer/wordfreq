@@ -33,7 +33,7 @@ def count_tokens(filename):
     return counts
 
 
-def read_values(filename, cutoff=0, lang=None):
+def read_values(filename, cutoff=0, max_size=1e8, lang=None):
     """
     Read words and their frequency or count values from a CSV file. Returns
     a dictionary of values and the total of all values.
@@ -52,7 +52,7 @@ def read_values(filename, cutoff=0, lang=None):
         for key, strval in csv.reader(infile):
             val = float(strval)
             key = fix_text(key)
-            if val < cutoff:
+            if val < cutoff or len(values) >= max_size:
                 break
             tokens = tokenize(key, lang) if lang is not None else simple_tokenize(key)
             for token in tokens:
@@ -76,7 +76,7 @@ def read_freqs(filename, cutoff=0, lang=None):
     If lang is given, read_freqs will apply language specific preprocessing
     operations.
     """
-    values, total = read_values(filename, cutoff, lang)
+    values, total = read_values(filename, cutoff, lang=lang)
     for word in values:
         values[word] /= total
 

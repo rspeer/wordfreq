@@ -5,7 +5,7 @@ import argparse
 def merge_lists(input_names, output_name):
     count_dicts = []
     for input_name in input_names:
-        values, total = read_values(input_name, cutoff=0)
+        values, total = read_values(input_name, cutoff=0, max_size=1000000)
         count_dicts.append(values)
     merged = merge_counts(count_dicts)
     write_wordlist(merged, output_name)

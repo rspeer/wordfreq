@@ -77,6 +77,10 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
             data_filename('source-lists/subtlex'),
             CONFIG['sources']['subtlex-other']
         ),
+        reddit_deps(
+            data_filename('raw-input/reddit'),
+            CONFIG['sources']['reddit']
+        ),
         jieba_deps(
             data_filename('source-lists/jieba'),
             CONFIG['sources']['jieba']
@@ -229,6 +233,27 @@ def jieba_deps(dirname_in, languages):
     )
     add_dep(lines, 'simplify_chinese', input_file, transformed_file)
     add_dep(lines, 'convert_jieba', transformed_file, reformatted_file)
+    return lines
+
+
+def reddit_deps(dirname_in, languages):
+    lines = []
+    if not languages:
+        return lines
+    assert languages == ['en']
+
+    processed_files = []
+    path_in = pathlib.Path(dirname_in)
+    for filepath in path_in.glob('*/*.bz2'):
+        base = filepath.name[:-4]
+        transformed_file = wordlist_filename('reddit', 'en', base + '.txt')
+        add_dep(lines, 'extract_reddit', str(filepath), transformed_file)
+        count_file = wordlist_filename('reddit', 'en', base + '.counts.txt')
+        add_dep(lines, 'count', transformed_file, count_file)
+        processed_files.append(count_file)
+
+    output_file = wordlist_filename('reddit', 'en', 'counts.txt')
+    add_dep(lines, 'merge_counts', processed_files, output_file)
     return lines
 
 

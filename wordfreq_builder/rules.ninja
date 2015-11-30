@@ -13,7 +13,7 @@
 # contains the programatically-defined dependency graph.
 
 # Variables
-DATA = ./data
+JQ = lib/jq-linux64
 
 # How to build the build.ninja file itself. (Use the Makefile to get it the
 # first time.)
@@ -99,3 +99,6 @@ rule freqs2cB
 
 rule cat
   command = cat $in > $out
+
+rule extract_reddit
+  command = bunzip2 -c $in | $JQ -r '.body' | fgrep -v '[deleted]' | sed 's/&gt;/>/g' | sed 's/&lt;/</g' | sed 's/&amp;/\&/g' > $out

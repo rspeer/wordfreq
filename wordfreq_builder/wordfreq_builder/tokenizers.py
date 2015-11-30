@@ -22,6 +22,8 @@ CLD2_BAD_CHARS_RE = regex.compile(CLD2_BAD_CHAR_RANGE)
 
 TWITTER_HANDLE_RE = regex.compile(r'@[\S--\p{punct}]+')
 TCO_RE = regex.compile('http(?:s)?://t.co/[a-zA-Z0-9]+')
+URL_RE = regex.compile(r'http(?:s)?://[^) ]*')
+MARKDOWN_URL_RESIDUE_RE = regex.compile(r'\]\(\)')
 
 
 def cld2_surface_tokenizer(text):
@@ -31,6 +33,7 @@ def cld2_surface_tokenizer(text):
     text = unescape_html(text)
     text = TWITTER_HANDLE_RE.sub('', text)
     text = TCO_RE.sub('', text)
+
     lang = cld2_detect_language(text)
 
     # Don't allow tokenization in Chinese when language-detecting, because
@@ -39,6 +42,26 @@ def cld2_surface_tokenizer(text):
         lang = 'en'
 
     tokens = tokenize(text, lang)
+    return lang, tokens
+
+
+# Low-frequency languages tend to be detected incorrectly. Keep a limited
+# list of languages we're allowed to use here.
+KEEP_THESE_LANGUAGES = {
+    'ar', 'de', 'el', 'en', 'es', 'fr', 'hr', 'id', 'ja', 'ko', 'ms', 'nl',
+    'pl', 'pt', 'ro', 'ru', 'sv', 'th'
+}
+
+
+def cld2_reddit_tokenizer(text):
+    text = URL_RE.sub('', text)
+    text = MARKDOWN_URL_RESIDUE_RE.sub(']', text)
+
+    lang = cld2_detect_language(text)
+    if lang not in KEEP_THESE_LANGUAGES:
+        lang = 'en'
+
+    tokens = tokenize(text, lang, include_punctuation=True)
     return lang, tokens
 
 
@@ -59,11 +82,9 @@ def cld2_detect_language(text):
     return pycld2.detect(text)[2][0][1]
 
 
-def tokenize_twitter(in_filename, out_prefix, tokenizer):
+def tokenize_by_language(in_filename, out_prefix, tokenizer):
     """
-    Process a file by running it through the Twitter-specific tokenizer,
-    which uses cld2 for language detection, and removes Twitter handles
-    and t.co URLs.
+    Process a file by running it through a given tokenizer.
 
     Produces output files that are separated by language, with newlines
     between the tokens.

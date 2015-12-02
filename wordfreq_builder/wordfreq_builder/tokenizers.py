@@ -49,7 +49,7 @@ def cld2_surface_tokenizer(text):
 # list of languages we're allowed to use here.
 KEEP_THESE_LANGUAGES = {
     'ar', 'de', 'el', 'en', 'es', 'fr', 'hr', 'id', 'it', 'ja', 'ko', 'ms',
-    'nl', 'pl', 'pt', 'ro', 'ru', 'sv', 'th'
+    'nl', 'pl', 'pt', 'ro', 'ru', 'sv'
 }
 
 

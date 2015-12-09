@@ -246,7 +246,7 @@ def reddit_deps(dirname_in, languages):
     path_in = pathlib.Path(dirname_in)
     for filepath in path_in.glob('*/*.bz2'):
         base = filepath.name[:-4]
-        transformed_file = wordlist_filename('reddit', 'en', base + '.txt')
+        transformed_file = wordlist_filename('reddit', 'en', base + '.txt.gz')
         add_dep(lines, 'extract_reddit', str(filepath), transformed_file)
         count_file = wordlist_filename('reddit', 'en', base + '.counts.txt')
         add_dep(lines, 'count', transformed_file, count_file)

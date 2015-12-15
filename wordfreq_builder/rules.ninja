@@ -92,7 +92,7 @@ rule merge
   command = python -m wordfreq_builder.cli.merge_freqs -o $out -c $cutoff -l $lang $in
 
 rule merge_counts
-  command = python -m wordfreq_builder.cli.merge_counts -o $out $in
+  command = python -m wordfreq_builder.cli.merge_counts -o $out -c $cutoff $in
 
 rule freqs2cB
   command = python -m wordfreq_builder.cli.freqs_to_cB $in $out

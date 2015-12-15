@@ -253,7 +253,10 @@ def reddit_deps(dirname_in, languages):
         processed_files.append(count_file)
 
     output_file = wordlist_filename('reddit', 'en', 'counts.txt')
-    add_dep(lines, 'merge_counts', processed_files, output_file)
+    add_dep(
+        lines, 'merge_counts', processed_files, output_file,
+        params={'cutoff': 3}
+    )
     return lines
 
 
@@ -289,7 +292,10 @@ def subtlex_en_deps(dirname_in, languages):
         )
 
     output_file = wordlist_filename('subtlex-en', 'en', 'counts.txt')
-    add_dep(lines, 'merge_counts', processed_files, output_file)
+    add_dep(
+        lines, 'merge_counts', processed_files, output_file,
+        params={'cutoff': 0}
+    )
 
     return lines
 
@@ -317,7 +323,8 @@ def subtlex_other_deps(dirname_in, languages):
             params={'textcol': textcol, 'freqcol': freqcol, 'startrow': 2}
         )
         add_dep(
-            lines, 'merge_counts', processed_file, output_file
+            lines, 'merge_counts', processed_file, output_file,
+            params={'cutoff': 0}
         )
     return lines
 

@@ -95,7 +95,7 @@ rule merge_counts
   command = python -m wordfreq_builder.cli.merge_counts -o $out -c $cutoff $in
 
 rule freqs2cB
-  command = python -m wordfreq_builder.cli.freqs_to_cB $in $out
+  command = python -m wordfreq_builder.cli.freqs_to_cB $in $out -b $buckets
 
 rule cat
   command = cat $in > $out

@@ -345,9 +345,15 @@ def combine_lists(languages):
         output_cBpack = wordlist_filename(
             'combined-dist', language, 'msgpack.gz'
         )
+        output_cBpack_big = wordlist_filename(
+            'combined-dist-large', language, 'msgpack.gz'
+        )
         add_dep(lines, 'freqs2cB', output_file, output_cBpack,
                 extra='wordfreq_builder/word_counts.py',
-                params={'lang': language})
+                params={'lang': language, 'buckets': 600})
+        add_dep(lines, 'freqs2cB', output_file, output_cBpack_big,
+                extra='wordfreq_builder/word_counts.py',
+                params={'lang': language, 'buckets': 900})
 
         lines.append('default {}'.format(output_cBpack))
 
@@ -358,7 +364,7 @@ def combine_lists(languages):
                 'twitter-dist', language, 'msgpack.gz')
             add_dep(lines, 'freqs2cB', input_file, output_cBpack,
                     extra='wordfreq_builder/word_counts.py',
-                    params={'lang': language})
+                    params={'lang': language, 'buckets': 600})
 
             lines.append('default {}'.format(output_cBpack))
 

@@ -56,6 +56,7 @@ CONFIG = {
         'reddit': 'generated/reddit/reddit_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}',
         'combined-dist': 'dist/combined_{lang}.{ext}',
+        'combined-dist-large': 'dist/combined-large_{lang}.{ext}',
         'twitter-dist': 'dist/twitter_{lang}.{ext}',
         'jieba-dist': 'dist/jieba_{lang}.{ext}'
     },

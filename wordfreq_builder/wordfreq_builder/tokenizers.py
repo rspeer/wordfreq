@@ -95,7 +95,7 @@ def tokenize_by_language(in_filename, out_prefix, tokenizer):
             text = line.split('\t')[-1].strip()
             language, tokens = tokenizer(text)
             if language != 'un':
-                tokenized = '\n'.join(tokens)
+                tokenized = ' '.join(tokens)
                 out_filename = '%s.%s.txt' % (out_prefix, language)
                 if out_filename in out_files:
                     out_file = out_files[out_filename]

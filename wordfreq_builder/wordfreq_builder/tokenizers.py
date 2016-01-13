@@ -54,11 +54,17 @@ KEEP_THESE_LANGUAGES = {
 
 
 def cld2_reddit_tokenizer(text):
+    """
+    A language-detecting tokenizer with special cases for handling text from
+    Reddit.
+    """
     text = URL_RE.sub('', text)
     text = MARKDOWN_URL_RESIDUE_RE.sub(']', text)
 
     lang = cld2_detect_language(text)
     if lang not in KEEP_THESE_LANGUAGES:
+        # Reddit is 99.9% English, so if we detected a rare language, it's
+        # much more likely that it's actually English.
         lang = 'en'
 
     tokens = tokenize(text, lang, include_punctuation=True)
@@ -86,7 +92,7 @@ def tokenize_by_language(in_filename, out_prefix, tokenizer):
     """
     Process a file by running it through a given tokenizer.
 
-    Produces output files that are separated by language, with newlines
+    Produces output files that are separated by language, with spaces
     between the tokens.
     """
     out_files = {}

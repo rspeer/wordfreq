@@ -77,6 +77,10 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
             data_filename('source-lists/subtlex'),
             CONFIG['sources']['subtlex-other']
         ),
+        reddit_deps(
+            data_filename('raw-input/reddit'),
+            CONFIG['sources']['reddit']
+        ),
         jieba_deps(
             data_filename('source-lists/jieba'),
             CONFIG['sources']['jieba']
@@ -232,6 +236,30 @@ def jieba_deps(dirname_in, languages):
     return lines
 
 
+def reddit_deps(dirname_in, languages):
+    lines = []
+    if not languages:
+        return lines
+    assert languages == ['en']
+
+    processed_files = []
+    path_in = pathlib.Path(dirname_in)
+    for filepath in path_in.glob('*/*.bz2'):
+        base = filepath.name[:-4]
+        transformed_file = wordlist_filename('reddit', 'en', base + '.txt.gz')
+        add_dep(lines, 'extract_reddit', str(filepath), transformed_file)
+        count_file = wordlist_filename('reddit', 'en', base + '.counts.txt')
+        add_dep(lines, 'count', transformed_file, count_file)
+        processed_files.append(count_file)
+
+    output_file = wordlist_filename('reddit', 'en', 'counts.txt')
+    add_dep(
+        lines, 'merge_counts', processed_files, output_file,
+        params={'cutoff': 3}
+    )
+    return lines
+
+
 # Which columns of the SUBTLEX data files do the word and its frequency appear
 # in?
 SUBTLEX_COLUMN_MAP = {
@@ -264,7 +292,10 @@ def subtlex_en_deps(dirname_in, languages):
         )
 
     output_file = wordlist_filename('subtlex-en', 'en', 'counts.txt')
-    add_dep(lines, 'merge_counts', processed_files, output_file)
+    add_dep(
+        lines, 'merge_counts', processed_files, output_file,
+        params={'cutoff': 0}
+    )
 
     return lines
 
@@ -292,7 +323,8 @@ def subtlex_other_deps(dirname_in, languages):
             params={'textcol': textcol, 'freqcol': freqcol, 'startrow': 2}
         )
         add_dep(
-            lines, 'merge_counts', processed_file, output_file
+            lines, 'merge_counts', processed_file, output_file,
+            params={'cutoff': 0}
         )
     return lines
 

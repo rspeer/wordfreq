@@ -13,7 +13,7 @@
 # contains the programatically-defined dependency graph.
 
 # Variables
-DATA = ./data
+JQ = lib/jq-linux64
 
 # How to build the build.ninja file itself. (Use the Makefile to get it the
 # first time.)
@@ -92,10 +92,13 @@ rule merge
   command = python -m wordfreq_builder.cli.merge_freqs -o $out -c $cutoff -l $lang $in
 
 rule merge_counts
-  command = python -m wordfreq_builder.cli.merge_counts -o $out $in
+  command = python -m wordfreq_builder.cli.merge_counts -o $out -c $cutoff $in
 
 rule freqs2cB
   command = python -m wordfreq_builder.cli.freqs_to_cB $in $out
 
 rule cat
   command = cat $in > $out
+
+rule extract_reddit
+  command = bunzip2 -c $in | $JQ -r '.body' | fgrep -v '[deleted]' | sed 's/&gt;/>/g' | sed 's/&lt;/</g' | sed 's/&amp;/\&/g' | gzip -c > $out

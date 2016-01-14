@@ -18,10 +18,14 @@ def merge_lists(input_names, output_name, cutoff, lang):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', '--output', help='filename to write the output to', default='combined-freqs.csv')
-    parser.add_argument('-c', '--cutoff', type=int, help='stop after seeing a count below this', default=2)
-    parser.add_argument('-l', '--language', help='language code for which language the words are in', default=None)
-    parser.add_argument('inputs', help='names of input files to merge', nargs='+')
+    parser.add_argument('-o', '--output', default='combined-freqs.csv',
+                        help='filename to write the output to')
+    parser.add_argument('-c', '--cutoff', type=int, default=2,
+                        help='stop after seeing a count below this')
+    parser.add_argument('-l', '--language', default=None,
+                        help='language code for which language the words are in')
+    parser.add_argument('inputs', nargs='+',
+                        help='names of input files to merge')
     args = parser.parse_args()
     merge_lists(args.inputs, args.output, args.cutoff, args.language)
 

@@ -8,6 +8,7 @@ import itertools
 import pathlib
 import random
 import logging
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -146,6 +147,42 @@ def cB_to_freq(cB):
     return 10 ** (cB / 100)
 
 
+def cB_to_zipf(cB):
+    """
+    Convert a word frequency from centibels to the Zipf scale
+    (see `zipf_to_freq`).
+
+    The Zipf scale is related to centibels, the logarithmic unit that wordfreq
+    uses internally, because the Zipf unit is simply the bel, with a different
+    zero point. To convert centibels to Zipf, add 900 and divide by 100.
+    """
+    return (cB + 900) / 100
+
+
+def zipf_to_freq(zipf):
+    """
+    Convert a word frequency from the Zipf scale to a proportion between 0 and
+    1.
+
+    The Zipf scale is a logarithmic frequency scale proposed by Marc Brysbaert,
+    who compiled the SUBTLEX data. The goal of the Zipf scale is to map
+    reasonable word frequencies to understandable, small positive numbers.
+
+    A word rates as x on the Zipf scale when it occurs 10**x times per billion
+    words. For example, a word that occurs once per million words is at 3.0 on
+    the Zipf scale.
+    """
+    return 10 ** zipf / 1e9
+
+
+def freq_to_zipf(freq):
+    """
+    Convert a word frequency from a proportion between 0 and 1 to the
+    Zipf scale (see `zipf_to_freq`).
+    """
+    return math.log(freq, 10) + 9
+
+
 @lru_cache(maxsize=None)
 def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
     """
@@ -202,6 +239,7 @@ def _word_frequency(word, lang, wordlist, minimum):
 
     return max(freq, minimum)
 
+
 def word_frequency(word, lang, wordlist='combined', minimum=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
@@ -238,6 +276,33 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
             _wf_cache.clear()
         _wf_cache[args] = _word_frequency(*args)
         return _wf_cache[args]
+
+
+def zipf_frequency(word, lang, wordlist='combined', minimum=0.):
+    """
+    Get the frequency of `word`, in the language with code `lang`, on the Zipf
+    scale.
+    
+    The Zipf scale is a logarithmic frequency scale proposed by Marc Brysbaert,
+    who compiled the SUBTLEX data. The goal of the Zipf scale is to map
+    reasonable word frequencies to understandable, small positive numbers.
+    
+    A word rates as x on the Zipf scale when it occurs 10**x times per billion
+    words. For example, a word that occurs once per million words is at 3.0 on
+    the Zipf scale.
+    
+    Zipf values for reasonable words are between 0 and 8. The value this
+    function returns will always be at last as large as `minimum`, even for a
+    word that never appears. The default minimum is 0, representing words
+    that appear once per billion words or less.
+
+    wordfreq internally quantizes its frequencies to centibels, which are
+    1/100 of a Zipf unit. The output of `zipf_frequency` will be rounded to
+    the nearest hundredth to match this quantization.
+    """
+    freq_min = zipf_to_freq(minimum)
+    freq = word_frequency(word, lang, wordlist, freq_min)
+    return round(freq_to_zipf(freq), 2)
 
 
 @lru_cache(maxsize=100)

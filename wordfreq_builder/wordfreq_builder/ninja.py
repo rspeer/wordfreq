@@ -353,9 +353,11 @@ def combine_lists(languages):
                 params={'lang': language, 'buckets': 600})
         add_dep(lines, 'freqs2cB', output_file, output_cBpack_big,
                 extra='wordfreq_builder/word_counts.py',
-                params={'lang': language, 'buckets': 900})
+                params={'lang': language, 'buckets': 800})
 
         lines.append('default {}'.format(output_cBpack))
+        if language in CONFIG['big-lists']:
+            lines.append('default {}'.format(output_cBpack_big))
 
         # Write standalone lists for Twitter frequency
         if language in CONFIG['sources']['twitter']:

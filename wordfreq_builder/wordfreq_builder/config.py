@@ -60,7 +60,8 @@ CONFIG = {
         'twitter-dist': 'dist/twitter_{lang}.{ext}',
         'jieba-dist': 'dist/jieba_{lang}.{ext}'
     },
-    'min_sources': 2
+    'min_sources': 2,
+    'big-lists': ['en', 'fr', 'es', 'pt']
 }
 
 

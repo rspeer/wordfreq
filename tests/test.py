@@ -100,7 +100,7 @@ def test_tokenization():
     # data
     eq_(tokenize("I don't split at apostrophes, you see.", 'en'),
         ['i', "don't", 'split', 'at', 'apostrophes', 'you', 'see'])
-    
+
     eq_(tokenize("I don't split at apostrophes, you see.", 'en', include_punctuation=True),
         ['i', "don't", 'split', 'at', 'apostrophes', ',', 'you', 'see', '.'])
 
@@ -115,6 +115,12 @@ def test_tokenization():
 
     eq_(tokenize('this text has... punctuation :)', 'en', include_punctuation=True),
         ['this', 'text', 'has', '...', 'punctuation', ':)'])
+
+    # Test that we leave Thai letters stuck together. If we had better Thai support,
+    # we would actually split this into a three-word phrase.
+    eq_(tokenize('การเล่นดนตรี', 'th'), ['การเล่นดนตรี'])
+    eq_(tokenize('"การเล่นดนตรี" means "playing music"', 'en'),
+        ['การเล่นดนตรี', 'means', 'playing', 'music'])
 
 
 def test_casefolding():

@@ -116,12 +116,6 @@ def test_tokenization():
     eq_(tokenize('this text has... punctuation :)', 'en', include_punctuation=True),
         ['this', 'text', 'has', '...', 'punctuation', ':)'])
 
-    # Test that we leave Thai letters stuck together. If we had better Thai support,
-    # we would actually split this into a three-word phrase.
-    eq_(tokenize('การเล่นดนตรี', 'th'), ['การเล่นดนตรี'])
-    eq_(tokenize('"การเล่นดนตรี" means "playing music"', 'en'),
-        ['การเล่นดนตรี', 'means', 'playing', 'music'])
-
 
 def test_casefolding():
     eq_(tokenize('WEISS', 'de'), ['weiss'])
@@ -186,3 +180,10 @@ def test_ideographic_fallback():
         tokenize(ja_text, 'en'),
         ['ひらがな', 'カタカナ', 'romaji']
     )
+
+    # Test that we leave Thai letters stuck together. If we had better Thai support,
+    # we would actually split this into a three-word phrase.
+    eq_(tokenize('การเล่นดนตรี', 'th'), ['การเล่นดนตรี'])
+    eq_(tokenize('"การเล่นดนตรี" means "playing music"', 'en'),
+        ['การเล่นดนตรี', 'means', 'playing', 'music'])
+

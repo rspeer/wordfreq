@@ -3,23 +3,24 @@ import unicodedata
 
 
 TOKEN_RE = regex.compile(r"""
-    # Case 1: a special case for Chinese and Japanese
+    # Case 1: a special case for non-spaced languages
     # -----------------------------------------------
 
-    # When we see characters that are Han ideographs (\p{IsIdeo}) or hiragana
-    # (\p{Script=Hiragana}), we allow a sequence of those characters to be
-    # glued together as a single token. Without this case, the standard rule
-    # (case 2) would make each character a separate token. This would be the
-    # correct behavior for word-wrapping, but a messy failure mode for NLP
-    # tokenization.
+    # When we see characters that are Han ideographs (\p{IsIdeo}), hiragana
+    # (\p{Script=Hiragana}), or Thai (\p{Script=Thai}), we allow a sequence
+    # of those characters to be glued together as a single token.
     #
-    # It is, of course, better to use a tokenizer that is designed for Chinese
-    # or Japanese text. This is effectively a fallback for when the wrong
+    # Without this case, the standard rule (case 2) would make each character
+    # a separate token. This would be the correct behavior for word-wrapping,
+    # but a messy failure mode for NLP tokenization.
+    #
+    # It is, of course, better to use a tokenizer that is designed for Chinese,
+    # Japanese, or Thai text. This is effectively a fallback for when the wrong
     # tokenizer is used.
     #
     # This rule is listed first so that it takes precedence.
 
-    [\p{IsIdeo}\p{Script=Hiragana}]+ |
+    [\p{IsIdeo}\p{Script=Hiragana}\p{Script=Thai}]+ |
 
     # Case 2: standard Unicode segmentation
     # -------------------------------------

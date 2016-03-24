@@ -42,9 +42,11 @@ def read_values(filename, cutoff=0, max_size=1e8, lang=None):
     a dictionary of values and the total of all values.
 
     Only words with a value greater than or equal to `cutoff` are returned.
+    In addition, only up to `max_size` words are read.
 
-    If `cutoff` is greater than 0, the csv file must be sorted by value
-    in descending order.
+    If `cutoff` is greater than 0 or `max_size` is smaller than the list,
+    the csv file must be sorted by value in descending order, so that the
+    most frequent words are kept.
 
     If `lang` is given, it will apply language-specific tokenization to the
     words that it reads.

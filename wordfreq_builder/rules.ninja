@@ -104,4 +104,4 @@ rule cat
   command = cat $in > $out
 
 rule extract_reddit
-  command = bunzip2 -c $in | $JQ -r '.body' | fgrep -v '[deleted]' | sed 's/&gt;/>/g' | sed 's/&lt;/</g' | sed 's/&amp;/\&/g' > $out
+  command = bunzip2 -c $in | $JQ -r 'select(.score > 0) | .body' | fgrep -v '[deleted]' | sed 's/&gt;/>/g' | sed 's/&lt;/</g' | sed 's/&amp;/\&/g' > $out

@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output', default='combined-counts.csv',
                         help='filename to write the output to')
-    parser.add_argument('-c', '--cutoff', type=int, default=0
+    parser.add_argument('-c', '--cutoff', type=int, default=0,
                         help='minimum count to read from an input file')
     parser.add_argument('inputs', nargs='+',
                         help='names of input files to merge')

@@ -41,7 +41,10 @@ CONFIG = {
         'subtlex-en': ['en'],
         'subtlex-other': ['de', 'nl', 'zh'],
         'jieba': ['zh'],
-        'reddit': ['en'],
+        'reddit': [
+            'ar', 'de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'pt', 'ro',
+            'ru', 'sv'
+        ]
     },
     # Subtlex languages that need to be pre-processed
     'wordlist_paths': {

@@ -42,7 +42,7 @@ CONFIG = {
         'subtlex-other': ['de', 'nl', 'zh'],
         'jieba': ['zh'],
         'reddit': [
-            'de', 'en', 'es', 'fr', 'it', 'ja', 'pl', 'pt', 'ro', 'ru', 'sv'
+            'de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv'
         ]
     },
     # Subtlex languages that need to be pre-processed

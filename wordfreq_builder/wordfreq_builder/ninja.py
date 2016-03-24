@@ -253,7 +253,7 @@ def reddit_deps(dirname_in, languages):
     # .txt.gz files
     for filepath in path_in.glob('*/*.bz2'):
         base = reddit_base_filename(filepath)
-        transformed_file = wordlist_filename('reddit', base + '.all', '.txt')
+        transformed_file = wordlist_filename('reddit', base + '.all', 'txt')
         slices[base] = transformed_file
         add_dep(lines, 'extract_reddit', str(filepath), transformed_file)
 
@@ -261,7 +261,7 @@ def reddit_deps(dirname_in, languages):
         transformed_file = slices[base]
         language_outputs = []
         for language in languages:
-            filename = wordlist_filename('reddit', base + '.' + language, '.txt')
+            filename = wordlist_filename('reddit', base + '.' + language, 'txt')
             language_outputs.append(filename)
 
             count_filename = wordlist_filename('reddit', base + '.' + language, 'counts.txt')
@@ -270,7 +270,7 @@ def reddit_deps(dirname_in, languages):
 
         # find the prefix by constructing a filename, then stripping off
         # '.xx.txt' from the end
-        prefix = wordlist_filename('reddit', base + '.xx', '.txt')[:-7]
+        prefix = wordlist_filename('reddit', base + '.xx', 'txt')[:-7]
         add_dep(lines, 'tokenize_reddit', transformed_file, language_outputs,
                 params={'prefix': prefix},
                 extra='wordfreq_builder/tokenizers.py')

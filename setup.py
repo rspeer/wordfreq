@@ -24,7 +24,8 @@ classifiers = [
 ]
 
 current_dir = os.path.dirname(__file__)
-README_contents = open(os.path.join(current_dir, 'README.md')).read()
+README_contents = open(os.path.join(current_dir, 'README.md'),
+                       encoding='utf-8').read()
 doclines = README_contents.split("\n")
 dependencies = ['ftfy >= 4', 'msgpack-python', 'langcodes', 'regex >= 2015']
 if sys.version_info < (3, 4):

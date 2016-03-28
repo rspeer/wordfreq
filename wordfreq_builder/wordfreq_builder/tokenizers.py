@@ -116,19 +116,17 @@ def tokenize_by_language(in_filename, out_prefix, tokenizer):
     Produces output files that are separated by language, with spaces
     between the tokens.
     """
-    out_files = {}
+    out_files = {
+        language: open('%s.%s.txt' % (out_prefix, language), 'w', encoding='utf-8')
+        for language in KEEP_THESE_LANGUAGES
+    }
     with open(in_filename, encoding='utf-8') as in_file:
         for line in in_file:
             text = line.split('\t')[-1].strip()
             language, tokens = tokenizer(text)
-            if language != 'un':
+            if language in KEEP_THESE_LANGUAGES:
+                out_file = out_files[language]
                 tokenized = ' '.join(tokens)
-                out_filename = '%s.%s.txt' % (out_prefix, language)
-                if out_filename in out_files:
-                    out_file = out_files[out_filename]
-                else:
-                    out_file = open(out_filename, 'w', encoding='utf-8')
-                    out_files[out_filename] = out_file
                 print(tokenized, file=out_file)
     for out_file in out_files.values():
         out_file.close()

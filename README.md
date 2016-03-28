@@ -167,6 +167,7 @@ The sources (and the abbreviations we'll use for them) are:
 - **OpenSub**: Data derived from OpenSubtitles but not from SUBTLEX
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wpedia**: The full text of Wikipedia in 2015
+- **Reddit**: The corpus of Reddit comments through May 2015
 - **Other**: We get additional English frequencies from Google Books Syntactic
   Ngrams 2013, and Chinese frequencies from the frequency dictionary that
   comes with the Jieba tokenizer.
@@ -174,35 +175,37 @@ The sources (and the abbreviations we'll use for them) are:
 The following 17 languages are well-supported, with reasonable tokenization and
 at least 3 different sources of word frequencies:
 
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Other
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit  Other
     ──────────────────┼─────────────────────────────────────────────────────
-    Arabic      ar    │ -       Yes     Yes     Yes     Yes     -
-    German      de    │ Yes     -       Yes     Yes[1]  Yes     -
-    Greek       el    │ -       Yes     Yes     Yes     Yes     -
-    English     en    │ Yes     Yes     Yes     Yes     Yes     Google Books
-    Spanish     es    │ -       Yes     Yes     Yes     Yes     -
-    French      fr    │ -       Yes     Yes     Yes     Yes     -
-    Indonesian  id    │ -       Yes     -       Yes     Yes     -
-    Italian     it    │ -       Yes     Yes     Yes     Yes     -
-    Japanese    ja    │ -       -       Yes     Yes     Yes     -
-    Malay       ms    │ -       Yes     -       Yes     Yes     -
-    Dutch       nl    │ Yes     Yes     -       Yes     Yes     -
-    Polish      pl    │ -       Yes     -       Yes     Yes     -
-    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -
-    Russian     ru    │ -       Yes     Yes     Yes     Yes     -
-    Swedish     sv    │ -       Yes     -       Yes     Yes     -
-    Turkish     tr    │ -       Yes     -       Yes     Yes     -
-    Chinese     zh    │ Yes     -       Yes     -       -       Jieba
+    Arabic      ar    │ -       Yes     Yes     Yes     Yes     -       -
+    German      de    │ Yes     -       Yes     Yes[1]  Yes     Yes     -
+    Greek       el    │ -       Yes     Yes     Yes     Yes     -       -
+    English     en    │ Yes     Yes     Yes     Yes     Yes     Yes     Google Books
+    Spanish     es    │ -       Yes     Yes     Yes     Yes     Yes     -
+    French      fr    │ -       Yes     Yes     Yes     Yes     -       -
+    Indonesian  id    │ -       Yes     -       Yes     Yes     -       -
+    Italian     it    │ -       Yes     Yes     Yes     Yes     -       -
+    Japanese    ja    │ -       -       Yes     Yes     Yes     -       -
+    Malay       ms    │ -       Yes     -       Yes     Yes     -       -
+    Dutch       nl    │ Yes     Yes     -       Yes     Yes     -       -
+    Polish      pl    │ -       Yes     -       Yes     Yes     -       -
+    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -       -
+    Russian     ru    │ -       Yes     Yes     Yes     Yes     -       -
+    Swedish     sv    │ -       Yes     -       Yes     Yes     Yes     -
+    Turkish     tr    │ -       Yes     -       Yes     Yes     -       -
+    Chinese     zh    │ Yes     -       Yes     -       -       -       Jieba
 
 
 Additionally, Korean is marginally supported. You can look up frequencies in
-it, but we have too few data sources for it so far:
+it, but it will be insufficiently tokenized into words, and we have too few
+data sources for it so far:
 
     Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia
     ──────────────────┼───────────────────────────────────────
     Korean      ko    │ -       -       -       Yes     Yes
 
-The 'large' wordlists are available in English, Spanish, French, and Portuguese.
+The 'large' wordlists are available in English, German, Spanish, French, and
+Portuguese.
 
 [1] We've counted the frequencies from tweets in German, such as they are, but
 you should be aware that German is not a frequently-used language on Twitter.

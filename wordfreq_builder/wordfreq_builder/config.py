@@ -41,9 +41,11 @@ CONFIG = {
         'subtlex-en': ['en'],
         'subtlex-other': ['de', 'nl', 'zh'],
         'jieba': ['zh'],
-        'reddit': [
-            'de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv'
-        ]
+
+        # About 99.2% of Reddit is in English, but there are pockets of
+        # conversation in other languages. These are the languages that seem
+        # to have enough non-spam comments to actually learn from.
+        'reddit': ['de', 'en', 'es', 'sv']
     },
     # Subtlex languages that need to be pre-processed
     'wordlist_paths': {
@@ -63,7 +65,7 @@ CONFIG = {
         'jieba-dist': 'dist/jieba_{lang}.{ext}'
     },
     'min_sources': 2,
-    'big-lists': ['en', 'fr', 'es', 'pt']
+    'big-lists': ['en', 'fr', 'es', 'pt', 'de']
 }
 
 

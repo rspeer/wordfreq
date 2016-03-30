@@ -97,7 +97,7 @@ one occurrence per billion words.
     >>> zipf_frequency('zipf', 'en')
     0.0
 
-    >>> zipf_frequency('zipf', 'en', 'large')
+    >>> zipf_frequency('zipf', 'en', wordlist='large')
     1.42
 
 

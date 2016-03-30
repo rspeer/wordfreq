@@ -200,9 +200,9 @@ Additionally, Korean is marginally supported. You can look up frequencies in
 it, but it will be insufficiently tokenized into words, and we have too few
 data sources for it so far:
 
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia
-    ──────────────────┼───────────────────────────────────────
-    Korean      ko    │ -       -       -       Yes     Yes
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit
+    ──────────────────┼───────────────────────────────────────────────
+    Korean      ko    │ -       -       -       Yes     Yes     -
 
 The 'large' wordlists are available in English, German, Spanish, French, and
 Portuguese.

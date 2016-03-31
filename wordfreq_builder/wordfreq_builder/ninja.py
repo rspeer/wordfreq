@@ -236,13 +236,6 @@ def jieba_deps(dirname_in, languages):
     return lines
 
 
-def reddit_base_filename(path):
-    """
-    Get the base name of a Reddit input file, without its path or extension.
-    """
-    return path.stem
-
-
 def reddit_deps(dirname_in, languages):
     lines = []
     path_in = pathlib.Path(dirname_in)
@@ -252,7 +245,7 @@ def reddit_deps(dirname_in, languages):
     # Extract text from the Reddit comment dumps, and write them to
     # .txt.gz files
     for filepath in path_in.glob('*/*.bz2'):
-        base = reddit_base_filename(filepath)
+        base = filepath.stem
         transformed_file = wordlist_filename('reddit', base + '.all', 'txt')
         slices[base] = transformed_file
         add_dep(lines, 'extract_reddit', str(filepath), transformed_file)

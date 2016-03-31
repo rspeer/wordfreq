@@ -2,10 +2,10 @@ from wordfreq_builder.word_counts import read_values, merge_counts, write_wordli
 import argparse
 
 
-def merge_lists(input_names, output_name, cutoff=0, max_size=1000000):
+def merge_lists(input_names, output_name, cutoff=0, max_words=1000000):
     count_dicts = []
     for input_name in input_names:
-        values, total = read_values(input_name, cutoff=cutoff, max_size=max_size)
+        values, total = read_values(input_name, cutoff=cutoff, max_words=max_words)
         count_dicts.append(values)
     merged = merge_counts(count_dicts)
     write_wordlist(merged, output_name)
@@ -22,5 +22,4 @@ if __name__ == '__main__':
     parser.add_argument('inputs', nargs='+',
                         help='names of input files to merge')
     args = parser.parse_args()
-    merge_lists(args.inputs, args.output, cutoff=args.cutoff, max_size=args.max_words)
-
+    merge_lists(args.inputs, args.output, cutoff=args.cutoff, max_words=args.max_words)

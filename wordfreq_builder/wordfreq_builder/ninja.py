@@ -240,7 +240,7 @@ def reddit_base_filename(path):
     """
     Get the base name of a Reddit input file, without its path or extension.
     """
-    return path.name[:-4]
+    return path.stem
 
 
 def reddit_deps(dirname_in, languages):

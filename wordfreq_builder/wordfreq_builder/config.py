@@ -42,10 +42,10 @@ CONFIG = {
         'subtlex-other': ['de', 'nl', 'zh'],
         'jieba': ['zh'],
 
-        # About 99.2% of Reddit is in English, but there are pockets of
-        # conversation in other languages. These are the languages that seem
-        # to have enough non-spam comments to actually learn from.
-        'reddit': ['de', 'en', 'es', 'sv']
+        # About 99.2% of Reddit is in English. There are pockets of
+        # conversation in other languages, but we're concerned that they're not
+        # representative enough for learning general word frequencies.
+        'reddit': ['en']
     },
     # Subtlex languages that need to be pre-processed
     'wordlist_paths': {

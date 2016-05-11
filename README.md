@@ -178,10 +178,10 @@ at least 3 different sources of word frequencies:
     Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit  Other
     ──────────────────┼─────────────────────────────────────────────────────
     Arabic      ar    │ -       Yes     Yes     Yes     Yes     -       -
-    German      de    │ Yes     -       Yes     Yes[1]  Yes     Yes     -
+    German      de    │ Yes     -       Yes     Yes[1]  Yes     -       -
     Greek       el    │ -       Yes     Yes     Yes     Yes     -       -
     English     en    │ Yes     Yes     Yes     Yes     Yes     Yes     Google Books
-    Spanish     es    │ -       Yes     Yes     Yes     Yes     Yes     -
+    Spanish     es    │ -       Yes     Yes     Yes     Yes     -       -
     French      fr    │ -       Yes     Yes     Yes     Yes     -       -
     Indonesian  id    │ -       Yes     -       Yes     Yes     -       -
     Italian     it    │ -       Yes     Yes     Yes     Yes     -       -
@@ -191,7 +191,7 @@ at least 3 different sources of word frequencies:
     Polish      pl    │ -       Yes     -       Yes     Yes     -       -
     Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -       -
     Russian     ru    │ -       Yes     Yes     Yes     Yes     -       -
-    Swedish     sv    │ -       Yes     -       Yes     Yes     Yes     -
+    Swedish     sv    │ -       Yes     -       Yes     Yes     -       -
     Turkish     tr    │ -       Yes     -       Yes     Yes     -       -
     Chinese     zh    │ Yes     -       Yes     -       -       -       Jieba
 

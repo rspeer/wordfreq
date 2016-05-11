@@ -39,11 +39,18 @@ For example:
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 18 languages (see *Supported languages* below). It loads
-efficiently-packed data structures that contain all words that appear at least
-once per million words.
+used, in 18 languages (see *Supported languages* below).
 
-The most useful function is:
+It provides three kinds of pre-built wordlists:
+
+- `'combined'` lists, containing words that appear at least once per
+  million words, averaged across all data sources.
+- `'twitter'` lists, containing words that appear at least once per
+  million words on Twitter alone.
+- `'large'` lists, containing words that appear at least once per 100
+  million words, averaged across all data sources.
+
+The most straightforward function is:
 
     word_frequency(word, lang, wordlist='combined', minimum=0.0)
 
@@ -64,7 +71,37 @@ frequencies by a million (1e6) to get more readable numbers:
     >>> word_frequency('café', 'fr') * 1e6
     77.62471166286912
 
-The parameters are:
+
+`zipf_frequency` is a variation on `word_frequency` that aims to return the
+word frequency on a human-friendly logarithmic scale. The Zipf scale was
+proposed by Marc Brysbaert, who created the SUBTLEX lists. The Zipf frequency
+of a word is the base-10 logarithm of the number of times it appears per
+billion words. A word with Zipf value 6 appears once per thousand words, for
+example, and a word with Zipf value 3 appears once per million words.
+
+Reasonable Zipf values are between 0 and 8, but because of the cutoffs
+described above, the minimum Zipf value appearing in these lists is 1.0 for the
+'large' wordlists and 3.0 for all others. We use 0 as the default Zipf value
+for words that do not appear in the given wordlist, although it should mean
+one occurrence per billion words.
+
+    >>> zipf_frequency('the', 'en')
+    7.59
+
+    >>> zipf_frequency('word', 'en')
+    5.34
+
+    >>> zipf_frequency('frequency', 'en')
+    4.44
+
+    >>> zipf_frequency('zipf', 'en')
+    0.0
+
+    >>> zipf_frequency('zipf', 'en', wordlist='large')
+    1.42
+
+
+The parameters to `word_frequency` and `zipf_frequency` are:
 
 - `word`: a Unicode string containing the word to look up. Ideally the word
   is a single token according to our tokenizer, but if not, there is still
@@ -73,21 +110,18 @@ The parameters are:
 - `lang`: the BCP 47 or ISO 639 code of the language to use, such as 'en'.
 
 - `wordlist`: which set of word frequencies to use. Current options are
-  'combined', which combines up to five different sources, and
-  'twitter', which returns frequencies observed on Twitter alone.
+  'combined', 'twitter', and 'large'.
 
 - `minimum`: If the word is not in the list or has a frequency lower than
-  `minimum`, return `minimum` instead. In some applications, you'll want
-  to set `minimum=1e-6` to avoid a discontinuity where the list ends, because
-  a frequency of 1e-6 (1 per million) is the threshold for being included in
-  the list at all.
+  `minimum`, return `minimum` instead. You may want to set this to the minimum
+  value contained in the wordlist, to avoid a discontinuity where the wordlist
+  ends.
 
 Other functions:
 
 `tokenize(text, lang)` splits text in the given language into words, in the same
 way that the words in wordfreq's data were counted in the first place. See
-*Tokenization*. Tokenizing Japanese requires the optional dependency `mecab-python3`
-to be installed.
+*Tokenization*.
 
 `top_n_list(lang, n, wordlist='combined')` returns the most common *n* words in
 the list, in descending frequency order.
@@ -133,6 +167,7 @@ The sources (and the abbreviations we'll use for them) are:
 - **OpenSub**: Data derived from OpenSubtitles but not from SUBTLEX
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wpedia**: The full text of Wikipedia in 2015
+- **Reddit**: The corpus of Reddit comments through May 2015
 - **Other**: We get additional English frequencies from Google Books Syntactic
   Ngrams 2013, and Chinese frequencies from the frequency dictionary that
   comes with the Jieba tokenizer.
@@ -140,33 +175,37 @@ The sources (and the abbreviations we'll use for them) are:
 The following 17 languages are well-supported, with reasonable tokenization and
 at least 3 different sources of word frequencies:
 
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Other
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit  Other
     ──────────────────┼─────────────────────────────────────────────────────
-    Arabic      ar    │ -       Yes     Yes     Yes     Yes     -
-    German      de    │ Yes     -       Yes     Yes[1]  Yes     -
-    Greek       el    │ -       Yes     Yes     Yes     Yes     -
-    English     en    │ Yes     Yes     Yes     Yes     Yes     Google Books
-    Spanish     es    │ -       Yes     Yes     Yes     Yes     -
-    French      fr    │ -       Yes     Yes     Yes     Yes     -
-    Indonesian  id    │ -       Yes     -       Yes     Yes     -
-    Italian     it    │ -       Yes     Yes     Yes     Yes     -
-    Japanese    ja    │ -       -       Yes     Yes     Yes     -
-    Malay       ms    │ -       Yes     -       Yes     Yes     -
-    Dutch       nl    │ Yes     Yes     -       Yes     Yes     -
-    Polish      pl    │ -       Yes     -       Yes     Yes     -
-    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -
-    Russian     ru    │ -       Yes     Yes     Yes     Yes     -
-    Swedish     sv    │ -       Yes     -       Yes     Yes     -
-    Turkish     tr    │ -       Yes     -       Yes     Yes     -
-    Chinese     zh    │ Yes     -       Yes     -       -       Jieba
+    Arabic      ar    │ -       Yes     Yes     Yes     Yes     -       -
+    German      de    │ Yes     -       Yes     Yes[1]  Yes     -       -
+    Greek       el    │ -       Yes     Yes     Yes     Yes     -       -
+    English     en    │ Yes     Yes     Yes     Yes     Yes     Yes     Google Books
+    Spanish     es    │ -       Yes     Yes     Yes     Yes     -       -
+    French      fr    │ -       Yes     Yes     Yes     Yes     -       -
+    Indonesian  id    │ -       Yes     -       Yes     Yes     -       -
+    Italian     it    │ -       Yes     Yes     Yes     Yes     -       -
+    Japanese    ja    │ -       -       Yes     Yes     Yes     -       -
+    Malay       ms    │ -       Yes     -       Yes     Yes     -       -
+    Dutch       nl    │ Yes     Yes     -       Yes     Yes     -       -
+    Polish      pl    │ -       Yes     -       Yes     Yes     -       -
+    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -       -
+    Russian     ru    │ -       Yes     Yes     Yes     Yes     -       -
+    Swedish     sv    │ -       Yes     -       Yes     Yes     -       -
+    Turkish     tr    │ -       Yes     -       Yes     Yes     -       -
+    Chinese     zh    │ Yes     -       Yes     -       -       -       Jieba
 
 
 Additionally, Korean is marginally supported. You can look up frequencies in
-it, but we have too few data sources for it so far:
+it, but it will be insufficiently tokenized into words, and we have too few
+data sources for it so far:
 
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia
-    ──────────────────┼───────────────────────────────────────
-    Korean      ko    │ -       -       -       Yes     Yes
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit
+    ──────────────────┼───────────────────────────────────────────────
+    Korean      ko    │ -       -       -       Yes     Yes     -
+
+The 'large' wordlists are available in English, German, Spanish, French, and
+Portuguese.
 
 [1] We've counted the frequencies from tweets in German, such as they are, but
 you should be aware that German is not a frequently-used language on Twitter.
@@ -179,7 +218,8 @@ wordfreq uses the Python package `regex`, which is a more advanced
 implementation of regular expressions than the standard library, to
 separate text into tokens that can be counted consistently. `regex`
 produces tokens that follow the recommendations in [Unicode
-Annex #29, Text Segmentation][uax29].
+Annex #29, Text Segmentation][uax29], including the optional rule that
+splits words between apostrophes and vowels.
 
 There are language-specific exceptions:
 
@@ -199,10 +239,10 @@ Because tokenization in the real world is far from consistent, wordfreq will
 also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
-    >>> word_frequency('New York', 'en')
-    0.0002315934248950231
-    >>> word_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.2187603965715087e-06
+    >>> zipf_frequency('New York', 'en')
+    5.31
+    >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
+    3.51
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,
@@ -216,8 +256,8 @@ frequencies, because that would assume they are statistically unrelated. So if
 you give it an uncommon combination of tokens, it will hugely over-estimate
 their frequency:
 
-    >>> word_frequency('owl-flavored', 'en')
-    1.3557098723512335e-06
+    >>> zipf_frequency('owl-flavored', 'en')
+    3.18
 
 
 ## License

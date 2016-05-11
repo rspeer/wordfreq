@@ -21,11 +21,13 @@ def test_languages():
     avail = available_languages()
     assert_greater(len(avail), 15)
 
-    # Laughter is the universal language. Look up either 'lol' or '笑' in each
-    # language and make sure it has a non-zero frequency.
+    # Look up a word representing laughter in each language, and make sure
+    # it has a non-zero frequency.
     for lang in avail:
         if lang in {'zh', 'ja'}:
             text = '笑'
+        elif lang == 'ar':
+            text = 'ههههه'
         else:
             text = 'lol'
         assert_greater(word_frequency(text, lang), 0)
@@ -33,7 +35,7 @@ def test_languages():
         # Make up a weirdly verbose language code and make sure
         # we still get it
         new_lang_code = '%s-001-x-fake-extension' % lang.upper()
-        assert_greater(word_frequency(text, new_lang_code), 0)
+        assert_greater(word_frequency(text, new_lang_code), 0, (text, new_lang_code))
 
 
 def test_twitter():

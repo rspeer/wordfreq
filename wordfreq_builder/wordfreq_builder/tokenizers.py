@@ -2,6 +2,7 @@ from wordfreq import tokenize
 from ftfy.fixes import unescape_html
 import regex
 import pycld2
+import langcodes
 
 CLD2_BAD_CHAR_RANGE = "[%s]" % "".join(
     [
@@ -26,48 +27,63 @@ URL_RE = regex.compile(r'http(?:s)?://[^) ]*')
 MARKDOWN_URL_RESIDUE_RE = regex.compile(r'\]\(\)')
 
 
-def cld2_surface_tokenizer(text):
-    """
-    Uses CLD2 to detect the language and wordfreq tokenizer to create tokens.
-    """
-    text = unescape_html(text)
-    text = TWITTER_HANDLE_RE.sub('', text)
-    text = TCO_RE.sub('', text)
+# Low-frequency languages tend to be detected incorrectly by cld2. The
+# following list of languages are languages that appear in our data with any
+# reasonable frequency, and seem to usually be detected *correctly*. These are
+# the languages we'll keep in the Reddit and Twitter results.
+#
+# This list is larger than the list that wordfreq ultimately generates, so we
+# can look here as a source of future data.
 
-    lang = cld2_detect_language(text)
-
-    # Don't allow tokenization in Chinese when language-detecting, because
-    # the Chinese tokenizer may not be built yet
-    if lang == 'zh':
-        lang = 'en'
-
-    tokens = tokenize(text, lang)
-    return lang, tokens
-
-
-# Low-frequency languages tend to be detected incorrectly. Keep a limited
-# list of languages we're allowed to use here.
 KEEP_THESE_LANGUAGES = {
-    'ar', 'de', 'el', 'en', 'es', 'fr', 'hr', 'id', 'it', 'ja', 'ko', 'ms',
-    'nl', 'pl', 'pt', 'ro', 'ru', 'sv'
+    'af', 'ar', 'bs', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi',
+    'fr', 'gl', 'he', 'hi', 'hr', 'hu', 'id', 'is', 'it', 'ja', 'ko', 'lv',
+    'ms', 'nl', 'nn', 'no', 'pl', 'pt', 'ro', 'ru', 'sr', 'sv', 'sw', 'tl',
+    'tr', 'uk', 'vi'
 }
 
+# Semi-frequent languages that are excluded by the above:
+#
+#   - Chinese, not because it's detected incorrectly, but because we can't
+#     handle it until we already have word frequencies
+#   - Thai (seems to be detected whenever someone uses Thai characters in
+#     an emoticon)
+#   - Welsh (which is detected for "ohmygodohmygodohmygod")
+#   - Turkmen (detected for ASCII art)
+#   - Irish Gaelic (detected for Cthulhu-related text)
+#   - Kannada (looks of disapproval)
+#   - Lao, Tamil, Xhosa, Slovak (various emoticons and Internet memes)
+#   - Breton (the word "memes" itself)
 
-def cld2_reddit_tokenizer(text):
+
+def cld2_surface_tokenizer(text, mode='twitter'):
     """
-    A language-detecting tokenizer with special cases for handling text from
-    Reddit.
+    Uses CLD2 to detect the language and wordfreq tokenizer to create tokens.
+
+    The `mode` can be 'twitter' or 'reddit', which slightly changes the
+    pre-processing of the text.
     """
-    text = URL_RE.sub('', text)
-    text = MARKDOWN_URL_RESIDUE_RE.sub(']', text)
+    text = unescape_html(text)
+    if mode == 'twitter':
+        text = TWITTER_HANDLE_RE.sub('', text)
+        text = TCO_RE.sub('', text)
+    elif mode == 'reddit':
+        text = URL_RE.sub('', text)
+        text = MARKDOWN_URL_RESIDUE_RE.sub(']', text)
 
     lang = cld2_detect_language(text)
-    if lang not in KEEP_THESE_LANGUAGES:
-        # Reddit is 99.9% English, so if we detected a rare language, it's
-        # much more likely that it's actually English.
-        lang = 'en'
 
-    tokens = tokenize(text, lang, include_punctuation=True)
+    # If the detected language isn't in our pretty generous list of languages,
+    # return no tokens.
+    if lang not in KEEP_THESE_LANGUAGES:
+        return 'xx', []
+
+    # cld2's accuracy seems to improve dramatically with at least 50
+    # bytes of input, so throw away non-English below this length.
+    if len(text.encode('utf-8')) < 50 and lang != 'en':
+        return 'xx', []
+
+    tokens = tokenize(text, lang)
     return lang, tokens
 
 
@@ -85,7 +101,12 @@ def cld2_detect_language(text):
     #       Confidence score: float))
 
     text = CLD2_BAD_CHARS_RE.sub('', text)
-    return pycld2.detect(text)[2][0][1]
+    lang = pycld2.detect(text)[2][0][1]
+
+    # Normalize the language code: 'iw' becomes 'he', and 'zh-Hant'
+    # becomes 'zh'
+    code = langcodes.get(lang).language
+    return code
 
 
 def tokenize_by_language(in_filename, out_prefix, tokenizer):
@@ -95,19 +116,17 @@ def tokenize_by_language(in_filename, out_prefix, tokenizer):
     Produces output files that are separated by language, with spaces
     between the tokens.
     """
-    out_files = {}
+    out_files = {
+        language: open('%s.%s.txt' % (out_prefix, language), 'w', encoding='utf-8')
+        for language in KEEP_THESE_LANGUAGES
+    }
     with open(in_filename, encoding='utf-8') as in_file:
         for line in in_file:
             text = line.split('\t')[-1].strip()
             language, tokens = tokenizer(text)
-            if language != 'un':
+            if language in KEEP_THESE_LANGUAGES:
+                out_file = out_files[language]
                 tokenized = ' '.join(tokens)
-                out_filename = '%s.%s.txt' % (out_prefix, language)
-                if out_filename in out_files:
-                    out_file = out_files[out_filename]
-                else:
-                    out_file = open(out_filename, 'w', encoding='utf-8')
-                    out_files[out_filename] = out_file
                 print(tokenized, file=out_file)
     for out_file in out_files.values():
         out_file.close()

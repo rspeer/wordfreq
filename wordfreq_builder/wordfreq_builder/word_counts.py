@@ -36,15 +36,17 @@ def count_tokens(filename):
     return counts
 
 
-def read_values(filename, cutoff=0, max_size=1e8, lang=None):
+def read_values(filename, cutoff=0, max_words=1e8, lang=None):
     """
     Read words and their frequency or count values from a CSV file. Returns
     a dictionary of values and the total of all values.
 
     Only words with a value greater than or equal to `cutoff` are returned.
+    In addition, only up to `max_words` words are read.
 
-    If `cutoff` is greater than 0, the csv file must be sorted by value
-    in descending order.
+    If `cutoff` is greater than 0 or `max_words` is smaller than the list,
+    the csv file must be sorted by value in descending order, so that the
+    most frequent words are kept.
 
     If `lang` is given, it will apply language-specific tokenization to the
     words that it reads.
@@ -55,7 +57,7 @@ def read_values(filename, cutoff=0, max_size=1e8, lang=None):
         for key, strval in csv.reader(infile):
             val = float(strval)
             key = fix_text(key)
-            if val < cutoff or len(values) >= max_size:
+            if val < cutoff or len(values) >= max_words:
                 break
             tokens = tokenize(key, lang) if lang is not None else simple_tokenize(key)
             for token in tokens:

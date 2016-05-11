@@ -46,6 +46,9 @@ rule simplify_chinese
 rule tokenize_twitter
   command = mkdir -p $$(dirname $prefix) && python -m wordfreq_builder.cli.tokenize_twitter $in $prefix
 
+rule tokenize_reddit
+  command = mkdir -p $$(dirname $prefix) && python -m wordfreq_builder.cli.tokenize_reddit $in $prefix
+
 # To convert the Leeds corpus, look for space-separated lines that start with
 # an integer and a decimal. The integer is the rank, which we discard. The
 # decimal is the frequency, and the remaining text is the term. Use sed -n
@@ -95,10 +98,10 @@ rule merge_counts
   command = python -m wordfreq_builder.cli.merge_counts -o $out -c $cutoff $in
 
 rule freqs2cB
-  command = python -m wordfreq_builder.cli.freqs_to_cB $in $out
+  command = python -m wordfreq_builder.cli.freqs_to_cB $in $out -b $buckets
 
 rule cat
   command = cat $in > $out
 
 rule extract_reddit
-  command = bunzip2 -c $in | $JQ -r '.body' | fgrep -v '[deleted]' | sed 's/&gt;/>/g' | sed 's/&lt;/</g' | sed 's/&amp;/\&/g' | gzip -c > $out
+  command = bunzip2 -c $in | $JQ -r 'select(.score > 0) | .body' | fgrep -v '[deleted]' | sed 's/&gt;/>/g' | sed 's/&lt;/</g' | sed 's/&amp;/\&/g' > $out

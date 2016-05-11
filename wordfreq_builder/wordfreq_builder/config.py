@@ -41,7 +41,11 @@ CONFIG = {
         'subtlex-en': ['en'],
         'subtlex-other': ['de', 'nl', 'zh'],
         'jieba': ['zh'],
-        'reddit': ['en'],
+
+        # About 99.2% of Reddit is in English. There are pockets of
+        # conversation in other languages, but we're concerned that they're not
+        # representative enough for learning general word frequencies.
+        'reddit': ['en']
     },
     # Subtlex languages that need to be pre-processed
     'wordlist_paths': {
@@ -56,10 +60,12 @@ CONFIG = {
         'reddit': 'generated/reddit/reddit_{lang}.{ext}',
         'combined': 'generated/combined/combined_{lang}.{ext}',
         'combined-dist': 'dist/combined_{lang}.{ext}',
+        'combined-dist-large': 'dist/large_{lang}.{ext}',
         'twitter-dist': 'dist/twitter_{lang}.{ext}',
         'jieba-dist': 'dist/jieba_{lang}.{ext}'
     },
-    'min_sources': 2
+    'min_sources': 2,
+    'big-lists': ['en', 'fr', 'es', 'pt', 'de']
 }
 
 

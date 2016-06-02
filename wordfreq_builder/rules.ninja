@@ -103,5 +103,12 @@ rule freqs2cB
 rule cat
   command = cat $in > $out
 
+# A pipeline that extracts text from Reddit comments:
+# - Unzip the input files
+# - Select the body of comments, but only those whose Reddit score is positive
+#   (skipping the downvoted ones)
+# - Skip deleted comments
+# - Replace HTML escapes
 rule extract_reddit
   command = bunzip2 -c $in | $JQ -r 'select(.score > 0) | .body' | fgrep -v '[deleted]' | sed 's/&gt;/>/g' | sed 's/&lt;/</g' | sed 's/&amp;/\&/g' > $out
+

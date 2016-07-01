@@ -39,10 +39,10 @@ TOKEN_RE = regex.compile(r"""
     # a separate token. This would be the correct behavior for word-wrapping,
     # but a messy failure mode for NLP tokenization.
     #
-    # It is, of course, better to use a tokenizer that is designed for Chinese
-    # or Japanese text if that's what you have. When alternate tokenizers are
-    # available, this is effectively a fallback for when the wrong tokenizer
-    # is used.
+    # If you have Chinese or Japanese text, it's certainly better to use a
+    # tokenizer that's designed for it. In those cases, the purpose of this
+    # rule is to make this general tokenizer fail less badly on languages
+    # that need specific tokenization.
     #
     # This rule is listed first so that it takes precedence. The placeholder
     # <SPACELESS> will be replaced by the complex range expression made by

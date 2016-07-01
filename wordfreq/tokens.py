@@ -40,9 +40,10 @@ TOKEN_RE = regex.compile(r"""
     # but a messy failure mode for NLP tokenization.
     #
     # If you have Chinese or Japanese text, it's certainly better to use a
-    # tokenizer that's designed for it. In those cases, the purpose of this
-    # rule is to make this general tokenizer fail less badly on languages
-    # that need specific tokenization.
+    # tokenizer that's designed for it. Elsewhere in this file, we have
+    # specific tokenizers that can handle Chinese and Japanese. With this
+    # rule, though, at lest this general tokenizer will fail less badly
+    # on those languages.
     #
     # This rule is listed first so that it takes precedence. The placeholder
     # <SPACELESS> will be replaced by the complex range expression made by

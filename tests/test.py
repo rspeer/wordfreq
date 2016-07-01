@@ -189,3 +189,8 @@ def test_ideographic_fallback():
     eq_(tokenize('"การเล่นดนตรี" means "playing music"', 'en'),
         ['การเล่นดนตรี', 'means', 'playing', 'music'])
 
+    # Test Khmer, a script similar to Thai
+    eq_(tokenize('សូមស្វាគមន៍', 'km'), ['សូមស្វាគមន៍'])
+
+    # Test Hindi -- tokens split where there are spaces, and not where there aren't
+    eq_(tokenize('हिन्दी विक्षनरी', 'hi'), ['हिन्दी', 'विक्षनरी'])

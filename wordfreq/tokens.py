@@ -18,8 +18,8 @@ TOKEN_RE = regex.compile(r"""
     # but a messy failure mode for NLP tokenization.
     #
     # Some South Asian scripts also manage to create unexpected word breaks
-    # even though they have spaces: Devanagari, Gurmukhi, Sundanese, Tamil,
-    # Telugu, and Tibetan.
+    # even though they have spaces: Devanagari, Gurmukhi, Sindhi, Sundanese,
+    # Tamil, Telugu, and Tibetan.
     #
     # It is, of course, better to use a tokenizer that is designed for Chinese
     # or Japanese text if that's what you have. When alternate tokenizers are
@@ -28,7 +28,7 @@ TOKEN_RE = regex.compile(r"""
     #
     # This rule is listed first so that it takes precedence.
 
-    [\p{IsIdeo}\p{Script=Hiragana}\p{Script=Thai}\p{Script=Khmr}\p{Script=Laoo}\p{Script=Mymr}\p{Script=Guru}\p{Script=Deva}\p{Script=Sund}\p{Script=Taml}\p{Script=Telu}\p{script=Tibt}]+ |
+    [\p{IsIdeo}\p{Script=Hiragana}\p{Script=Thai}\p{Script=Khmr}\p{Script=Laoo}\p{Script=Mymr}\p{Script=Deva}\p{Script=Guru}\p{Script=Sind}\p{Script=Sund}\p{Script=Taml}\p{Script=Telu}\p{script=Tibt}]+ |
 
     # Case 2: standard Unicode segmentation
     # -------------------------------------

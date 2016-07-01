@@ -17,7 +17,7 @@ SPACELESS_SCRIPTS = [
 
 
 def _make_spaceless_expr():
-    pieces = [r'\p{IsIdeo}'] + [r'\p{%s}' % script_code for script_code in SPACELESS_SCRIPTS]
+    pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in SPACELESS_SCRIPTS]
     return ''.join(pieces)
 
 

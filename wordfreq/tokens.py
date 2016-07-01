@@ -2,6 +2,28 @@ import regex
 import unicodedata
 
 
+# See the documentation inside TOKEN_RE for why we have to handle these
+# scripts specially.
+SPACELESS_SCRIPTS = [
+    'Hiragana',
+    'Thai',  # Thai script
+    'Khmr',  # Khmer script
+    'Laoo',  # Lao script
+    'Mymr',  # Burmese script
+    'Tale',  # Tai Le script
+    'Talu',  # Tai Lü script
+    'Lana',  # Lanna script
+]
+
+
+def _make_spaceless_expr():
+    pieces = [r'\p{IsIdeo}'] + [r'\p{%s}' % script_code for script_code in SPACELESS_SCRIPTS]
+    return ''.join(pieces)
+
+
+SPACELESS_EXPR = _make_spaceless_expr()
+
+
 TOKEN_RE = regex.compile(r"""
     # Case 1: a special case for non-spaced languages
     # -----------------------------------------------
@@ -10,25 +32,23 @@ TOKEN_RE = regex.compile(r"""
     # seems to overreact and insert word breaks between all their letters.
     # When we see sequences of characters in these scripts, we make sure not
     # to break them up. Such scripts include Han ideographs (\p{IsIdeo}),
-    # hiragana (\p{Script=Hiragana}), and many Southeast Asian scripts:
-    # Thai, Khmer, Lao, and Myanmar.
+    # hiragana (\p{Script=Hiragana}), and many Southeast Asian scripts such
+    # as Thai and Khmer.
     #
     # Without this case, the standard rule (case 2) would make each character
     # a separate token. This would be the correct behavior for word-wrapping,
     # but a messy failure mode for NLP tokenization.
-    #
-    # Some South Asian scripts also manage to create unexpected word breaks
-    # even though they have spaces: Devanagari, Gurmukhi, Sindhi, Sundanese,
-    # Tamil, Telugu, and Tibetan.
     #
     # It is, of course, better to use a tokenizer that is designed for Chinese
     # or Japanese text if that's what you have. When alternate tokenizers are
     # available, this is effectively a fallback for when the wrong tokenizer
     # is used.
     #
-    # This rule is listed first so that it takes precedence.
+    # This rule is listed first so that it takes precedence. The placeholder
+    # <SPACELESS> will be replaced by the complex range expression made by
+    # _make_spaceless_expr().
 
-    [\p{IsIdeo}\p{Script=Hiragana}\p{Script=Thai}\p{Script=Khmr}\p{Script=Laoo}\p{Script=Mymr}\p{Script=Deva}\p{Script=Guru}\p{Script=Sind}\p{Script=Sund}\p{Script=Taml}\p{Script=Telu}\p{script=Tibt}]+ |
+    [<SPACELESS>]+ |
 
     # Case 2: standard Unicode segmentation
     # -------------------------------------
@@ -42,16 +62,16 @@ TOKEN_RE = regex.compile(r"""
 
     # The rest of the token matches characters that are not any sort of space
     # (\S) and do not cause word breaks according to the Unicode word
-    # segmentation heuristic (\B).
+    # segmentation heuristic (\B), or are categorized as Marks (\p{M}).
 
-    (?:\B\S)*
-""", regex.V1 | regex.WORD | regex.VERBOSE)
+    (?:\B\S|\p{M})*
+""".replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
-    [\p{IsIdeo}\p{Script=Hiragana}]+ |
+    [<SPACELESS>]+ |
     [\p{punct}]+ |
-    \S(?:\B\S)*
-""", regex.V1 | regex.WORD | regex.VERBOSE)
+    \S(?:\B\S|\p{M})*
+""".replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 ARABIC_MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 

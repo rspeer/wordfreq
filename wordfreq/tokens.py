@@ -42,7 +42,7 @@ TOKEN_RE = regex.compile(r"""
     # If you have Chinese or Japanese text, it's certainly better to use a
     # tokenizer that's designed for it. Elsewhere in this file, we have
     # specific tokenizers that can handle Chinese and Japanese. With this
-    # rule, though, at lest this general tokenizer will fail less badly
+    # rule, though, at least this general tokenizer will fail less badly
     # on those languages.
     #
     # This rule is listed first so that it takes precedence. The placeholder

@@ -6,21 +6,29 @@ TOKEN_RE = regex.compile(r"""
     # Case 1: a special case for non-spaced languages
     # -----------------------------------------------
 
-    # When we see characters that are Han ideographs (\p{IsIdeo}), hiragana
-    # (\p{Script=Hiragana}), or Thai (\p{Script=Thai}), we allow a sequence
-    # of those characters to be glued together as a single token.
+    # Some scripts are written without spaces, and the Unicode algorithm
+    # seems to overreact and insert word breaks between all their letters.
+    # When we see sequences of characters in these scripts, we make sure not
+    # to break them up. Such scripts include Han ideographs (\p{IsIdeo}),
+    # hiragana (\p{Script=Hiragana}), and many Southeast Asian scripts:
+    # Thai, Khmer, Lao, and Myanmar.
     #
     # Without this case, the standard rule (case 2) would make each character
     # a separate token. This would be the correct behavior for word-wrapping,
     # but a messy failure mode for NLP tokenization.
     #
-    # It is, of course, better to use a tokenizer that is designed for Chinese,
-    # Japanese, or Thai text. This is effectively a fallback for when the wrong
-    # tokenizer is used.
+    # Some South Asian scripts also manage to create unexpected word breaks
+    # even though they have spaces: Devanagari, Gurmukhi, Sundanese, Tamil,
+    # Telugu, and Tibetan.
+    #
+    # It is, of course, better to use a tokenizer that is designed for Chinese
+    # or Japanese text if that's what you have. When alternate tokenizers are
+    # available, this is effectively a fallback for when the wrong tokenizer
+    # is used.
     #
     # This rule is listed first so that it takes precedence.
 
-    [\p{IsIdeo}\p{Script=Hiragana}\p{Script=Thai}]+ |
+    [\p{IsIdeo}\p{Script=Hiragana}\p{Script=Thai}\p{Script=Khmr}\p{Script=Laoo}\p{Script=Mymr}\p{Script=Guru}\p{Script=Deva}\p{Script=Sund}\p{Script=Taml}\p{Script=Telu}\p{script=Tibt}]+ |
 
     # Case 2: standard Unicode segmentation
     # -------------------------------------

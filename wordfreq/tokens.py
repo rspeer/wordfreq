@@ -74,7 +74,7 @@ TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
     \S(?:\B\S|\p{M})*
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
-ARABIC_MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
+MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 
 
 def simple_tokenize(text, include_punctuation=False):
@@ -140,16 +140,16 @@ def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
     return [token.casefold() for token in tokens if token_expr.match(token)]
 
 
-def remove_arabic_marks(text):
+def remove_marks(text):
     """
-    Remove decorations from Arabic words:
+    Remove decorations from words in Arabic or other Semitic-derived languages:
 
     - Combining marks of class Mn, which tend to represent non-essential
       vowel markings.
-    - Tatweels, horizontal segments that are used to extend or justify a
-      word.
+    - Tatweels, horizontal segments that are used to extend or justify an
+      Arabic word.
     """
-    return ARABIC_MARK_RE.sub('', text)
+    return MARK_RE.sub('', text)
 
 
 def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
@@ -196,8 +196,8 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         return chinese_tokenize(text, include_punctuation, external_wordlist)
     elif lang == 'tr':
         return turkish_tokenize(text, include_punctuation)
-    elif lang == 'ar':
-        text = remove_arabic_marks(unicodedata.normalize('NFKC', text))
+    elif lang in {'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'}:
+        text = remove_marks(unicodedata.normalize('NFKC', text))
         return simple_tokenize(text, include_punctuation)
     else:
         return simple_tokenize(text, include_punctuation)

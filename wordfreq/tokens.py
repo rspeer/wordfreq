@@ -161,7 +161,7 @@ def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
 
 def remove_marks(text):
     """
-    Remove decorations from words in Arabic or other Semitic-derived languages:
+    Remove decorations from words in abjad scripts:
 
     - Combining marks of class Mn, which tend to represent non-essential
       vowel markings.
@@ -182,7 +182,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     the language uses, out of these categories:
 
     - Alphabetic scripts: English, Spanish, Russian, etc.
-    - Semitic abjad scripts: Arabic, Hebrew, Farsi, Urdu, etc.
+    - Abjad scripts: Arabic, Hebrew, Persian, Urdu, etc.
     - CJK scripts: Chinese, Japanese, Korean
     - Brahmic scripts: Hindi, Tamil, Telugu, Kannada, etc.
 
@@ -206,8 +206,8 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     account, so that capital I and İ map to ı and i respectively.
 
 
-    Semitic abjad scripts
-    ---------------------
+    Abjad scripts
+    -------------
 
     Languages in the Arabic or Hebrew scripts are written with optional vowel
     marks, and sometimes other decorative markings and ligatures. In these
@@ -276,7 +276,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     elif lang == 'tr':
         return turkish_tokenize(text, include_punctuation)
     elif lang in {'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'}:
-        # Semitic abjad languages
+        # Abjad languages
         text = remove_marks(unicodedata.normalize('NFKC', text))
         return simple_tokenize(text, include_punctuation)
     else:

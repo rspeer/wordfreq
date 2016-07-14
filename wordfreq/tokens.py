@@ -3,6 +3,7 @@ import unicodedata
 
 
 mecab_tokenize = None
+jieba_tokenize = None
 
 # See the documentation inside TOKEN_RE for why we have to handle these
 # scripts specially.
@@ -122,31 +123,20 @@ def turkish_tokenize(text, include_punctuation=False):
     return [token.strip("'").casefold() for token in token_expr.findall(text)]
 
 
-def japanese_tokenize(text, include_punctuation=False):
+def tokenize_mecab_language(text, lang, include_punctuation=False):
     """
-    Tokenize Japanese text, initializing the MeCab tokenizer if necessary.
+    Tokenize Japanese or Korean text, initializing the MeCab tokenizer if necessary.
     """
     global mecab_tokenize
+    if lang not in {'ja', 'ko'}:
+        raise ValueError("Only Japanese and Korean can be tokenized using MeCab")
     if mecab_tokenize is None:
         from wordfreq.mecab import mecab_tokenize
-    tokens = mecab_tokenize(text, 'ja')
+    tokens = mecab_tokenize(text, lang)
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
     return [token.casefold() for token in tokens if token_expr.match(token)]
 
 
-def korean_tokenize(text, include_punctuation=False):
-    """
-    Tokenize Korean text, initializing the MeCab tokenizer if necessary.
-    """
-    global mecab_tokenize
-    if mecab_tokenize is None:
-        from wordfreq.mecab import mecab_tokenize
-    tokens = mecab_tokenize(text, 'ko')
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.casefold() for token in tokens if token_expr.match(token)]
-
-
-jieba_tokenize = None
 def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
     """
     Tokenize Chinese text, initializing the Jieba tokenizer if necessary.
@@ -230,7 +220,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     regular expression. Instead, there needs to be some language-specific
     handling.
 
-    - Chinese text first gets converted to a representation we call
+    - Chinese text first gets converted to a canonical representation we call
       "Oversimplified Chinese", where all characters are replaced by their
       Simplified Chinese form, no matter what, even when this misspells a word or
       a name. This representation is then tokenized using the Jieba tokenizer,
@@ -267,10 +257,8 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     does not support these languages yet. It will split on spaces and
     punctuation, giving tokens that are far too long.
     """
-    if lang == 'ja':
-        return japanese_tokenize(text, include_punctuation)
-    elif lang == 'ko':
-        return korean_tokenize(text, include_punctuation)
+    if lang == 'ja' or lang == 'ko':
+        return tokenize_mecab_language(text, lang, include_punctuation)
     elif lang == 'zh':
         return chinese_tokenize(text, include_punctuation, external_wordlist)
     elif lang == 'tr':

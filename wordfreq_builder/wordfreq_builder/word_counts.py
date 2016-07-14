@@ -36,6 +36,24 @@ def count_tokens(filename):
     return counts
 
 
+def count_tokens_langtagged(filename, lang):
+    counts = defauldict(int)
+    if filename.endswith('gz'):
+        infile = gzip.open(filename, 'rt', encoding='utf-8', errors='replace')
+    else:
+        infile = open(filename, encoding='utf-8', errors='replace')
+    for line in infile:
+        if '\t' not in line:
+            continue
+        line_lang, text = line.split('\t')
+        if line_lang == lang:
+            tokens = tokenize(text.strip(), lang)
+            for token in tokens:
+                counts[token] += 1
+    infile.close()
+    return counts
+
+
 def read_values(filename, cutoff=0, max_words=1e8, lang=None):
     """
     Read words and their frequency or count values from a CSV file. Returns

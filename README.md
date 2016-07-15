@@ -276,7 +276,11 @@ The terms of use of this data are:
     acknowledgement of Google Books Ngram Viewer as the source, and inclusion
     of a link to http://books.google.com/ngrams, would be appreciated.
 
-It also contains data derived from the following Creative Commons-licensed
+`wordfreq` uses MeCab, by Taku Kudo, plus Korean data files by Yongwoon Lee and
+Yungho Yu. The Korean data is under an Apache 2 license, a copy of which
+appears in wordfreq/data/mecab-ko-dic/COPYING.
+
+`wordfreq` also contains data derived from the following Creative Commons-licensed
 sources:
 
 - The Leeds Internet Corpus, from the University of Leeds Centre for Translation

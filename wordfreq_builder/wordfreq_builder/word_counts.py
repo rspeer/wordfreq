@@ -37,7 +37,7 @@ def count_tokens(filename):
 
 
 def count_tokens_langtagged(filename, lang):
-    counts = defauldict(int)
+    counts = defaultdict(int)
     if filename.endswith('gz'):
         infile = gzip.open(filename, 'rt', encoding='utf-8', errors='replace')
     else:
@@ -45,7 +45,7 @@ def count_tokens_langtagged(filename, lang):
     for line in infile:
         if '\t' not in line:
             continue
-        line_lang, text = line.split('\t')
+        line_lang, text = line.split('\t', 1)
         if line_lang == lang:
             tokens = tokenize(text.strip(), lang)
             for token in tokens:

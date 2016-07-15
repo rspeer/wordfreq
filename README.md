@@ -168,48 +168,51 @@ The sources (and the abbreviations we'll use for them) are:
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wpedia**: The full text of Wikipedia in 2015
 - **Reddit**: The corpus of Reddit comments through May 2015
+- **CCrawl**: Text extracted from the Common Crawl and language-detected with cld2
 - **Other**: We get additional English frequencies from Google Books Syntactic
   Ngrams 2013, and Chinese frequencies from the frequency dictionary that
   comes with the Jieba tokenizer.
 
-The following 17 languages are well-supported, with reasonable tokenization and
-at least 3 different sources of word frequencies:
+The following 28 languages are supported, with reasonable tokenization and at
+least 3 different sources of word frequencies:
 
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit  Other
-    ──────────────────┼─────────────────────────────────────────────────────
-    Arabic      ar    │ -       Yes     Yes     Yes     Yes     -       -
-    German      de    │ Yes     -       Yes     Yes[1]  Yes     -       -
-    Greek       el    │ -       Yes     Yes     Yes     Yes     -       -
-    English     en    │ Yes     Yes     Yes     Yes     Yes     Yes     Google Books
-    Spanish     es    │ -       Yes     Yes     Yes     Yes     -       -
-    French      fr    │ -       Yes     Yes     Yes     Yes     -       -
-    Indonesian  id    │ -       Yes     -       Yes     Yes     -       -
-    Italian     it    │ -       Yes     Yes     Yes     Yes     -       -
-    Japanese    ja    │ -       -       Yes     Yes     Yes     -       -
-    Malay       ms    │ -       Yes     -       Yes     Yes     -       -
-    Dutch       nl    │ Yes     Yes     -       Yes     Yes     -       -
-    Polish      pl    │ -       Yes     -       Yes     Yes     -       -
-    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -       -
-    Russian     ru    │ -       Yes     Yes     Yes     Yes     -       -
-    Swedish     sv    │ -       Yes     -       Yes     Yes     -       -
-    Turkish     tr    │ -       Yes     -       Yes     Yes     -       -
-    Chinese     zh    │ Yes     -       Yes     -       -       -       Jieba
+    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  CCrawl  Reddit  Other
+    ──────────────────┼──────────────────────────────────────────────────────────────
+    Arabic      ar    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Bulgarian   bg    │ -       Yes     -       -       Yes     Yes     -       -
+    Catalan     ca    │ -       Yes     -       Yes     Yes     -       -       -
+    Danish      da    │ -       Yes     -       -       Yes     Yes     -       -
+    German      de    │ Yes     -       Yes     Yes     Yes     Yes     -       -
+    Greek       el    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    English     en    │ Yes     Yes     Yes     Yes     Yes     -       Yes     Google Books
+    Spanish     es    │ -       Yes     Yes     Yes     Yes     Yes     Yes     -
+    Finnish     fi    │ -       Yes     -       -       Yes     Yes     -       -
+    French      fr    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Hebrew      he    │ -       Yes     -       Yes     Yes     Yes     -       -
+    Hindi       hi    │ -       -       -       Yes     Yes     Yes     -       -
+    Hungarian   hu    │ -       Yes     -       -       Yes     Yes     -       -
+    Indonesian  id    │ -       Yes     -       Yes     Yes     Yes     -       -
+    Italian     it    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Japanese    ja    │ -       -       Yes     Yes     Yes     Yes     -       -
+    Korean      ko    │ -       -       -       Yes     Yes     Yes     -       -
+    Malay       ms    │ -       Yes     -       Yes     Yes     Yes     -       -
+    Norwegian   nb[1] │ -       Yes     -       -       Yes     Yes     -       -
+    Dutch       nl    │ Yes     Yes     -       Yes     Yes     Yes     -       -
+    Polish      pl    │ -       Yes     -       Yes     Yes     Yes     -       -
+    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Romanian    ro    │ -       Yes     -       -       Yes     Yes     -       -
+    Russian     ru    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Swedish     sv    │ -       Yes     -       Yes     Yes     Yes     -       -
+    Turkish     tr    │ -       Yes     -       Yes     Yes     Yes     -       -
+    Ukrainian   uk    │ -       Yes     -       -       Yes     Yes     -       -
+    Chinese     zh    │ Yes     -       Yes     -       -       Yes     -       Jieba
 
+[1] The Norwegian text we have is specifically written in Norwegian Bokmål, so
+we give it the language code 'nb'. We would use 'nn' for Nynorsk, but there
+isn't enough data to include it in wordfreq.
 
-Additionally, Korean is marginally supported. You can look up frequencies in
-it, but it will be insufficiently tokenized into words, and we have too few
-data sources for it so far:
-
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit
-    ──────────────────┼───────────────────────────────────────────────
-    Korean      ko    │ -       -       -       Yes     Yes     -
-
-The 'large' wordlists are available in English, German, Spanish, French, and
-Portuguese.
-
-[1] We've counted the frequencies from tweets in German, such as they are, but
-you should be aware that German is not a frequently-used language on Twitter.
-Germans just don't tweet that much.
+The 'large' wordlists are available in languages with five or more sources:
+Arabic, German, Greek, English, Spanish, French, Italian, Portuguese, and Russian.
 
 
 ## Tokenization
@@ -223,10 +226,13 @@ splits words between apostrophes and vowels.
 
 There are language-specific exceptions:
 
-- In Arabic, it additionally normalizes ligatures and removes combining marks.
-- In Japanese, instead of using the regex library, it uses the external library
-  `mecab-python3`. This is an optional dependency of wordfreq, and compiling
-  it requires the `libmecab-dev` system package to be installed.
+- In Arabic and Hebrew, it additionally normalizes ligatures and removes
+  combining marks.
+
+- In Japanese and Korean, instead of using the regex library, it uses the
+  external library `mecab-python3`. This is an optional dependency of wordfreq,
+  and compiling it requires the `libmecab-dev` system package to be installed.
+
 - In Chinese, it uses the external Python library `jieba`, another optional
   dependency.
 

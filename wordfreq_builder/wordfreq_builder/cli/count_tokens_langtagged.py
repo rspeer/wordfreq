@@ -1,3 +1,8 @@
+"""
+Count tokens of text in a particular language, taking input from a
+tab-separated file whose first column is a language code. Lines in all
+languages except the specified one will be skipped.
+"""
 from wordfreq_builder.word_counts import count_tokens_langtagged, write_wordlist
 import argparse
 

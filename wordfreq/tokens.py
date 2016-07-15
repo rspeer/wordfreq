@@ -2,6 +2,9 @@ import regex
 import unicodedata
 
 
+mecab_tokenize = None
+jieba_tokenize = None
+
 # See the documentation inside TOKEN_RE for why we have to handle these
 # scripts specially.
 SPACELESS_SCRIPTS = [
@@ -22,7 +25,6 @@ def _make_spaceless_expr():
 
 
 SPACELESS_EXPR = _make_spaceless_expr()
-
 
 TOKEN_RE = regex.compile(r"""
     # Case 1: a special case for non-spaced languages
@@ -74,7 +76,7 @@ TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
     \S(?:\B\S|\p{M})*
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
-ARABIC_MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
+MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 
 
 def simple_tokenize(text, include_punctuation=False):
@@ -98,6 +100,13 @@ def simple_tokenize(text, include_punctuation=False):
       tokens.
 
     - It breaks on all spaces, even the "non-breaking" ones.
+
+    - It aims to keep marks together with words, so that they aren't erroneously
+      split off as punctuation in languages such as Hindi.
+
+    - It keeps Southeast Asian scripts, such as Thai, glued together. This yields
+      tokens that are much too long, but the alternative is that every character
+      would end up in its own token, which is worse.
     """
     text = unicodedata.normalize('NFC', text)
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
@@ -114,20 +123,20 @@ def turkish_tokenize(text, include_punctuation=False):
     return [token.strip("'").casefold() for token in token_expr.findall(text)]
 
 
-mecab_tokenize = None
-def japanese_tokenize(text, include_punctuation=False):
+def tokenize_mecab_language(text, lang, include_punctuation=False):
     """
-    Tokenize Japanese text, initializing the MeCab tokenizer if necessary.
+    Tokenize Japanese or Korean text, initializing the MeCab tokenizer if necessary.
     """
     global mecab_tokenize
+    if lang not in {'ja', 'ko'}:
+        raise ValueError("Only Japanese and Korean can be tokenized using MeCab")
     if mecab_tokenize is None:
-        from wordfreq.japanese import mecab_tokenize
-    tokens = mecab_tokenize(text)
+        from wordfreq.mecab import mecab_tokenize
+    tokens = mecab_tokenize(text, lang)
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
     return [token.casefold() for token in tokens if token_expr.match(token)]
 
 
-jieba_tokenize = None
 def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
     """
     Tokenize Chinese text, initializing the Jieba tokenizer if necessary.
@@ -140,16 +149,16 @@ def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
     return [token.casefold() for token in tokens if token_expr.match(token)]
 
 
-def remove_arabic_marks(text):
+def remove_marks(text):
     """
-    Remove decorations from Arabic words:
+    Remove decorations from words in abjad scripts:
 
     - Combining marks of class Mn, which tend to represent non-essential
       vowel markings.
-    - Tatweels, horizontal segments that are used to extend or justify a
-      word.
+    - Tatweels, horizontal segments that are used to extend or justify an
+      Arabic word.
     """
-    return ARABIC_MARK_RE.sub('', text)
+    return MARK_RE.sub('', text)
 
 
 def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
@@ -158,30 +167,68 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     the language. Strings that are looked up in wordfreq will be run through
     this function first, so that they can be expected to match the data.
 
-    Here is what the tokenizer will do, depending on the language:
+    Some of the processing steps are specific to one language, such as Chinese,
+    but what broadly happens to the text depends on what general writing system
+    the language uses, out of these categories:
 
-    - Chinese will be mapped to Simplified Chinese characters and tokenized
-      using the Jieba tokenizer, trained on a custom word list of words that
-      can be looked up in wordfreq.
+    - Alphabetic scripts: English, Spanish, Russian, etc.
+    - Abjad scripts: Arabic, Hebrew, Persian, Urdu, etc.
+    - CJK scripts: Chinese, Japanese, Korean
+    - Brahmic scripts: Hindi, Tamil, Telugu, Kannada, etc.
 
-    - Japanese will be delegated to the external mecab-python module. It will
-      be NFKC normalized, which is stronger than NFC normalization.
 
-    - Chinese or Japanese texts that aren't identified as the appropriate
-      language will only split on punctuation and script boundaries, giving
-      you untokenized globs of characters that probably represent many words.
+    Alphabetic scripts
+    ------------------
 
-    - Arabic will be NFKC normalized, and will have Arabic-specific combining
-      marks and tatweels removed.
+    The major alphabetic scripts -- Latin, Cyrillic, and Greek -- cover most
+    European languages, which are relatively straightforward to tokenize.
 
-    - Languages written in cased alphabets will be case-folded to lowercase.
+    Text in these scripts will be normalized to NFC form, then passed
+    through a regular expression that implements the Word Segmentation section
+    of Unicode Annex #29, and then case-folded to lowercase.
 
-    - Turkish will use a different case-folding procedure, so that capital
-      I and İ map to ı and i respectively.
+    The effect is mostly to split the text on spaces and punctuation. There are
+    some subtleties involving apostrophes inside words, which the regex will
+    only split when they occur before a vowel. ("Hasn't" is one token, but
+    "l'enfant" is two.)
 
-    - Languages besides Japanese and Chinese will be tokenized using a regex
-      that mostly implements the Word Segmentation section of Unicode Annex
-      #29. See `simple_tokenize` for details.
+    If the language is Turkish, the case-folding rules will take this into
+    account, so that capital I and İ map to ı and i respectively.
+
+
+    Abjad scripts
+    -------------
+
+    Languages in the Arabic or Hebrew scripts are written with optional vowel
+    marks, and sometimes other decorative markings and ligatures. In these
+    languages:
+
+    - The text will be NFKC-normalized, which is a stronger and lossier form
+      than NFC. Here its purpose is to reduce ligatures to simpler characters.
+
+    - Marks will be removed, as well as the Arabic tatweel (an extension of
+      a word that is used for justification or decoration).
+
+    After these steps, the text will go through the same process as the
+    alphabetic scripts above.
+
+
+    CJK scripts
+    -----------
+
+    In the CJK languages, word boundaries can't usually be identified by a
+    regular expression. Instead, there needs to be some language-specific
+    handling.
+
+    - Chinese text first gets converted to a canonical representation we call
+      "Oversimplified Chinese", where all characters are replaced by their
+      Simplified Chinese form, no matter what, even when this misspells a word or
+      a name. This representation is then tokenized using the Jieba tokenizer,
+      trained on the list of Chinese words that can be looked up in wordfreq.
+
+    - Japanese and Korean will be NFKC-normalized, then tokenized using the
+      MeCab tokenizer, using dictionary files that are included in this
+      package.
 
     The `external_wordlist` option only affects Chinese tokenization.  If it's
     True, then wordfreq will not use its own Chinese wordlist for tokenization.
@@ -189,15 +236,36 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     and it will leave Traditional Chinese characters as is. This will probably
     give more accurate tokenization, but the resulting tokens won't necessarily
     have word frequencies that can be looked up.
+
+    If you end up seeing tokens that are entire phrases or sentences glued
+    together, that probably means you passed in CJK text with the wrong
+    language code.
+
+
+    Brahmic scripts and other languages
+    -----------------------------------
+
+    Any kind of language not previously mentioned will just go through the same
+    tokenizer that alphabetic languages use.
+
+    We've tweaked this tokenizer for the case of Indic languages in Brahmic
+    scripts, such as Hindi, Tamil, and Telugu, so that we can handle these
+    languages where the default Unicode algorithm wouldn't quite work.
+
+    Southeast Asian languages, such as Thai, Khmer, Lao, and Myanmar, are
+    written in Brahmic-derived scripts, but usually *without spaces*. wordfreq
+    does not support these languages yet. It will split on spaces and
+    punctuation, giving tokens that are far too long.
     """
-    if lang == 'ja':
-        return japanese_tokenize(text, include_punctuation)
+    if lang == 'ja' or lang == 'ko':
+        return tokenize_mecab_language(text, lang, include_punctuation)
     elif lang == 'zh':
         return chinese_tokenize(text, include_punctuation, external_wordlist)
     elif lang == 'tr':
         return turkish_tokenize(text, include_punctuation)
-    elif lang == 'ar':
-        text = remove_arabic_marks(unicodedata.normalize('NFKC', text))
+    elif lang in {'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'}:
+        # Abjad languages
+        text = remove_marks(unicodedata.normalize('NFKC', text))
         return simple_tokenize(text, include_punctuation)
     else:
         return simple_tokenize(text, include_punctuation)

@@ -152,7 +152,7 @@ def test_not_enough_ascii():
     random_ascii_words(lang='zh')
 
 
-def test_ar():
+def test_arabic():
     # Remove tatweels
     eq_(
         tokenize('متــــــــعب', 'ar'),
@@ -183,6 +183,7 @@ def test_ideographic_fallback():
         ['ひらがな', 'カタカナ', 'romaji']
     )
 
+def test_other_languages():
     # Test that we leave Thai letters stuck together. If we had better Thai support,
     # we would actually split this into a three-word phrase.
     eq_(tokenize('การเล่นดนตรี', 'th'), ['การเล่นดนตรี'])
@@ -194,3 +195,7 @@ def test_ideographic_fallback():
 
     # Test Hindi -- tokens split where there are spaces, and not where there aren't
     eq_(tokenize('हिन्दी विक्षनरी', 'hi'), ['हिन्दी', 'विक्षनरी'])
+
+    # Remove vowel points in Hebrew
+    eq_(tokenize('דֻּגְמָה', 'he'), ['דגמה'])
+

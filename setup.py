@@ -34,7 +34,7 @@ if sys.version_info < (3, 4):
 
 setup(
     name="wordfreq",
-    version='1.4.1',
+    version='1.4.2',
     maintainer='Luminoso Technologies, Inc.',
     maintainer_email='info@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
@@ -47,10 +47,10 @@ setup(
     include_package_data=True,
     install_requires=dependencies,
 
-    # mecab-python3 is required for looking up Japanese word frequencies. In
-    # turn, it depends on libmecab-dev being installed on the system. It's not
-    # listed under 'install_requires' because wordfreq should be usable in
-    # other languages without it.
+    # mecab-python3 is required for looking up Japanese or Korean word
+    # frequencies. In turn, it depends on libmecab-dev being installed on the
+    # system. It's not listed under 'install_requires' because wordfreq should
+    # be usable in other languages without it.
     #
     # Similarly, jieba is required for Chinese word frequencies.
     extras_require={

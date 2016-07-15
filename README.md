@@ -176,43 +176,49 @@ The sources (and the abbreviations we'll use for them) are:
 The following 28 languages are supported, with reasonable tokenization and at
 least 3 different sources of word frequencies:
 
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  CCrawl  Reddit  Other
-    ──────────────────┼──────────────────────────────────────────────────────────────
-    Arabic      ar    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Bulgarian   bg    │ -       Yes     -       -       Yes     Yes     -       -
-    Catalan     ca    │ -       Yes     -       Yes     Yes     -       -       -
-    Danish      da    │ -       Yes     -       -       Yes     Yes     -       -
-    German      de    │ Yes     -       Yes     Yes     Yes     Yes     -       -
-    Greek       el    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    English     en    │ Yes     Yes     Yes     Yes     Yes     -       Yes     Google Books
-    Spanish     es    │ -       Yes     Yes     Yes     Yes     Yes     Yes     -
-    Finnish     fi    │ -       Yes     -       -       Yes     Yes     -       -
-    French      fr    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Hebrew      he    │ -       Yes     -       Yes     Yes     Yes     -       -
-    Hindi       hi    │ -       -       -       Yes     Yes     Yes     -       -
-    Hungarian   hu    │ -       Yes     -       -       Yes     Yes     -       -
-    Indonesian  id    │ -       Yes     -       Yes     Yes     Yes     -       -
-    Italian     it    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Japanese    ja    │ -       -       Yes     Yes     Yes     Yes     -       -
-    Korean      ko    │ -       -       -       Yes     Yes     Yes     -       -
-    Malay       ms    │ -       Yes     -       Yes     Yes     Yes     -       -
-    Norwegian   nb[1] │ -       Yes     -       -       Yes     Yes     -       -
-    Dutch       nl    │ Yes     Yes     -       Yes     Yes     Yes     -       -
-    Polish      pl    │ -       Yes     -       Yes     Yes     Yes     -       -
-    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Romanian    ro    │ -       Yes     -       -       Yes     Yes     -       -
-    Russian     ru    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Swedish     sv    │ -       Yes     -       Yes     Yes     Yes     -       -
-    Turkish     tr    │ -       Yes     -       Yes     Yes     Yes     -       -
-    Ukrainian   uk    │ -       Yes     -       -       Yes     Yes     -       -
-    Chinese     zh    │ Yes     -       Yes     -       -       Yes     -       Jieba
+    Language    Code    Large?   SUBTLEX OpenSub LeedsIC Twitter Wpedia  CCrawl  Reddit  Other
+    ───────────────────────────┼──────────────────────────────────────────────────────────────
+    Arabic      ar      Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Bulgarian   bg      -      │ -       Yes     -       -       Yes     Yes     -       -
+    Catalan     ca      -      │ -       Yes     -       Yes     Yes     -       -       -
+    Danish      da      -      │ -       Yes     -       -       Yes     Yes     -       -
+    German      de      Yes    │ Yes     -       Yes     Yes     Yes     Yes     -       -
+    Greek       el      Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    English     en      Yes    │ Yes     Yes     Yes     Yes     Yes     -       Yes     Google Books
+    Spanish     es      Yes    │ -       Yes     Yes     Yes     Yes     Yes     Yes     -
+    Finnish     fi      -      │ -       Yes     -       -       Yes     Yes     -       -
+    French      fr      Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Hebrew      he      -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Hindi       hi      -      │ -       -       -       Yes     Yes     Yes     -       -
+    Hungarian   hu      -      │ -       Yes     -       -       Yes     Yes     -       -
+    Indonesian  id      -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Italian     it      Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Japanese    ja      -      │ -       -       Yes     Yes     Yes     Yes     -       -
+    Korean      ko      -      │ -       -       -       Yes     Yes     Yes     -       -
+    Malay       ms      -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Norwegian   nb[1]   -      │ -       Yes     -       -       Yes     Yes     -       -
+    Dutch       nl      Yes    │ Yes     Yes     -       Yes     Yes     Yes     -       -
+    Polish      pl      -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Portuguese  pt      Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Romanian    ro      -      │ -       Yes     -       -       Yes     Yes     -       -
+    Russian     ru      Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Swedish     sv      -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Turkish     tr      -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Ukrainian   uk      -      │ -       Yes     -       -       Yes     Yes     -       -
+    Chinese     zh[2]   -      │ Yes     -       Yes     -       Yes     Yes     -       Jieba
 
 [1] The Norwegian text we have is specifically written in Norwegian Bokmål, so
 we give it the language code 'nb'. We would use 'nn' for Nynorsk, but there
 isn't enough data to include it in wordfreq.
 
-The 'large' wordlists are available in languages with five or more sources:
-Arabic, German, Greek, English, Spanish, French, Italian, Portuguese, and Russian.
+[2] This data represents text written in both Simplified and Traditional
+Chinese. (SUBTLEX is mostly Simplified, while Wikipedia is mostly Traditional.)
+The characters are mapped to one another so they can use the same word
+frequency list.
+
+Some languages provide 'large' wordlists, including words with a Zipf frequency
+between 1.0 and 3.0. These are available in 10 languages that are covered by
+enough data sources.
 
 
 ## Tokenization

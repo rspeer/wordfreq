@@ -21,7 +21,7 @@ CONFIG = {
         # Hindi.)
         'wikipedia': [
             'ar', 'ca', 'de', 'el', 'en', 'es', 'fr', 'he', 'hi', 'id', 'it',
-            'ja', 'ko', 'ms', 'nb', 'nl', 'pl', 'pt', 'ru', 'sv', 'tr',
+            'ja', 'ko', 'ms', 'nb', 'nl', 'pl', 'pt', 'ru', 'sv', 'tr', 'zh',
             'bg', 'da', 'fi', 'hu', 'ro', 'uk'
         ],
         'opensubtitles': [
@@ -80,7 +80,7 @@ CONFIG = {
         'jieba-dist': 'dist/jieba_{lang}.{ext}'
     },
     'min_sources': 3,
-    'big-lists': ['en', 'fr', 'es', 'pt', 'de', 'ar', 'el', 'it', 'ru'],
+    'big-lists': ['en', 'fr', 'es', 'pt', 'de', 'ar', 'el', 'it', 'nl', 'ru'],
     # When dealing with language tags that come straight from cld2, we need
     # to un-standardize a few of them
     'cld2-language-aliases': {

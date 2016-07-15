@@ -1,3 +1,8 @@
 recursive-include wordfreq/data *.gz
 include README.md
 recursive-include wordfreq/data *.txt
+recursive-include wordfreq/data *.bin
+recursive-include wordfreq/data *.def
+recursive-include wordfreq/data *.dic
+recursive-include wordfreq/data dicrc
+recursive-include wordfreq/data COPYING

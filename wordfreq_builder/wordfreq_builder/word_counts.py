@@ -2,6 +2,7 @@ from wordfreq import simple_tokenize, tokenize
 from collections import defaultdict
 from operator import itemgetter
 from ftfy import fix_text
+import statistics
 import math
 import csv
 import msgpack
@@ -152,22 +153,31 @@ def merge_counts(count_dicts):
     return merged
 
 
+def _positive_minimum(values):
+    return min([v for v in values if v > 0])
+
+
 def merge_freqs(freq_dicts):
     """
     Merge multiple dictionaries of frequencies, representing each word with
-    the word's average frequency over all sources.
+    the geometric mean of the word's frequency over all sources.
     """
     vocab = set()
     for freq_dict in freq_dicts:
         vocab.update(freq_dict)
+    defaults = [_positive_minimum(freq_dict.values()) / 2 for freq_dict in freq_dicts]
 
     merged = defaultdict(float)
     N = len(freq_dicts)
     for term in vocab:
-        term_total = 0.
-        for freq_dict in freq_dicts:
-            term_total += freq_dict.get(term, 0.)
-        merged[term] = term_total / N
+        freqs = []
+        log_total = 0.
+        for (freq_dict, default_freq) in zip(freq_dicts, defaults):
+            freq = max(freq_dict.get(term, default_freq), 1e-9)
+            freqs.append(freq)
+        median = statistics.median(freqs)
+        amean = statistics.mean(freqs)
+        merged[term] = (median * amean) ** 0.5
 
     return merged
 
@@ -244,7 +254,6 @@ def correct_apostrophe_trimming(freqs):
     removed.
     """
     if (freqs.get('wouldn', 0) > 1e-6 and freqs.get('couldn', 0) > 1e-6):
-        print("Applying apostrophe trimming")
         for trim_word, trim_prob in APOSTROPHE_TRIMMED_PROB.items():
             if trim_word in freqs:
                 freq = freqs[trim_word]

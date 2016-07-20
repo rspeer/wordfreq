@@ -165,24 +165,46 @@ def merge_freqs(freq_dicts):
     vocab = set()
     for freq_dict in freq_dicts:
         vocab.update(freq_dict)
-    defaults = [_positive_minimum(freq_dict.values()) / 2 for freq_dict in freq_dicts]
 
     merged = defaultdict(float)
     N = len(freq_dicts)
     for term in vocab:
         freqs = []
-        log_total = 0.
-        for (freq_dict, default_freq) in zip(freq_dicts, defaults):
-            freq = max(freq_dict.get(term, default_freq), 1e-9)
-            freqs.append(freq)
-        median = statistics.median(freqs)
-        amean = statistics.mean(freqs)
-        merged[term] = (median * amean) ** 0.5
+        for freq_dict in freq_dicts:
+            freq = freq_dict.get(term, 0.)
 
+            # Take a weighted average, counting sources that are present
+            # twice, and sources that are absent once. A word then only
+            # needs to appear in 1/3 of sources to make it into the list.
+            if freq > 1e-9:
+                freqs.append(freq)
+                freqs.append(freq)
+            else:
+                freqs.append(0.)
+
+        if len(term) == 1:
+            # Emoji and symbols are important, and are naturally missing from
+            # some sources. In this case, we take the arithmetic mean across
+            # the sources, indicating a tendency to believe the sources that
+            # say that one-character tokens are frequent.
+            merged[term] = statistics.mean(freqs)
+        else:
+            median = statistics.median(freqs)
+            if median > 0.:
+                log_median = statistics.median([math.log(max(x, 1e-9)) for x in freqs])
+                merged[term] = math.exp(log_median)
+
+    total = sum(merged.values())
+
+    # Normalize the merged values so that they add up to 0.99 (based on
+    # a rough estimate that 1% of tokens will be out-of-vocabulary in a
+    # wordlist of this size).
+    for term in merged:
+        merged[term] = merged[term] / total * 0.99
     return merged
 
 
-def write_wordlist(freqs, filename, cutoff=1e-8):
+def write_wordlist(freqs, filename, cutoff=1e-9):
     """
     Write a dictionary of either raw counts or frequencies to a file of
     comma-separated values.

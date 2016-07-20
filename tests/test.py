@@ -199,3 +199,11 @@ def test_other_languages():
     # Remove vowel points in Hebrew
     eq_(tokenize('דֻּגְמָה', 'he'), ['דגמה'])
 
+    # Deal with commas, cedillas, and I's in Turkish
+    eq_(tokenize('kișinin', 'tr'), ['kişinin'])
+    eq_(tokenize('KİȘİNİN', 'tr'), ['kişinin'])
+
+    # Deal with cedillas that should be commas-below in Romanian
+    eq_(tokenize('acelaşi', 'ro'), ['același'])
+    eq_(tokenize('ACELAŞI', 'ro'), ['același'])
+

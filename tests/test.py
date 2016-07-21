@@ -28,8 +28,17 @@ def test_languages():
             text = '笑'
         elif lang == 'ar':
             text = 'ههههه'
+        elif lang == 'he':
+            text = 'חחח'
+        elif lang == 'bg':
+            text = 'хаха'
+        elif lang == 'ru':
+            text = 'ахах'
+        elif lang == 'uk':
+            text = 'гага'
         else:
             text = 'lol'
+        print(text, lang)
         assert_greater(word_frequency(text, lang), 0)
 
         # Make up a weirdly verbose language code and make sure
@@ -62,7 +71,7 @@ def test_most_common_words():
         """
         return top_n_list(lang, 1)[0]
 
-    eq_(get_most_common('ar'), 'في')
+    eq_(get_most_common('ar'), 'من')
     eq_(get_most_common('de'), 'die')
     eq_(get_most_common('en'), 'the')
     eq_(get_most_common('es'), 'de')
@@ -144,7 +153,7 @@ def test_not_really_random():
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
     eq_(random_ascii_words(nwords=4, lang='ja', bits_per_word=0),
-        'rt rt rt rt')
+        '1 1 1 1')
 
 
 @raises(ValueError)

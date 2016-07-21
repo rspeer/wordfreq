@@ -7,6 +7,7 @@ import math
 import csv
 import msgpack
 import gzip
+import unicodedata
 import regex
 
 
@@ -166,11 +167,31 @@ def merge_freqs(freq_dicts):
     for freq_dict in freq_dicts:
         vocab.update(freq_dict)
 
+    # Detect whether these data sources support emoji and apostrophes
+    dict_info = [
+        (freq_dict,
+         freq_dict.get('\U0001f602', 0.) > 1e-8,
+         freq_dict.get("i'm", 0.) > 1e-6,
+         freq_dict.get("10", 0.) > 1e-6)
+        for freq_dict in freq_dicts
+    ]
+
     merged = defaultdict(float)
     N = len(freq_dicts)
     for term in vocab:
         freqs = []
-        for freq_dict in freq_dicts:
+        for freq_dict, supports_emoji, supports_apostrophes, supports_numbers in dict_info:
+            # Skip sources that can't represent this term
+            if not supports_apostrophes and "'" in term:
+                continue
+            if not supports_numbers and term.isdigit():
+                continue
+            if (
+                not supports_emoji and len(term) == 1 and
+                (unicodedata.category(term).startswith('S') or '\U0001F000' <= term <= '\U0001FFFD')
+            ):
+                continue
+
             freq = freq_dict.get(term, 0.)
 
             # Take a weighted average, counting sources that are present
@@ -182,17 +203,12 @@ def merge_freqs(freq_dicts):
             else:
                 freqs.append(0.)
 
-        if len(term) == 1:
-            # Emoji and symbols are important, and are naturally missing from
-            # some sources. In this case, we take the arithmetic mean across
-            # the sources, indicating a tendency to believe the sources that
-            # say that one-character tokens are frequent.
-            merged[term] = statistics.mean(freqs)
-        else:
+        if freqs:
             median = statistics.median(freqs)
             if median > 0.:
-                log_median = statistics.median([math.log(max(x, 1e-9)) for x in freqs])
-                merged[term] = math.exp(log_median)
+                log_freqs = [math.log(max(x, 1e-9)) for x in freqs]
+                gm = math.exp(statistics.mean(log_freqs))
+                merged[term] = gm
 
     total = sum(merged.values())
 

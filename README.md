@@ -173,7 +173,7 @@ The sources (and the abbreviations we'll use for them) are:
   Ngrams 2013, and Chinese frequencies from the frequency dictionary that
   comes with the Jieba tokenizer.
 
-The following 28 languages are supported, with reasonable tokenization and at
+The following 27 languages are supported, with reasonable tokenization and at
 least 3 different sources of word frequencies:
 
     Language    Code    Large?   SUBTLEX OpenSub LeedsIC Twitter Wpedia  CCrawl  Reddit  Other
@@ -204,7 +204,6 @@ least 3 different sources of word frequencies:
     Russian     ru      Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
     Swedish     sv      -      │ -       Yes     -       Yes     Yes     Yes     -       -
     Turkish     tr      -      │ -       Yes     -       Yes     Yes     Yes     -       -
-    Ukrainian   uk      -      │ -       Yes     -       -       Yes     Yes     -       -
     Chinese     zh[2]   -      │ Yes     -       Yes     -       Yes     Yes     -       Jieba
 
 [1] The Norwegian text we have is specifically written in Norwegian Bokmål, so

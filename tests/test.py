@@ -26,6 +26,8 @@ def test_languages():
     for lang in avail:
         if lang == 'zh' or lang == 'ja':
             text = '笑'
+        elif lang == 'ko':
+            text = 'ᄏᄏᄏ'
         elif lang == 'ar':
             text = 'ههههه'
         elif lang == 'ca' or lang == 'es':

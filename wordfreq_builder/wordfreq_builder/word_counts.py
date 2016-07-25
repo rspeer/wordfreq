@@ -171,8 +171,7 @@ def merge_freqs(freq_dicts):
     dict_info = [
         (freq_dict,
          freq_dict.get('\U0001f602', 0.) > 1e-8,
-         freq_dict.get("i'm", 0.) > 1e-6,
-         freq_dict.get("10", 0.) > 1e-6)
+         freq_dict.get("i'm", 0.) > 1e-6)
         for freq_dict in freq_dicts
     ]
 
@@ -180,11 +179,9 @@ def merge_freqs(freq_dicts):
     N = len(freq_dicts)
     for term in vocab:
         freqs = []
-        for freq_dict, supports_emoji, supports_apostrophes, supports_numbers in dict_info:
+        for freq_dict, supports_emoji, supports_apostrophes in dict_info:
             # Skip sources that can't represent this term
             if not supports_apostrophes and "'" in term:
-                continue
-            if not supports_numbers and term.isdigit():
                 continue
             if (
                 not supports_emoji and len(term) == 1 and

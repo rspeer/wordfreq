@@ -11,8 +11,9 @@ CONFIG = {
         # Consider adding:
         # 'th' when we get tokenization for it
         # 'tl' with one more data source
+        # 'el' if we can filter out kaomoji
         'twitter': [
-            'ar', 'ca', 'de', 'el', 'en', 'es', 'fr', 'he', 'hi', 'id', 'it',
+            'ar', 'ca', 'de', 'en', 'es', 'fr', 'he', 'hi', 'id', 'it',
             'ja', 'ko', 'ms', 'nl', 'pl', 'pt', 'ru', 'sv', 'tr'
         ],
         # Languages with large Wikipedias. (Languages whose Wikipedia dump is
@@ -55,10 +56,11 @@ CONFIG = {
         'reddit': ['en', 'es'],
 
         # Well-represented languages in the Common Crawl
+        # It's possible we could add 'uk' to the list, needs more checking
         'commoncrawl': [
             'ar', 'bg', 'cs', 'da', 'de', 'el', 'es', 'fa', 'fi', 'fr',
             'he', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'ms', 'nb', 'nl',
-            'pl', 'pt', 'ro', 'ru', 'sk', 'sv', 'ta', 'tr', 'uk', 'vi', 'zh'
+            'pl', 'pt', 'ro', 'ru', 'sk', 'sv', 'ta', 'tr', 'vi', 'zh'
         ],
     },
     # Subtlex languages that need to be pre-processed
@@ -80,7 +82,7 @@ CONFIG = {
         'jieba-dist': 'dist/jieba_{lang}.{ext}'
     },
     'min_sources': 3,
-    'big-lists': ['en', 'fr', 'es', 'pt', 'de', 'ar', 'el', 'it', 'nl', 'ru'],
+    'big-lists': ['en', 'fr', 'es', 'pt', 'de', 'ar', 'it', 'nl', 'ru'],
     # When dealing with language tags that come straight from cld2, we need
     # to un-standardize a few of them
     'cld2-language-aliases': {

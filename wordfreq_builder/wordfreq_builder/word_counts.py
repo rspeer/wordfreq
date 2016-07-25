@@ -154,10 +154,6 @@ def merge_counts(count_dicts):
     return merged
 
 
-def _positive_minimum(values):
-    return min([v for v in values if v > 0])
-
-
 def merge_freqs(freq_dicts):
     """
     Merge multiple dictionaries of frequencies, representing each word with
@@ -206,9 +202,7 @@ def merge_freqs(freq_dicts):
         if freqs:
             median = statistics.median(freqs)
             if median > 0.:
-                log_freqs = [math.log(max(x, 1e-9)) for x in freqs]
-                gm = math.exp(statistics.mean(log_freqs))
-                merged[term] = gm
+                merged[term] = median
 
     total = sum(merged.values())
 

@@ -24,22 +24,29 @@ def test_languages():
     # Look up a word representing laughter in each language, and make sure
     # it has a non-zero frequency.
     for lang in avail:
-        if lang in {'zh', 'ja'}:
+        if lang == 'zh' or lang == 'ja':
             text = '笑'
         elif lang == 'ar':
             text = 'ههههه'
+        elif lang == 'ca' or lang == 'es':
+            text = 'jajaja'
+        elif lang in {'de', 'nb', 'sv', 'da'}:
+            text = 'haha'
+        elif lang == 'pt':
+            text = 'kkkk'
         elif lang == 'he':
             text = 'חחח'
+        elif lang == 'ru':
+            text = 'лол'
         elif lang == 'bg':
             text = 'хаха'
-        elif lang == 'ru':
-            text = 'ахах'
-        elif lang == 'uk':
-            text = 'гага'
+        elif lang == 'ro':
+            text = 'ha'
+        elif lang == 'el':
+            text = 'χαχα'
         else:
             text = 'lol'
-        print(text, lang)
-        assert_greater(word_frequency(text, lang), 0)
+        assert_greater(word_frequency(text, lang), 0, lang)
 
         # Make up a weirdly verbose language code and make sure
         # we still get it
@@ -81,7 +88,7 @@ def test_most_common_words():
     eq_(get_most_common('nl'), 'de')
     eq_(get_most_common('pt'), 'de')
     eq_(get_most_common('ru'), 'в')
-    eq_(get_most_common('tr'), 'bir')
+    eq_(get_most_common('tr'), 've')
     eq_(get_most_common('zh'), '的')
 
 
@@ -158,7 +165,7 @@ def test_not_really_random():
 
 @raises(ValueError)
 def test_not_enough_ascii():
-    random_ascii_words(lang='zh')
+    random_ascii_words(lang='zh', bits_per_word=14)
 
 
 def test_arabic():

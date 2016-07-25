@@ -39,6 +39,10 @@ def count_tokens(filename):
 
 
 def count_tokens_langtagged(filename, lang):
+    """
+    Count tokens that appear in an already language-tagged file, in which each
+    line begins with a language code followed by a tab.
+    """
     counts = defaultdict(int)
     if filename.endswith('gz'):
         infile = gzip.open(filename, 'rt', encoding='utf-8', errors='replace')
@@ -157,7 +161,7 @@ def merge_counts(count_dicts):
 def merge_freqs(freq_dicts):
     """
     Merge multiple dictionaries of frequencies, representing each word with
-    the geometric mean of the word's frequency over all sources.
+    the median of the word's frequency over all sources.
     """
     vocab = set()
     for freq_dict in freq_dicts:

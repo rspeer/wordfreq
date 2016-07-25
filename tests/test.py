@@ -222,4 +222,3 @@ def test_other_languages():
     # Deal with cedillas that should be commas-below in Romanian
     eq_(tokenize('acelaşi', 'ro'), ['același'])
     eq_(tokenize('ACELAŞI', 'ro'), ['același'])
-

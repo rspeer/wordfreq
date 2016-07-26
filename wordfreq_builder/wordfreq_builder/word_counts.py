@@ -167,38 +167,19 @@ def merge_freqs(freq_dicts):
     for freq_dict in freq_dicts:
         vocab.update(freq_dict)
 
-    # Detect whether these data sources support emoji and apostrophes
-    dict_info = [
-        (freq_dict,
-         freq_dict.get('\U0001f602', 0.) > 1e-8,
-         freq_dict.get("i'm", 0.) > 1e-6)
-        for freq_dict in freq_dicts
-    ]
-
     merged = defaultdict(float)
     N = len(freq_dicts)
     for term in vocab:
         freqs = []
-        for freq_dict, supports_emoji, supports_apostrophes in dict_info:
-            # Skip sources that can't represent this term
-            if not supports_apostrophes and "'" in term:
-                continue
-            if (
-                not supports_emoji and len(term) == 1 and
-                (unicodedata.category(term).startswith('S') or '\U0001F000' <= term <= '\U0001FFFD')
-            ):
-                continue
-
+        missing_values = 0
+        for freq_dict in freq_dicts:
             freq = freq_dict.get(term, 0.)
+            if freq < 1e-8:
+                missing_values += 1
+                if missing_values > 2:
+                    continue
 
-            # Take a weighted average, counting sources that are present
-            # twice, and sources that are absent once. A word then only
-            # needs to appear in 1/3 of sources to make it into the list.
-            if freq > 1e-9:
-                freqs.append(freq)
-                freqs.append(freq)
-            else:
-                freqs.append(0.)
+            freqs.append(freq)
 
         if freqs:
             median = statistics.median(freqs)

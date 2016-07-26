@@ -60,16 +60,16 @@ frequencies by a million (1e6) to get more readable numbers:
 
     >>> from wordfreq import word_frequency
     >>> word_frequency('cafe', 'en') * 1e6
-    12.30268770812381
+    12.88249551693135
 
     >>> word_frequency('café', 'en') * 1e6
-    3.3113112148259076
+    3.3884415613920273
 
     >>> word_frequency('cafe', 'fr') * 1e6
-    2.5118864315095824
+    2.6302679918953817
 
     >>> word_frequency('café', 'fr') * 1e6
-    83.1763771102671
+    87.09635899560814
 
 
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
@@ -85,20 +85,21 @@ described above, the minimum Zipf value appearing in these lists is 1.0 for the
 for words that do not appear in the given wordlist, although it should mean
 one occurrence per billion words.
 
+    >>> from wordfreq import zipf_frequency
     >>> zipf_frequency('the', 'en')
-    7.65
+    7.67
 
     >>> zipf_frequency('word', 'en')
-    5.38
+    5.39
 
     >>> zipf_frequency('frequency', 'en')
-    4.17
+    4.19
 
-    >>> zipf_frequency('wordlist', 'en')
+    >>> zipf_frequency('zipf', 'en')
     0.0
 
-    >>> zipf_frequency('wordlist', 'en', wordlist='large')
-    1.73
+    >>> zipf_frequency('zipf', 'en', wordlist='large')
+    1.65
 
 
 The parameters to `word_frequency` and `zipf_frequency` are:
@@ -251,9 +252,9 @@ also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> zipf_frequency('New York', 'en')
-    5.06
+    5.07
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.48
+    3.58
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,
@@ -268,7 +269,7 @@ you give it an uncommon combination of tokens, it will hugely over-estimate
 their frequency:
 
     >>> zipf_frequency('owl-flavored', 'en')
-    3.17
+    3.19
 
 
 ## License

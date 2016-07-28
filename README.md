@@ -60,16 +60,16 @@ frequencies by a million (1e6) to get more readable numbers:
 
     >>> from wordfreq import word_frequency
     >>> word_frequency('cafe', 'en') * 1e6
-    14.45439770745928
+    12.88249551693135
 
     >>> word_frequency('café', 'en') * 1e6
-    4.7863009232263805
+    3.3884415613920273
 
     >>> word_frequency('cafe', 'fr') * 1e6
-    2.0417379446695274
+    2.6302679918953817
 
     >>> word_frequency('café', 'fr') * 1e6
-    77.62471166286912
+    87.09635899560814
 
 
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
@@ -85,20 +85,21 @@ described above, the minimum Zipf value appearing in these lists is 1.0 for the
 for words that do not appear in the given wordlist, although it should mean
 one occurrence per billion words.
 
+    >>> from wordfreq import zipf_frequency
     >>> zipf_frequency('the', 'en')
-    7.59
+    7.67
 
     >>> zipf_frequency('word', 'en')
-    5.34
+    5.39
 
     >>> zipf_frequency('frequency', 'en')
-    4.44
+    4.19
 
     >>> zipf_frequency('zipf', 'en')
     0.0
 
     >>> zipf_frequency('zipf', 'en', wordlist='large')
-    1.42
+    1.65
 
 
 The parameters to `word_frequency` and `zipf_frequency` are:
@@ -128,10 +129,10 @@ the list, in descending frequency order.
 
     >>> from wordfreq import top_n_list
     >>> top_n_list('en', 10)
-    ['the', 'of', 'to', 'in', 'and', 'a', 'i', 'you', 'is', 'it']
+    ['the', 'i', 'to', 'a', 'and', 'of', 'you', 'in', 'that', 'is']
 
     >>> top_n_list('es', 10)
-    ['de', 'la', 'que', 'el', 'en', 'y', 'a', 'no', 'los', 'es']
+    ['de', 'que', 'la', 'y', 'a', 'en', 'el', 'no', 'los', 'es']
 
 `iter_wordlist(lang, wordlist='combined')` iterates through all the words in a
 wordlist, in descending frequency order.
@@ -168,48 +169,56 @@ The sources (and the abbreviations we'll use for them) are:
 - **Twitter**: Messages sampled from Twitter's public stream
 - **Wpedia**: The full text of Wikipedia in 2015
 - **Reddit**: The corpus of Reddit comments through May 2015
+- **CCrawl**: Text extracted from the Common Crawl and language-detected with cld2
 - **Other**: We get additional English frequencies from Google Books Syntactic
   Ngrams 2013, and Chinese frequencies from the frequency dictionary that
   comes with the Jieba tokenizer.
 
-The following 17 languages are well-supported, with reasonable tokenization and
-at least 3 different sources of word frequencies:
+The following 27 languages are supported, with reasonable tokenization and at
+least 3 different sources of word frequencies:
 
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit  Other
-    ──────────────────┼─────────────────────────────────────────────────────
-    Arabic      ar    │ -       Yes     Yes     Yes     Yes     -       -
-    German      de    │ Yes     -       Yes     Yes[1]  Yes     -       -
-    Greek       el    │ -       Yes     Yes     Yes     Yes     -       -
-    English     en    │ Yes     Yes     Yes     Yes     Yes     Yes     Google Books
-    Spanish     es    │ -       Yes     Yes     Yes     Yes     -       -
-    French      fr    │ -       Yes     Yes     Yes     Yes     -       -
-    Indonesian  id    │ -       Yes     -       Yes     Yes     -       -
-    Italian     it    │ -       Yes     Yes     Yes     Yes     -       -
-    Japanese    ja    │ -       -       Yes     Yes     Yes     -       -
-    Malay       ms    │ -       Yes     -       Yes     Yes     -       -
-    Dutch       nl    │ Yes     Yes     -       Yes     Yes     -       -
-    Polish      pl    │ -       Yes     -       Yes     Yes     -       -
-    Portuguese  pt    │ -       Yes     Yes     Yes     Yes     -       -
-    Russian     ru    │ -       Yes     Yes     Yes     Yes     -       -
-    Swedish     sv    │ -       Yes     -       Yes     Yes     -       -
-    Turkish     tr    │ -       Yes     -       Yes     Yes     -       -
-    Chinese     zh    │ Yes     -       Yes     -       -       -       Jieba
+    Language    Code    Sources Large?   SUBTLEX OpenSub LeedsIC Twitter Wpedia  CCrawl  Reddit  Other
+    ───────────────────────────────────┼──────────────────────────────────────────────────────────────
+    Arabic      ar      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Bulgarian   bg      3       -      │ -       Yes     -       -       Yes     Yes     -       -
+    Catalan     ca      3       -      │ -       Yes     -       Yes     Yes     -       -       -
+    Danish      da      3       -      │ -       Yes     -       -       Yes     Yes     -       -
+    German      de      5       Yes    │ Yes     -       Yes     Yes     Yes     Yes     -       -
+    Greek       el      4       -      │ -       Yes     Yes     -       Yes     Yes     -       -
+    English     en      7       Yes    │ Yes     Yes     Yes     Yes     Yes     -       Yes     Google Books
+    Spanish     es      6       Yes    │ -       Yes     Yes     Yes     Yes     Yes     Yes     -
+    Finnish     fi      3       -      │ -       Yes     -       -       Yes     Yes     -       -
+    French      fr      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Hebrew      he      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Hindi       hi      3       -      │ -       -       -       Yes     Yes     Yes     -       -
+    Hungarian   hu      3       -      │ -       Yes     -       -       Yes     Yes     -       -
+    Indonesian  id      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Italian     it      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Japanese    ja      4       -      │ -       -       Yes     Yes     Yes     Yes     -       -
+    Korean      ko      3       -      │ -       -       -       Yes     Yes     Yes     -       -
+    Malay       ms      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Norwegian   nb[1]   3       -      │ -       Yes     -       -       Yes     Yes     -       -
+    Dutch       nl      5       Yes    │ Yes     Yes     -       Yes     Yes     Yes     -       -
+    Polish      pl      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Portuguese  pt      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Romanian    ro      3       -      │ -       Yes     -       -       Yes     Yes     -       -
+    Russian     ru      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
+    Swedish     sv      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Turkish     tr      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
+    Chinese     zh[2]   5       -      │ Yes     -       Yes     -       Yes     Yes     -       Jieba
 
+[1] The Norwegian text we have is specifically written in Norwegian Bokmål, so
+we give it the language code 'nb'. We would use 'nn' for Nynorsk, but there
+isn't enough data to include it in wordfreq.
 
-Additionally, Korean is marginally supported. You can look up frequencies in
-it, but it will be insufficiently tokenized into words, and we have too few
-data sources for it so far:
+[2] This data represents text written in both Simplified and Traditional
+Chinese. (SUBTLEX is mostly Simplified, while Wikipedia is mostly Traditional.)
+The characters are mapped to one another so they can use the same word
+frequency list.
 
-    Language    Code    SUBTLEX OpenSub LeedsIC Twitter Wpedia  Reddit
-    ──────────────────┼───────────────────────────────────────────────
-    Korean      ko    │ -       -       -       Yes     Yes     -
-
-The 'large' wordlists are available in English, German, Spanish, French, and
-Portuguese.
-
-[1] We've counted the frequencies from tweets in German, such as they are, but
-you should be aware that German is not a frequently-used language on Twitter.
-Germans just don't tweet that much.
+Some languages provide 'large' wordlists, including words with a Zipf frequency
+between 1.0 and 3.0. These are available in 9 languages that are covered by
+enough data sources.
 
 
 ## Tokenization
@@ -223,10 +232,13 @@ splits words between apostrophes and vowels.
 
 There are language-specific exceptions:
 
-- In Arabic, it additionally normalizes ligatures and removes combining marks.
-- In Japanese, instead of using the regex library, it uses the external library
-  `mecab-python3`. This is an optional dependency of wordfreq, and compiling
-  it requires the `libmecab-dev` system package to be installed.
+- In Arabic and Hebrew, it additionally normalizes ligatures and removes
+  combining marks.
+
+- In Japanese and Korean, instead of using the regex library, it uses the
+  external library `mecab-python3`. This is an optional dependency of wordfreq,
+  and compiling it requires the `libmecab-dev` system package to be installed.
+
 - In Chinese, it uses the external Python library `jieba`, another optional
   dependency.
 
@@ -240,9 +252,9 @@ also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> zipf_frequency('New York', 'en')
-    5.31
+    5.07
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.51
+    3.58
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,
@@ -257,7 +269,7 @@ you give it an uncommon combination of tokens, it will hugely over-estimate
 their frequency:
 
     >>> zipf_frequency('owl-flavored', 'en')
-    3.18
+    3.19
 
 
 ## License

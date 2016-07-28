@@ -23,6 +23,9 @@ def mecab_tokenize(text, lang):
         raise ValueError("Can't run MeCab on language %r" % lang)
     analyzer = MECAB_ANALYZERS[lang]
     text = unicodedata.normalize('NFKC', text.strip())
+    analyzed = analyzer.parse(text)
+    if not analyzed:
+        return []
     return [line.split('\t')[0]
-            for line in analyzer.parse(text).split('\n')
+            for line in analyzed.split('\n')
             if line != '' and line != 'EOS']

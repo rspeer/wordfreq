@@ -282,15 +282,15 @@ def zipf_frequency(word, lang, wordlist='combined', minimum=0.):
     """
     Get the frequency of `word`, in the language with code `lang`, on the Zipf
     scale.
-    
+
     The Zipf scale is a logarithmic frequency scale proposed by Marc Brysbaert,
     who compiled the SUBTLEX data. The goal of the Zipf scale is to map
     reasonable word frequencies to understandable, small positive numbers.
-    
+
     A word rates as x on the Zipf scale when it occurs 10**x times per billion
     words. For example, a word that occurs once per million words is at 3.0 on
     the Zipf scale.
-    
+
     Zipf values for reasonable words are between 0 and 8. The value this
     function returns will always be at last as large as `minimum`, even for a
     word that never appears. The default minimum is 0, representing words

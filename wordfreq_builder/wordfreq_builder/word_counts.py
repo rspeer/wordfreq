@@ -175,6 +175,18 @@ def merge_freqs(freq_dicts):
         for freq_dict in freq_dicts:
             freq = freq_dict.get(term, 0.)
             if freq < 1e-8:
+                # Usually we trust the median of the wordlists, but when at
+                # least 2 wordlists say a word exists and the rest say it
+                # doesn't, we kind of want to listen to the two that have
+                # information about the word. The word might be a word that's
+                # inconsistently accounted for, such as an emoji or a word
+                # containing an apostrophe.
+                #
+                # So, once we see at least 2 values that are very low or
+                # missing, we ignore further low values in the median. A word
+                # that appears in 2 sources gets a reasonable frequency, while
+                # a word that appears in 1 source still gets dropped.
+
                 missing_values += 1
                 if missing_values > 2:
                     continue

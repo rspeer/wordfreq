@@ -2,10 +2,12 @@ from wordfreq import simple_tokenize, tokenize
 from collections import defaultdict
 from operator import itemgetter
 from ftfy import fix_text
+import statistics
 import math
 import csv
 import msgpack
 import gzip
+import unicodedata
 import regex
 
 
@@ -32,6 +34,28 @@ def count_tokens(filename):
         line = URL_RE.sub('', line.strip())
         for token in simple_tokenize(line):
             counts[token] += 1
+    infile.close()
+    return counts
+
+
+def count_tokens_langtagged(filename, lang):
+    """
+    Count tokens that appear in an already language-tagged file, in which each
+    line begins with a language code followed by a tab.
+    """
+    counts = defaultdict(int)
+    if filename.endswith('gz'):
+        infile = gzip.open(filename, 'rt', encoding='utf-8', errors='replace')
+    else:
+        infile = open(filename, encoding='utf-8', errors='replace')
+    for line in infile:
+        if '\t' not in line:
+            continue
+        line_lang, text = line.split('\t', 1)
+        if line_lang == lang:
+            tokens = tokenize(text.strip(), lang)
+            for token in tokens:
+                counts[token] += 1
     infile.close()
     return counts
 
@@ -137,7 +161,7 @@ def merge_counts(count_dicts):
 def merge_freqs(freq_dicts):
     """
     Merge multiple dictionaries of frequencies, representing each word with
-    the word's average frequency over all sources.
+    the median of the word's frequency over all sources.
     """
     vocab = set()
     for freq_dict in freq_dicts:
@@ -146,15 +170,45 @@ def merge_freqs(freq_dicts):
     merged = defaultdict(float)
     N = len(freq_dicts)
     for term in vocab:
-        term_total = 0.
+        freqs = []
+        missing_values = 0
         for freq_dict in freq_dicts:
-            term_total += freq_dict.get(term, 0.)
-        merged[term] = term_total / N
+            freq = freq_dict.get(term, 0.)
+            if freq < 1e-8:
+                # Usually we trust the median of the wordlists, but when at
+                # least 2 wordlists say a word exists and the rest say it
+                # doesn't, we kind of want to listen to the two that have
+                # information about the word. The word might be a word that's
+                # inconsistently accounted for, such as an emoji or a word
+                # containing an apostrophe.
+                #
+                # So, once we see at least 2 values that are very low or
+                # missing, we ignore further low values in the median. A word
+                # that appears in 2 sources gets a reasonable frequency, while
+                # a word that appears in 1 source still gets dropped.
 
+                missing_values += 1
+                if missing_values > 2:
+                    continue
+
+            freqs.append(freq)
+
+        if freqs:
+            median = statistics.median(freqs)
+            if median > 0.:
+                merged[term] = median
+
+    total = sum(merged.values())
+
+    # Normalize the merged values so that they add up to 0.99 (based on
+    # a rough estimate that 1% of tokens will be out-of-vocabulary in a
+    # wordlist of this size).
+    for term in merged:
+        merged[term] = merged[term] / total * 0.99
     return merged
 
 
-def write_wordlist(freqs, filename, cutoff=1e-8):
+def write_wordlist(freqs, filename, cutoff=1e-9):
     """
     Write a dictionary of either raw counts or frequencies to a file of
     comma-separated values.
@@ -226,7 +280,6 @@ def correct_apostrophe_trimming(freqs):
     removed.
     """
     if (freqs.get('wouldn', 0) > 1e-6 and freqs.get('couldn', 0) > 1e-6):
-        print("Applying apostrophe trimming")
         for trim_word, trim_prob in APOSTROPHE_TRIMMED_PROB.items():
             if trim_word in freqs:
                 freq = freqs[trim_word]

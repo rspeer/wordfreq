@@ -87,6 +87,10 @@ def make_ninja_deps(rules_filename, out=sys.stdout):
             data_filename('source-lists/jieba'),
             CONFIG['sources']['jieba']
         ),
+        commoncrawl_deps(
+            data_filename('raw-input/commoncrawl'),
+            CONFIG['sources']['commoncrawl']
+        ),
         combine_lists(all_languages())
     ))
 
@@ -114,6 +118,19 @@ def wikipedia_deps(dirname_in, languages):
         else:
             add_dep(lines, 'count', plain_text_file, count_file)
 
+    return lines
+
+
+def commoncrawl_deps(dirname_in, languages):
+    lines = []
+    for language in languages:
+        if language in CONFIG['cld2-language-aliases']:
+            language_alias = CONFIG['cld2-language-aliases'][language]
+        else:
+            language_alias = language
+        input_file = dirname_in + '/{}.txt.gz'.format(language_alias)
+        count_file = wordlist_filename('commoncrawl', language, 'counts.txt')
+        add_dep(lines, 'count_langtagged', input_file, count_file, params={'language': language_alias})
     return lines
 
 

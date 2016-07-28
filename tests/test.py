@@ -19,23 +19,43 @@ def test_freq_examples():
 def test_languages():
     # Make sure the number of available languages doesn't decrease
     avail = available_languages()
-    assert_greater(len(avail), 15)
+    assert_greater(len(avail), 26)
 
+    avail_twitter = available_languages('twitter')
+    assert_greater(len(avail_twitter), 15)
     # Look up a word representing laughter in each language, and make sure
-    # it has a non-zero frequency.
-    for lang in avail:
-        if lang in {'zh', 'ja'}:
+    # it has a non-zero frequency in the informal 'twitter' list.
+    for lang in avail_twitter:
+        if lang == 'zh' or lang == 'ja':
             text = '笑'
+        elif lang == 'ko':
+            text = 'ᄏᄏᄏ'
         elif lang == 'ar':
             text = 'ههههه'
+        elif lang == 'ca' or lang == 'es':
+            text = 'jaja'
+        elif lang in {'de', 'nb', 'sv', 'da'}:
+            text = 'haha'
+        elif lang == 'pt':
+            text = 'kkkk'
+        elif lang == 'he':
+            text = 'חחח'
+        elif lang == 'ru':
+            text = 'лол'
+        elif lang == 'bg':
+            text = 'хаха'
+        elif lang == 'ro':
+            text = 'haha'
+        elif lang == 'el':
+            text = 'χαχα'
         else:
             text = 'lol'
-        assert_greater(word_frequency(text, lang), 0)
+        assert_greater(word_frequency(text, lang, wordlist='twitter'), 0, (text, lang))
 
         # Make up a weirdly verbose language code and make sure
         # we still get it
         new_lang_code = '%s-001-x-fake-extension' % lang.upper()
-        assert_greater(word_frequency(text, new_lang_code), 0, (text, new_lang_code))
+        assert_greater(word_frequency(text, new_lang_code, wordlist='twitter'), 0, (text, new_lang_code))
 
 
 def test_twitter():
@@ -62,7 +82,7 @@ def test_most_common_words():
         """
         return top_n_list(lang, 1)[0]
 
-    eq_(get_most_common('ar'), 'في')
+    eq_(get_most_common('ar'), 'من')
     eq_(get_most_common('de'), 'die')
     eq_(get_most_common('en'), 'the')
     eq_(get_most_common('es'), 'de')
@@ -144,12 +164,12 @@ def test_not_really_random():
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
     eq_(random_ascii_words(nwords=4, lang='ja', bits_per_word=0),
-        'rt rt rt rt')
+        '1 1 1 1')
 
 
 @raises(ValueError)
 def test_not_enough_ascii():
-    random_ascii_words(lang='zh')
+    random_ascii_words(lang='zh', bits_per_word=14)
 
 
 def test_arabic():
@@ -199,3 +219,10 @@ def test_other_languages():
     # Remove vowel points in Hebrew
     eq_(tokenize('דֻּגְמָה', 'he'), ['דגמה'])
 
+    # Deal with commas, cedillas, and I's in Turkish
+    eq_(tokenize('kișinin', 'tr'), ['kişinin'])
+    eq_(tokenize('KİȘİNİN', 'tr'), ['kişinin'])
+
+    # Deal with cedillas that should be commas-below in Romanian
+    eq_(tokenize('acelaşi', 'ro'), ['același'])
+    eq_(tokenize('ACELAŞI', 'ro'), ['același'])

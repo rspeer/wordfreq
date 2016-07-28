@@ -116,11 +116,26 @@ def simple_tokenize(text, include_punctuation=False):
 def turkish_tokenize(text, include_punctuation=False):
     """
     Like `simple_tokenize`, but modifies i's so that they case-fold correctly
-    in Turkish.
+    in Turkish, and modifies 'comma-below' characters to use cedillas.
     """
     text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.strip("'").casefold() for token in token_expr.findall(text)]
+    return [
+        commas_to_cedillas(token.strip("'").casefold())
+        for token in token_expr.findall(text)
+    ]
+
+
+def romanian_tokenize(text, include_punctuation=False):
+    """
+    Like `simple_tokenize`, but modifies the letters ş and ţ (with cedillas)
+    to use commas-below instead.
+    """
+    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
+    return [
+        cedillas_to_commas(token.strip("'").casefold())
+        for token in token_expr.findall(text)
+    ]
 
 
 def tokenize_mecab_language(text, lang, include_punctuation=False):
@@ -159,6 +174,34 @@ def remove_marks(text):
       Arabic word.
     """
     return MARK_RE.sub('', text)
+
+
+def commas_to_cedillas(text):
+    """
+    Convert s and t with commas (ș and ț) to cedillas (ş and ţ), which is
+    preferred in Turkish.
+    """
+    return text.replace(
+        '\N{LATIN SMALL LETTER S WITH COMMA BELOW}',
+        '\N{LATIN SMALL LETTER S WITH CEDILLA}'
+    ).replace(
+        '\N{LATIN SMALL LETTER T WITH COMMA BELOW}',
+        '\N{LATIN SMALL LETTER T WITH CEDILLA}'
+    )
+
+
+def cedillas_to_commas(text):
+    """
+    Convert s and t with cedillas (ş and ţ) to commas (ș and ț), which is
+    preferred in Romanian.
+    """
+    return text.replace(
+        '\N{LATIN SMALL LETTER S WITH CEDILLA}',
+        '\N{LATIN SMALL LETTER S WITH COMMA BELOW}'
+    ).replace(
+        '\N{LATIN SMALL LETTER T WITH CEDILLA}',
+        '\N{LATIN SMALL LETTER T WITH COMMA BELOW}'
+    )
 
 
 def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
@@ -263,6 +306,8 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         return chinese_tokenize(text, include_punctuation, external_wordlist)
     elif lang == 'tr':
         return turkish_tokenize(text, include_punctuation)
+    elif lang == 'ro':
+        return romanian_tokenize(text, include_punctuation)
     elif lang in {'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'}:
         # Abjad languages
         text = remove_marks(unicodedata.normalize('NFKC', text))

@@ -16,61 +16,56 @@ def test_freq_examples():
                    word_frequency('the', 'es'))
 
 
+# To test the reasonableness of the Twitter list, we want to look up a
+# common word representing laughter in each language. The default for
+# languages not listed here is 'haha'.
+LAUGHTER_WORDS = {
+    'en': 'lol',
+    'hi': 'lol',
+    'ru': 'лол',
+    'zh': '笑',
+    'ja': '笑',
+    'ar': 'ﻪﻬﻬﻬﻫ',
+    'ca': 'jaja',
+    'es': 'jaja',
+    'fr': 'ptdr',
+    'pt': 'kkkk',
+    'he': 'חחח',
+    'bg': 'xaxa',
+}
+
+
 def test_languages():
     # Make sure the number of available languages doesn't decrease
     avail = available_languages()
     assert_greater(len(avail), 26)
 
-    avail_twitter = available_languages('twitter')
-    assert_greater(len(avail_twitter), 15)
-    # Look up a word representing laughter in each language, and make sure
-    # it has a non-zero frequency in the informal 'twitter' list.
-    for lang in avail_twitter:
-        if lang == 'zh' or lang == 'ja':
-            text = '笑'
-        elif lang == 'ko':
-            text = 'ᄏᄏᄏ'
-        elif lang == 'ar':
-            text = 'ههههه'
-        elif lang == 'ca' or lang == 'es':
-            text = 'jaja'
-        elif lang in {'de', 'nb', 'sv', 'da'}:
-            text = 'haha'
-        elif lang == 'pt':
-            text = 'kkkk'
-        elif lang == 'he':
-            text = 'חחח'
-        elif lang == 'ru':
-            text = 'лол'
-        elif lang == 'bg':
-            text = 'хаха'
-        elif lang == 'ro':
-            text = 'haha'
-        elif lang == 'el':
-            text = 'χαχα'
-        else:
-            text = 'lol'
-        assert_greater(word_frequency(text, lang, wordlist='twitter'), 0, (text, lang))
+    # Look up the digit '2' in the main word list for each language
+    for lang in avail:
+        assert_greater(word_frequency('2', lang), 0, lang)
 
         # Make up a weirdly verbose language code and make sure
         # we still get it
         new_lang_code = '%s-001-x-fake-extension' % lang.upper()
-        assert_greater(word_frequency(text, new_lang_code, wordlist='twitter'), 0, (text, new_lang_code))
+        assert_greater(word_frequency('2', new_lang_code), 0, new_lang_code)
 
 
 def test_twitter():
     avail = available_languages('twitter')
-    assert_greater(len(avail), 14)
+    assert_greater(len(avail), 15)
 
     for lang in avail:
         assert_greater(word_frequency('rt', lang, 'twitter'),
                        word_frequency('rt', lang, 'combined'))
+        text = LAUGHTER_WORDS.get(lang, 'haha')
+        assert_greater(word_frequency(text, lang, wordlist='twitter'), 0, (text, lang))
 
 
 def test_minimums():
     eq_(word_frequency('esquivalience', 'en'), 0)
     eq_(word_frequency('esquivalience', 'en', minimum=1e-6), 1e-6)
     eq_(word_frequency('the', 'en', minimum=1), 1)
+
 
 def test_most_common_words():
     # If something causes the most common words in well-supported languages to

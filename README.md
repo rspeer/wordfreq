@@ -1,4 +1,5 @@
-Tools for working with word frequencies from various corpora.
+wordfreq is a Python library for looking up the frequencies of words in many
+languages, based on many sources of data.
 
 Author: Rob Speer
 
@@ -15,31 +16,48 @@ or by getting the repository and running its setup.py:
 
     python3 setup.py install
 
-Japanese and Chinese have additional external dependencies so that they can be
+### Additional CJK setup
+
+Chinese, Japanese, and Korean have additional external dependencies so that they can be
 tokenized correctly.
-
-To be able to look up word frequencies in Japanese, you need to additionally
-install mecab-python3, which itself depends on libmecab-dev and its dictionary.
-These commands will install them on Ubuntu:
-
-    sudo apt-get install mecab-ipadic-utf8 libmecab-dev
-    pip3 install mecab-python3
 
 To be able to look up word frequencies in Chinese, you need Jieba, a
 pure-Python Chinese tokenizer:
 
     pip3 install jieba
 
-These dependencies can also be requested as options when installing wordfreq.
-For example:
+To be able to look up word frequencies in Japanese or Korean, you need to additionally
+install mecab-python3, which itself depends on libmecab-dev.
+These commands will install them on Ubuntu:
 
-    pip3 install wordfreq[mecab,jieba]
+    sudo apt-get install libmecab-dev
+    pip3 install mecab-python3
+
+If you installed wordfreq from Git, this should be all you need, because the
+dictionary files are included. Otherwise, read on.
+
+### Getting dictionary files for the PyPI version
+
+If you installed wordfreq from PyPI (for example, using pip), and you want to
+handle Japanese and Korean, you need to get their MeCab dictionary files
+separately. We would prefer to include them in the package, but PyPI has a size
+limit.
+
+The Japanese dictionary is called 'mecab-ipadic-utf8', and is available as an Ubuntu
+package by that name:
+
+    sudo apt-get install mecab-ipadic-utf8
+
+The Korean dictionary does not have an Ubuntu package. One option, besides getting it
+from wordfreq's Git repository, is to install it from source from:
+
+    https://bitbucket.org/eunjeon/mecab-ko-dic
 
 
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 18 languages (see *Supported languages* below).
+used, in 27 languages (see *Supported languages* below).
 
 It provides three kinds of pre-built wordlists:
 

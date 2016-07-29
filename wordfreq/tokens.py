@@ -18,6 +18,10 @@ SPACELESS_SCRIPTS = [
     'Lana',  # Lanna script
 ]
 
+ABJAD_LANGUAGES = {
+    'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'
+}
+
 
 def _make_spaceless_expr():
     pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in SPACELESS_SCRIPTS]
@@ -143,7 +147,7 @@ def tokenize_mecab_language(text, lang, include_punctuation=False):
     Tokenize Japanese or Korean text, initializing the MeCab tokenizer if necessary.
     """
     global mecab_tokenize
-    if lang not in {'ja', 'ko'}:
+    if not (lang == 'ja' or lang == 'ko'):
         raise ValueError("Only Japanese and Korean can be tokenized using MeCab")
     if mecab_tokenize is None:
         from wordfreq.mecab import mecab_tokenize
@@ -180,6 +184,9 @@ def commas_to_cedillas(text):
     """
     Convert s and t with commas (ș and ț) to cedillas (ş and ţ), which is
     preferred in Turkish.
+
+    Only the lowercase versions are replaced, because this assumes the
+    text has already been case-folded.
     """
     return text.replace(
         '\N{LATIN SMALL LETTER S WITH COMMA BELOW}',
@@ -194,6 +201,9 @@ def cedillas_to_commas(text):
     """
     Convert s and t with cedillas (ş and ţ) to commas (ș and ț), which is
     preferred in Romanian.
+
+    Only the lowercase versions are replaced, because this assumes the
+    text has already been case-folded.
     """
     return text.replace(
         '\N{LATIN SMALL LETTER S WITH CEDILLA}',
@@ -308,8 +318,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         return turkish_tokenize(text, include_punctuation)
     elif lang == 'ro':
         return romanian_tokenize(text, include_punctuation)
-    elif lang in {'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'}:
-        # Abjad languages
+    elif lang in ABJAD_LANGUAGES:
         text = remove_marks(unicodedata.normalize('NFKC', text))
         return simple_tokenize(text, include_punctuation)
     else:

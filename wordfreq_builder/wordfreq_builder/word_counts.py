@@ -190,8 +190,9 @@ def merge_freqs(freq_dicts):
                 missing_values += 1
                 if missing_values > 2:
                     continue
-
-            freqs.append(freq)
+                freqs.append(0.)
+            else:
+                freqs.append(freq)
 
         if freqs:
             median = statistics.median(freqs)
@@ -208,7 +209,7 @@ def merge_freqs(freq_dicts):
     return merged
 
 
-def write_wordlist(freqs, filename, cutoff=1e-9):
+def write_wordlist(freqs, filename, cutoff=1e-8):
     """
     Write a dictionary of either raw counts or frequencies to a file of
     comma-separated values.

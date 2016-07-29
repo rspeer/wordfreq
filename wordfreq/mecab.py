@@ -28,7 +28,7 @@ def find_mecab_dictionary(names):
             return path
 
     error_lines = [
-        "Couldn't find the MeCab dictionary named %r." % name,
+        "Couldn't find the MeCab dictionary named %r." % suggested_pkg,
         "You should download or use your system's package manager to install",
         "the %r package." % suggested_pkg,
         "",

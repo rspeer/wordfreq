@@ -4,6 +4,10 @@ import unicodedata
 import os
 
 
+# MeCab has fixed-sized buffers for many things, including the dictionary path
+MAX_PATH_LENGTH = 58
+
+
 def find_mecab_dictionary(names):
     """
     Find a MeCab dictionary with a given name. The dictionary might come as
@@ -15,7 +19,6 @@ def find_mecab_dictionary(names):
     """
     suggested_pkg = names[0]
     paths = [
-        resource_filename('wordfreq', 'data'),
         os.path.expanduser('~/.local/lib/mecab/dic'),
         '/var/lib/mecab/dic',
         '/var/local/lib/mecab/dic',
@@ -24,7 +27,7 @@ def find_mecab_dictionary(names):
     ]
     full_paths = [os.path.join(path, name) for path in paths for name in names]
     for path in full_paths:
-        if os.path.exists(path):
+        if os.path.exists(path) and len(path) <= MAX_PATH_LENGTH:
             return path
 
     error_lines = [
@@ -33,7 +36,13 @@ def find_mecab_dictionary(names):
         "the %r package." % suggested_pkg,
         "",
         "We looked in the following locations:"
-    ] + ["\t%s" % path for path in full_paths]
+    ] + ["\t%s" % path for path in full_paths if len(path) <= MAX_PATH_LENGTH]
+
+    skipped_paths = [path for path in full_paths if len(path) > MAX_PATH_LENGTH]
+    if skipped_paths:
+        error_lines += [
+            "We had to skip these paths that are too long for MeCab to find:",
+        ] + ["\t%s" % path for path in skipped_paths]
 
     raise OSError('\n'.join(error_lines))
 
@@ -50,7 +59,7 @@ def make_mecab_analyzer(names):
 # Instantiate the MeCab analyzers for each language.
 MECAB_ANALYZERS = {
     'ja': make_mecab_analyzer(['mecab-ipadic-utf8', 'mecab-ja-ipadic', 'ipadic-utf8']),
-    'ko': make_mecab_analyzer(['mecab-ko-dic', 'ko-dic'])
+    'ko': make_mecab_analyzer(['mecab-ko-dic', 'ko-dic', 'mecab-ko-dic-2.0.1-20150920'])
 }
 
 

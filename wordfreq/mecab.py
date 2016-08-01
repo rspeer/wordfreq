@@ -58,8 +58,8 @@ def make_mecab_analyzer(names):
 
 # Instantiate the MeCab analyzers for each language.
 MECAB_ANALYZERS = {
-    'ja': make_mecab_analyzer(['mecab-ipadic-utf8', 'mecab-ja-ipadic', 'ipadic-utf8']),
-    'ko': make_mecab_analyzer(['mecab-ko-dic', 'ko-dic', 'mecab-ko-dic-2.0.1-20150920'])
+    'ja': make_mecab_analyzer(['mecab-ipadic-utf8', 'ipadic-utf8']),
+    'ko': make_mecab_analyzer(['mecab-ko-dic', 'ko-dic'])
 }
 
 

@@ -16,42 +16,70 @@ or by getting the repository and running its setup.py:
 
     python3 setup.py install
 
-### Additional CJK setup
 
-Chinese, Japanese, and Korean have additional external dependencies so that they can be
-tokenized correctly.
+## Additional CJK installation
+
+Chinese, Japanese, and Korean have additional external dependencies so that
+they can be tokenized correctly. Here we'll explain how to set them up,
+in increasing order of difficulty.
+
+
+### Chinese
 
 To be able to look up word frequencies in Chinese, you need Jieba, a
 pure-Python Chinese tokenizer:
 
     pip3 install jieba
 
-To be able to look up word frequencies in Japanese or Korean, you need to additionally
-install mecab-python3, which itself depends on libmecab-dev.
-These commands will install them on Ubuntu:
 
-    sudo apt-get install libmecab-dev
-    pip3 install mecab-python3
+### Japanese
 
-If you installed wordfreq from Git, this should be all you need, because the
-dictionary files are included. Otherwise, read on.
+We use MeCab, by Taku Kudo, to tokenize Japanese. To use this in wordfreq, three
+things need to be installed:
 
-### Getting dictionary files for the PyPI version
+  * The MeCab development library (called `libmecab-dev` on Ubuntu)
+  * The UTF-8 version of the `ipadic` Japanese dictionary
+    (called `mecab-ipadic-utf8` on Ubuntu)
+  * The `mecab-python3` Python interface
 
-If you installed wordfreq from PyPI (for example, using pip), and you want to
-handle Japanese and Korean, you need to get their MeCab dictionary files
-separately. We would prefer to include them in the package, but PyPI has a size
-limit.
+To install these three things on Ubuntu, you can run:
 
-The Japanese dictionary is called 'mecab-ipadic-utf8', and is available as an Ubuntu
-package by that name:
+```sh
+sudo apt-get install libmecab-dev mecab-ipadic-utf8
+pip3 install mecab-python3
+```
 
-    sudo apt-get install mecab-ipadic-utf8
+If you choose to install `ipadic` from somewhere else or from its source code,
+be sure it's configured to use UTF-8. By default it will use EUC-JP, which will
+give you nonsense results.
 
-The Korean dictionary does not have an Ubuntu package. One option, besides getting it
-from wordfreq's Git repository, is to install it from source from:
 
-    https://bitbucket.org/eunjeon/mecab-ko-dic
+### Korean
+
+Korean also uses MeCab, with a Korean dictionary package by Yongwoon Lee and
+Yungho Yu. This dictionary is not available as an Ubuntu package.
+
+Here's a process you can use to install the Korean dictionary and the other
+MeCab dependencies:
+
+```sh
+sudo apt-get install libmecab-dev mecab-utils
+pip3 install mecab-python3
+wget https://bitbucket.org/eunjeon/mecab-ko-dic/downloads/mecab-ko-dic-2.0.1-20150920.tar.gz
+tar xvf mecab-ko-dic-2.0.1-20150920.tar.gz
+cd mecab-ko-dic-2.0.1-20150920
+./autogen.sh
+make
+sudo make install
+```
+
+If wordfreq cannot find the Japanese or Korean data for MeCab when asked to
+tokenize those languages, it will raise an error and show you the list of
+paths it searched.
+
+Sorry that this is difficult. We tried to just package the data files we need
+with wordfreq, like we do for Chinese, but PyPI would reject the package for
+being too large.
 
 
 ## Usage
@@ -305,10 +333,6 @@ The terms of use of this data are:
     Ngram Viewer graphs and data may be freely used for any purpose, although
     acknowledgement of Google Books Ngram Viewer as the source, and inclusion
     of a link to http://books.google.com/ngrams, would be appreciated.
-
-`wordfreq` uses MeCab, by Taku Kudo, plus Korean data files by Yongwoon Lee and
-Yungho Yu. The Korean data is under an Apache 2 license, a copy of which
-appears in wordfreq/data/mecab-ko-dic/COPYING.
 
 `wordfreq` also contains data derived from the following Creative Commons-licensed
 sources:

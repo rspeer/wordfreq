@@ -10,12 +10,8 @@ MAX_PATH_LENGTH = 58
 
 def find_mecab_dictionary(names):
     """
-    Find a MeCab dictionary with a given name. The dictionary might come as
-    part of this repository (if you got wordfreq from GitHub) or might have to
-    be installed separately (if you got wordfreq from PyPI).
-
-    We'd prefer to include MeCab in the repository all the time, but PyPI's
-    package size limits make that not an option.
+    Find a MeCab dictionary with a given name. The dictionary has to be
+    installed separately -- see wordfreq's README for instructions.
     """
     suggested_pkg = names[0]
     paths = [

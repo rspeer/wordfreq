@@ -49,8 +49,7 @@ def make_mecab_analyzer(names):
     Get a MeCab analyzer object, given a list of names the dictionary might
     have.
     """
-    filename = find_mecab_dictionary(names)
-    return MeCab.Tagger('-d %s' % filename)
+    return MeCab.Tagger('-d %s' % find_mecab_dictionary(names))
 
 
 # Instantiate the MeCab analyzers for each language.

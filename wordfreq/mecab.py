@@ -22,8 +22,9 @@ def find_mecab_dictionary(names):
         '/usr/local/lib/mecab/dic',
     ]
     full_paths = [os.path.join(path, name) for path in paths for name in names]
-    for path in full_paths:
-        if os.path.exists(path) and len(path) <= MAX_PATH_LENGTH:
+    checked_paths = [path for path in full_paths if len(path) <= MAX_PATH_LENGTH]
+    for path in checked_paths:
+        if os.path.exists(path):
             return path
 
     error_lines = [
@@ -32,7 +33,7 @@ def find_mecab_dictionary(names):
         "the %r package." % suggested_pkg,
         "",
         "We looked in the following locations:"
-    ] + ["\t%s" % path for path in full_paths if len(path) <= MAX_PATH_LENGTH]
+    ] + ["\t%s" % path for path in checked_paths]
 
     skipped_paths = [path for path in full_paths if len(path) > MAX_PATH_LENGTH]
     if skipped_paths:

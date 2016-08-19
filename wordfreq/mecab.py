@@ -52,11 +52,13 @@ def make_mecab_analyzer(names):
     return MeCab.Tagger('-d %s' % find_mecab_dictionary(names))
 
 
-# Instantiate the MeCab analyzers for each language.
-MECAB_ANALYZERS = {
-    'ja': make_mecab_analyzer(['mecab-ipadic-utf8', 'ipadic-utf8']),
-    'ko': make_mecab_analyzer(['mecab-ko-dic', 'ko-dic'])
+# Describe how to get the MeCab analyzers for each language.
+MECAB_DICTIONARY_NAMES = {
+    'ja': ['mecab-ipadic-utf8', 'ipadic-utf8'],
+    'ko': ['mecab-ko-dic', 'ko-dic']
 }
+# The constructed analyzers will go in this dictionary.
+MECAB_ANALYZERS = {}
 
 
 def mecab_tokenize(text, lang):
@@ -68,8 +70,11 @@ def mecab_tokenize(text, lang):
     contains the same table that the command-line version of MeCab would output.
     We find the tokens in the first column of this table.
     """
-    if lang not in MECAB_ANALYZERS:
+    if lang not in MECAB_DICTIONARY_NAMES:
         raise ValueError("Can't run MeCab on language %r" % lang)
+    if lang not in MECAB_ANALYZERS:
+        MECAB_ANALYZERS[lang] = make_mecab_analyzer(MECAB_DICTIONARY_NAMES[lang])
+
     analyzer = MECAB_ANALYZERS[lang]
     text = unicodedata.normalize('NFKC', text.strip())
     analyzed = analyzer.parse(text)

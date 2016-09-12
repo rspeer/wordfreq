@@ -364,6 +364,33 @@ streaming Twitter API, in accordance with Twitter's Developer Agreement &
 Policy. This software gives statistics about words that are commonly used on
 Twitter; it does not display or republish any Twitter content.
 
+
+## Citing wordfreq
+
+If you use wordfreq in your research, please cite it! We publish the code
+through Zenodo so that it can be reliably cited using a DOI. The current
+citation is:
+
+> Robert Speer, Joshua Chin, Andrew Lin, Lance Nathan, & Sara Jewett. (2016). wordfreq: v1.5.1 [Data set]. Zenodo. http://doi.org/10.5281/zenodo.61937
+
+The same citation in BibTex format:
+
+```
+@misc{robert_speer_2016_61937,
+  author       = {Robert Speer and
+                  Joshua Chin and
+                  Andrew Lin and
+                  Lance Nathan and
+                  Sara Jewett},
+  title        = {wordfreq: v1.5.1},
+  month        = sep,
+  year         = 2016,
+  doi          = {10.5281/zenodo.61937},
+  url          = {https://doi.org/10.5281/zenodo.61937}
+}
+```
+
+
 ## Citations to work that wordfreq is built on
 
 - Brysbaert, M. & New, B. (2009). Moving beyond Kucera and Francis: A Critical

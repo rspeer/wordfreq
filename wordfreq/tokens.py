@@ -22,6 +22,22 @@ ABJAD_LANGUAGES = {
     'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'
 }
 
+# Languages that can stick particles such as «l'» onto a word starting with
+# a vowel sound, and where this vowel sound can follow a silent «h». These
+# are French and related languages.
+FRENCH_ISH_LANGUAGES = {
+    'fr',   # French
+    'ca',   # Catalan
+    'frp',  # Franco-Provençal or Arpitan
+    'nrf',  # Norman French / Jèrriais / Guernésiais
+    'oc',   # Occitan
+    'pcd',  # Picard
+    'wa',   # Walloon
+
+    'frm',  # Middle French
+    'fro',  # Old French
+}
+
 
 def _make_spaceless_expr():
     pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in SPACELESS_SCRIPTS]
@@ -113,8 +129,10 @@ def simple_tokenize(text, include_punctuation=False):
       would end up in its own token, which is worse.
     """
     text = unicodedata.normalize('NFC', text)
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.strip("'").casefold() for token in token_expr.findall(text)]
+    if include_punctuation:
+        return [token.casefold() for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)]
+    else:
+        return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
 
 
 def turkish_tokenize(text, include_punctuation=False):
@@ -140,6 +158,30 @@ def romanian_tokenize(text, include_punctuation=False):
         cedillas_to_commas(token.strip("'").casefold())
         for token in token_expr.findall(text)
     ]
+
+
+def french_tokenize(text, include_punctuation=False):
+    """
+    Handle French apostrophes that precede an 'h', which should work the same as
+    before a vowel, which the Unicode Consortium forgot. "l'heure" should tokenize
+    as "l'" and "heure".
+
+    This also applies the same way to other languages such as Catalan.
+    """
+    tokens = []
+    for token in simple_tokenize(text, include_punctuation):
+        if "'h" in token:
+            idx = token.find("'h")
+            if include_punctuation:
+                # Only include the apostrophe in the token if
+                # include_punctuation is True
+                tokens.append(token[:idx + 1])
+            else:
+                tokens.append(token[:idx])
+            tokens.append(token[idx + 1:])
+        else:
+            tokens.append(token)
+    return tokens
 
 
 def tokenize_mecab_language(text, lang, include_punctuation=False):
@@ -318,6 +360,8 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         return turkish_tokenize(text, include_punctuation)
     elif lang == 'ro':
         return romanian_tokenize(text, include_punctuation)
+    elif lang in FRENCH_ISH_LANGUAGES:
+        return french_tokenize(text, include_punctuation)
     elif lang in ABJAD_LANGUAGES:
         text = remove_marks(unicodedata.normalize('NFKC', text))
         return simple_tokenize(text, include_punctuation)

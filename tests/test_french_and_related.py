@@ -17,3 +17,10 @@ def test_apostrophes():
         eq_(tokenize("This isn't French", lang),
             ['this', "isn't", 'french'])
 
+
+def test_catalan():
+    # Catalan orthography is fiddly. Test that we get a short sentence right.
+    eq_(tokenize("M'acabo d'instal·lar.", 'ca'),
+        ['m', 'acabo', 'd', 'instal·lar'])
+    eq_(tokenize("M'acabo d'instal·lar.", 'ca', include_punctuation=True),
+        ["m'", 'acabo', "d'", 'instal·lar', '.'])

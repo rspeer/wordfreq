@@ -22,7 +22,6 @@ ABJAD_LANGUAGES = {
     'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'
 }
 
-
 def _make_spaceless_expr():
     pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in SPACELESS_SCRIPTS]
     return ''.join(pieces)
@@ -60,6 +59,13 @@ TOKEN_RE = regex.compile(r"""
     # Case 2: standard Unicode segmentation
     # -------------------------------------
 
+    # The start of the token must not be a letter followed by «'h». If it is,
+    # we should use Case 3 to match up to the apostrophe, then match a new token
+    # starting with «h». This rule lets us break «l'heure» into two tokens, just
+    # like we would do for «l'arc».
+
+    (?!\w'[Hh])
+
     # The start of the token must be 'word-like', not punctuation or whitespace
     # or various other things. However, we allow characters of category So
     # (Symbol - Other) because many of these are emoji, which can convey
@@ -71,13 +77,22 @@ TOKEN_RE = regex.compile(r"""
     # (\S) and do not cause word breaks according to the Unicode word
     # segmentation heuristic (\B), or are categorized as Marks (\p{M}).
 
-    (?:\B\S|\p{M})*
+    (?:\B\S|\p{M})* |
+
+    # Case 3: Fix French
+    # ------------------
+    # This allows us to match the articles in French, Catalan, and related
+    # languages, such as «l'», that we may have excluded from being part of
+    # the token in Case 2.
+
+    \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
     [<SPACELESS>]+ |
     [\p{punct}]+ |
-    \S(?:\B\S|\p{M})*
+    (?!\w'[Hh]) \S(?:\B\S|\p{M})* |
+    \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
@@ -113,8 +128,10 @@ def simple_tokenize(text, include_punctuation=False):
       would end up in its own token, which is worse.
     """
     text = unicodedata.normalize('NFC', text)
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.strip("'").casefold() for token in token_expr.findall(text)]
+    if include_punctuation:
+        return [token.casefold() for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)]
+    else:
+        return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
 
 
 def turkish_tokenize(text, include_punctuation=False):

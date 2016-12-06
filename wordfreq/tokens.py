@@ -22,23 +22,6 @@ ABJAD_LANGUAGES = {
     'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'
 }
 
-# Languages that can stick particles such as «l'» onto a word starting with
-# a vowel sound, and where this vowel sound can follow a silent «h». These
-# are French and related languages.
-FRENCH_ISH_LANGUAGES = {
-    'fr',   # French
-    'ca',   # Catalan
-    'frp',  # Franco-Provençal or Arpitan
-    'nrf',  # Norman French / Jèrriais / Guernésiais
-    'oc',   # Occitan
-    'pcd',  # Picard
-    'wa',   # Walloon
-
-    'frm',  # Middle French
-    'fro',  # Old French
-}
-
-
 def _make_spaceless_expr():
     pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in SPACELESS_SCRIPTS]
     return ''.join(pieces)
@@ -76,6 +59,13 @@ TOKEN_RE = regex.compile(r"""
     # Case 2: standard Unicode segmentation
     # -------------------------------------
 
+    # The start of the token must not be a letter followed by «'h». If it is,
+    # we should use Case 3 to match up to the apostrophe, then match a new token
+    # starting with «h». This rule lets us break «l'heure» into two tokens, just
+    # like we would do for «l'arc».
+
+    (?!\w'[Hh])
+
     # The start of the token must be 'word-like', not punctuation or whitespace
     # or various other things. However, we allow characters of category So
     # (Symbol - Other) because many of these are emoji, which can convey
@@ -87,13 +77,22 @@ TOKEN_RE = regex.compile(r"""
     # (\S) and do not cause word breaks according to the Unicode word
     # segmentation heuristic (\B), or are categorized as Marks (\p{M}).
 
-    (?:\B\S|\p{M})*
+    (?:\B\S|\p{M})* |
+
+    # Case 3: Fix French
+    # ------------------
+    # This allows us to match the articles in French, Catalan, and related
+    # languages, such as «l'», that we may have excluded from being part of
+    # the token in Case 2.
+
+    \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
     [<SPACELESS>]+ |
     [\p{punct}]+ |
-    \S(?:\B\S|\p{M})*
+    (?!\w'[Hh]) \S(?:\B\S|\p{M})* |
+    \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
@@ -158,30 +157,6 @@ def romanian_tokenize(text, include_punctuation=False):
         cedillas_to_commas(token.strip("'").casefold())
         for token in token_expr.findall(text)
     ]
-
-
-def french_tokenize(text, include_punctuation=False):
-    """
-    Handle French apostrophes that precede an 'h', which should work the same as
-    before a vowel, which the Unicode Consortium forgot. "l'heure" should tokenize
-    as "l'" and "heure".
-
-    This also applies the same way to other languages such as Catalan.
-    """
-    tokens = []
-    for token in simple_tokenize(text, include_punctuation):
-        if "'h" in token:
-            idx = token.find("'h")
-            if include_punctuation:
-                # Only include the apostrophe in the token if
-                # include_punctuation is True
-                tokens.append(token[:idx + 1])
-            else:
-                tokens.append(token[:idx])
-            tokens.append(token[idx + 1:])
-        else:
-            tokens.append(token)
-    return tokens
 
 
 def tokenize_mecab_language(text, lang, include_punctuation=False):
@@ -360,8 +335,6 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         return turkish_tokenize(text, include_punctuation)
     elif lang == 'ro':
         return romanian_tokenize(text, include_punctuation)
-    elif lang in FRENCH_ISH_LANGUAGES:
-        return french_tokenize(text, include_punctuation)
     elif lang in ABJAD_LANGUAGES:
         text = remove_marks(unicodedata.normalize('NFKC', text))
         return simple_tokenize(text, include_punctuation)

@@ -17,6 +17,7 @@ def test_apostrophes():
         ["l'", 'heure'])
     eq_(tokenize("L'Hôpital", 'fr', include_punctuation=True),
         ["l'", 'hôpital'])
+    eq_(tokenize("aujourd'hui", 'fr'), ["aujourd'hui"])
     eq_(tokenize("This isn't French", 'en'),
         ['this', "isn't", 'french'])
 

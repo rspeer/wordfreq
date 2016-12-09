@@ -97,6 +97,9 @@ TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
 
 MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 
+DIGIT_RE = regex.compile('\d')
+MULTI_DIGIT_RE = regex.compile('\d[\d.,]+')
+
 
 def simple_tokenize(text, include_punctuation=False):
     """
@@ -129,9 +132,15 @@ def simple_tokenize(text, include_punctuation=False):
     """
     text = unicodedata.normalize('NFC', text)
     if include_punctuation:
-        return [token.casefold() for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)]
+        return [
+            smash_numbers(token.casefold())
+            for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
+        ]
     else:
-        return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
+        return [
+            smash_numbers(token.strip("'").casefold())
+            for token in TOKEN_RE.findall(text)
+        ]
 
 
 def turkish_tokenize(text, include_punctuation=False):
@@ -142,7 +151,7 @@ def turkish_tokenize(text, include_punctuation=False):
     text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
     return [
-        commas_to_cedillas(token.strip("'").casefold())
+        smash_numbers(commas_to_cedillas(token.strip("'").casefold()))
         for token in token_expr.findall(text)
     ]
 
@@ -154,7 +163,7 @@ def romanian_tokenize(text, include_punctuation=False):
     """
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
     return [
-        cedillas_to_commas(token.strip("'").casefold())
+        smash_numbers(cedillas_to_commas(token.strip("'").casefold()))
         for token in token_expr.findall(text)
     ]
 
@@ -170,7 +179,8 @@ def tokenize_mecab_language(text, lang, include_punctuation=False):
         from wordfreq.mecab import mecab_tokenize
     tokens = mecab_tokenize(text, lang)
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.casefold() for token in tokens if token_expr.match(token)]
+    return [smash_numbers(token.casefold()) for token in tokens
+            if token_expr.match(token)]
 
 
 def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
@@ -182,7 +192,8 @@ def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
         from wordfreq.chinese import jieba_tokenize
     tokens = jieba_tokenize(text, external_wordlist=external_wordlist)
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.casefold() for token in tokens if token_expr.match(token)]
+    return [smash_numbers(token.casefold()) for token in tokens
+            if token_expr.match(token)]
 
 
 def remove_marks(text):
@@ -229,6 +240,21 @@ def cedillas_to_commas(text):
         '\N{LATIN SMALL LETTER T WITH CEDILLA}',
         '\N{LATIN SMALL LETTER T WITH COMMA BELOW}'
     )
+
+def sub_zeroes(match):
+    """
+    Given a regex match, return what it matched with digits replaced by
+    zeroes.
+    """
+    return DIGIT_RE.sub('0', match.group(0))
+
+
+def smash_numbers(text):
+    """
+    Replace sequences of multiple digits with zeroes, so we don't need to
+    distinguish the frequencies of thousands of numbers.
+    """
+    return MULTI_DIGIT_RE.sub(sub_zeroes, text)
 
 
 def tokenize(text, lang, include_punctuation=False, external_wordlist=False):

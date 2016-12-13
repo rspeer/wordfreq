@@ -149,11 +149,16 @@ def turkish_tokenize(text, include_punctuation=False):
     in Turkish, and modifies 'comma-below' characters to use cedillas.
     """
     text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [
-        smash_numbers(commas_to_cedillas(token.strip("'").casefold()))
-        for token in token_expr.findall(text)
-    ]
+    if include_punctuation:
+        return [
+            smash_numbers(commas_to_cedillas(token.casefold()))
+            for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
+        ]
+    else:
+        return [
+            smash_numbers(commas_to_cedillas(token.strip("'").casefold()))
+            for token in TOKEN_RE.findall(text)
+        ]
 
 
 def romanian_tokenize(text, include_punctuation=False):
@@ -161,11 +166,16 @@ def romanian_tokenize(text, include_punctuation=False):
     Like `simple_tokenize`, but modifies the letters ş and ţ (with cedillas)
     to use commas-below instead.
     """
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [
-        smash_numbers(cedillas_to_commas(token.strip("'").casefold()))
-        for token in token_expr.findall(text)
-    ]
+    if include_punctuation:
+        return [
+            smash_numbers(cedillas_to_commas(token.casefold()))
+            for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
+        ]
+    else:
+        return [
+            smash_numbers(cedillas_to_commas(token.strip("'").casefold()))
+            for token in TOKEN_RE.findall(text)
+        ]
 
 
 def tokenize_mecab_language(text, lang, include_punctuation=False):
@@ -353,6 +363,9 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     does not support these languages yet. It will split on spaces and
     punctuation, giving tokens that are far too long.
     """
+    # A really simple way to handle language codes with more than just the
+    # language
+    lang = lang.split('-')[0]
     if lang == 'ja' or lang == 'ko':
         return tokenize_mecab_language(text, lang, include_punctuation)
     elif lang == 'zh':

@@ -1,6 +1,6 @@
 import regex
 import unicodedata
-
+from .transliterate import serbian_cyrillic_to_latin
 
 mecab_tokenize = None
 jieba_tokenize = None
@@ -142,42 +142,6 @@ def simple_tokenize(text, include_punctuation=False):
             for token in TOKEN_RE.findall(text)
         ]
 
-
-def turkish_tokenize(text, include_punctuation=False):
-    """
-    Like `simple_tokenize`, but modifies i's so that they case-fold correctly
-    in Turkish, and modifies 'comma-below' characters to use cedillas.
-    """
-    text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
-    if include_punctuation:
-        return [
-            smash_numbers(commas_to_cedillas(token.casefold()))
-            for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
-        ]
-    else:
-        return [
-            smash_numbers(commas_to_cedillas(token.strip("'").casefold()))
-            for token in TOKEN_RE.findall(text)
-        ]
-
-
-def romanian_tokenize(text, include_punctuation=False):
-    """
-    Like `simple_tokenize`, but modifies the letters ş and ţ (with cedillas)
-    to use commas-below instead.
-    """
-    if include_punctuation:
-        return [
-            smash_numbers(cedillas_to_commas(token.casefold()))
-            for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
-        ]
-    else:
-        return [
-            smash_numbers(cedillas_to_commas(token.strip("'").casefold()))
-            for token in TOKEN_RE.findall(text)
-        ]
-
-
 def tokenize_mecab_language(text, lang, include_punctuation=False):
     """
     Tokenize Japanese or Korean text, initializing the MeCab tokenizer if necessary.
@@ -250,6 +214,30 @@ def cedillas_to_commas(text):
         '\N{LATIN SMALL LETTER T WITH CEDILLA}',
         '\N{LATIN SMALL LETTER T WITH COMMA BELOW}'
     )
+
+def preprocess_turkish(text):
+    """
+    Modifies i's so that they case-fold correctly in Turkish, and modifies
+    'comma-below' characters to use cedillas.
+    """
+    text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
+    return commas_to_cedillas(text.casefold())
+
+
+def preprocess_romanian(text):
+    """
+    Modifies the letters ş and ţ (with cedillas) to use commas-below instead.
+    """
+    return cedillas_to_commas(text.casefold())
+
+
+def preprocess_serbian(text):
+    """
+    Serbian is written in two scripts, so transliterate from Cyrillic to Latin
+    (which is the unambiguous direction).
+    """
+    return serbian_cyrillic_to_latin(text)
+
 
 def sub_zeroes(match):
     """
@@ -371,9 +359,13 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     elif lang == 'zh':
         return chinese_tokenize(text, include_punctuation, external_wordlist)
     elif lang == 'tr':
-        return turkish_tokenize(text, include_punctuation)
+        return simple_tokenize(preprocess_turkish(text), include_punctuation)
     elif lang == 'ro':
-        return romanian_tokenize(text, include_punctuation)
+        return simple_tokenize(preprocess_romanian(text), include_punctuation)
+    elif lang == 'sr' or lang == 'sh' or lang == 'hbs':
+        # These are the three language codes that could include Serbian text,
+        # which could be in Cyrillic.
+        return simple_tokenize(preprocess_serbian(text), include_punctuation)
     elif lang in ABJAD_LANGUAGES:
         text = remove_marks(unicodedata.normalize('NFKC', text))
         return simple_tokenize(text, include_punctuation)

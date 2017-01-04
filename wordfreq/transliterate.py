@@ -31,6 +31,29 @@ SR_CYRL_TO_LATN_DICT = {
     ord('Ч'): 'Č',   ord('ч'): 'č',
     ord('Џ'): 'Dž',  ord('џ'): 'dž',
     ord('Ш'): 'Š',   ord('ш'): 'š',
+
+    # Handle borrowed letters from Russian
+    ord('Ё'): 'Jo',  ord('ё'): 'Jo',
+    ord('Й'): 'J',   ord('й'): 'j',
+    ord('Ў'): 'U',   ord('ў'): 'u',
+    ord('Щ'): 'Šč',  ord('щ'): 'šč',
+    ord('Ъ'): '',    ord('ъ'): '',
+    ord('Ы'): 'Y',   ord('ы'): 'y',
+    ord('Ь'): "'",   ord('ь'): "'",
+    ord('Э'): 'E',   ord('э'): 'e',
+    ord('Ю'): 'Ju',  ord('ю'): 'ju',
+    ord('Я'): 'Ja',  ord('я'): 'ja',
+
+    # Handle borrowed letters from Ukrainian
+    ord('Є'): 'Je',  ord('є'): 'je',
+    ord('І'): 'I',   ord('і'): 'i',
+    ord('Ї'): 'Ji',  ord('ї'): 'ji',
+    ord('Ґ'): 'G',   ord('ґ'): 'g',
+
+    # Handle borrowed letters from Macedonian
+    ord('Ѕ'): 'Dz',  ord('ѕ'): 'dz',
+    ord('Ѓ'): 'Ǵ',   ord('ѓ'): 'ǵ',
+    ord('Ќ'): 'Ḱ',   ord('ќ'): 'ḱ',
 }
 
 

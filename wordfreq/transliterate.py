@@ -32,10 +32,15 @@ SR_CYRL_TO_LATN_DICT = {
     ord('Џ'): 'Dž',  ord('џ'): 'dž',
     ord('Ш'): 'Š',   ord('ш'): 'š',
 
-    # Handle borrowed letters from Russian
+    # Handle Cyrillic letters from other languages. We hope these cases don't
+    # come up often when we're trying to transliterate Serbian, but if these
+    # letters show up in loan-words or code-switching text, we can at least
+    # transliterate them approximately instead of leaving them as Cyrillic
+    # letters surrounded by Latin.
+
+    # Russian letters
     ord('Ё'): 'Jo',  ord('ё'): 'Jo',
     ord('Й'): 'J',   ord('й'): 'j',
-    ord('Ў'): 'U',   ord('ў'): 'u',
     ord('Щ'): 'Šč',  ord('щ'): 'šč',
     ord('Ъ'): '',    ord('ъ'): '',
     ord('Ы'): 'Y',   ord('ы'): 'y',
@@ -44,13 +49,16 @@ SR_CYRL_TO_LATN_DICT = {
     ord('Ю'): 'Ju',  ord('ю'): 'ju',
     ord('Я'): 'Ja',  ord('я'): 'ja',
 
-    # Handle borrowed letters from Ukrainian
+    # Belarusian letter
+    ord('Ў'): 'Ŭ',   ord('ў'): 'ŭ',
+
+    # Ukrainian letters
     ord('Є'): 'Je',  ord('є'): 'je',
     ord('І'): 'I',   ord('і'): 'i',
     ord('Ї'): 'Ji',  ord('ї'): 'ji',
     ord('Ґ'): 'G',   ord('ґ'): 'g',
 
-    # Handle borrowed letters from Macedonian
+    # Macedonian letters
     ord('Ѕ'): 'Dz',  ord('ѕ'): 'dz',
     ord('Ѓ'): 'Ǵ',   ord('ѓ'): 'ǵ',
     ord('Ќ'): 'Ḱ',   ord('ќ'): 'ḱ',

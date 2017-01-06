@@ -14,6 +14,9 @@
 - Add automatic transliteration of Serbian text
 - Adjust tokenization of apostrophes next to vowel sounds: the French word
   "l'heure" is now tokenized similarly to "l'arc"
+- Numbers longer than a single digit are smashed into the same word frequency,
+  to remove meaningless differences and increase compatibility with word2vec.
+  (Internally, their digits are replaced by zeroes.)
 - Another new frequency-merging strategy (drop the highest and lowest,
   average the rest)
 

@@ -12,6 +12,8 @@
 - Drop the Common Crawl; we have enough good sources now that we don't have
   to deal with all that spam
 - Add automatic transliteration of Serbian text
+- Adjust tokenization of apostrophes next to vowel sounds: the French word
+  "l'heure" is now tokenized similarly to "l'arc"
 - Another new frequency-merging strategy (drop the highest and lowest,
   average the rest)
 

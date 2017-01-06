@@ -1,3 +1,21 @@
+## Version 1.6.0 (2017-01-05)
+
+- Support Czech, Persian, Ukrainian, and Croatian/Bosnian/Serbian
+- Add large lists in Chinese, Finnish, Japanese, and Polish
+- Data is now collected and built using Exquisite Corpus
+  (https://github.com/rspeer/exquisite-corpus)
+- Add word frequencies from OPUS OpenSubtitles 2016
+- Add word frequencies from the MOKK Hungarian Webcorpus
+- Expand Google Books Ngrams data to cover 8 languages
+- Expand language detection on Reddit to cover 13 languages with large enough
+  Reddit communities
+- Drop the Common Crawl; we have enough good sources now that we don't have
+  to deal with all that spam
+- Add automatic transliteration of Serbian text
+- Another new frequency-merging strategy (drop the highest and lowest,
+  average the rest)
+
+
 ## Version 1.5.1 (2016-08-19)
 
 - Bug fix: Made it possible to load the Japanese or Korean dictionary when the

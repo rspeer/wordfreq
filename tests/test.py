@@ -155,6 +155,7 @@ def test_number_smashing():
     eq_(tokenize('1', 'en', combine_numbers=True), ['1'])
     eq_(tokenize('3.14', 'en', combine_numbers=True), ['0.00'])
     eq_(tokenize('24601', 'en', combine_numbers=True), ['00000'])
+    eq_(word_frequency('24601', 'en'), word_frequency('90210', 'en'))
 
 
 def test_phrase_freq():

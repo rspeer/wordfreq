@@ -146,9 +146,15 @@ def test_casefolding():
 
 
 def test_number_smashing():
-    eq_(tokenize('1', 'en'), ['1'])
-    eq_(tokenize('3.14', 'en'), ['0.00'])
-    eq_(tokenize('24601', 'en'), ['00000'])
+    eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en'),
+        ['715', 'crσσks', 'by', 'bon', 'iver'])
+    eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en', combine_numbers=True),
+        ['000', 'crσσks', 'by', 'bon', 'iver'])
+    eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en', combine_numbers=True, include_punctuation=True),
+        ['"', '000', '-', 'crσσks', '"', 'by', 'bon', 'iver'])
+    eq_(tokenize('1', 'en', combine_numbers=True), ['1'])
+    eq_(tokenize('3.14', 'en', combine_numbers=True), ['0.00'])
+    eq_(tokenize('24601', 'en', combine_numbers=True), ['00000'])
 
 
 def test_phrase_freq():

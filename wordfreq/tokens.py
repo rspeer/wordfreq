@@ -101,7 +101,7 @@ DIGIT_RE = regex.compile('\d')
 MULTI_DIGIT_RE = regex.compile('\d[\d.,]+')
 
 
-def simple_tokenize(text, include_punctuation=False):
+def simple_tokenize(text, include_punctuation=False, combine_numbers=False):
     """
     Tokenize the given text using a straightforward, Unicode-aware token
     expression.
@@ -121,6 +121,11 @@ def simple_tokenize(text, include_punctuation=False):
       such as emoji. If `include_punctuation` is True, it outputs all non-space
       tokens.
 
+    - If `combine_numbers` is True, then multi-digit numbers will be replaced
+      by strings of zeroes. When looking up word frequencies, this allows all
+      numbers of the same length to be treated as the same "word", avoiding
+      unnecessarily sparse data.
+
     - It breaks on all spaces, even the "non-breaking" ones.
 
     - It aims to keep marks together with words, so that they aren't erroneously
@@ -131,18 +136,23 @@ def simple_tokenize(text, include_punctuation=False):
       would end up in its own token, which is worse.
     """
     text = unicodedata.normalize('NFC', text)
+    if combine_numbers:
+        postprocess = smash_numbers
+    else:
+        postprocess = _identity
     if include_punctuation:
         return [
-            smash_numbers(token.casefold())
+            postprocess(token.casefold())
             for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
         ]
     else:
         return [
-            smash_numbers(token.strip("'").casefold())
+            postprocess(token.strip("'").casefold())
             for token in TOKEN_RE.findall(text)
         ]
 
-def tokenize_mecab_language(text, lang, include_punctuation=False):
+def tokenize_mecab_language(text, lang, include_punctuation=False,
+                            combine_numbers=False):
     """
     Tokenize Japanese or Korean text, initializing the MeCab tokenizer if necessary.
     """
@@ -151,22 +161,31 @@ def tokenize_mecab_language(text, lang, include_punctuation=False):
         raise ValueError("Only Japanese and Korean can be tokenized using MeCab")
     if mecab_tokenize is None:
         from wordfreq.mecab import mecab_tokenize
+    if combine_numbers:
+        postprocess = smash_numbers
+    else:
+        postprocess = _identity
     tokens = mecab_tokenize(text, lang)
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [smash_numbers(token.casefold()) for token in tokens
+    return [postprocess(token.casefold()) for token in tokens
             if token_expr.match(token)]
 
 
-def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
+def chinese_tokenize(text, include_punctuation=False, external_wordlist=False,
+                     combine_numbers=False):
     """
     Tokenize Chinese text, initializing the Jieba tokenizer if necessary.
     """
     global jieba_tokenize
     if jieba_tokenize is None:
         from wordfreq.chinese import jieba_tokenize
+    if combine_numbers:
+        postprocess = smash_numbers
+    else:
+        postprocess = _identity
     tokens = jieba_tokenize(text, external_wordlist=external_wordlist)
     token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [smash_numbers(token.casefold()) for token in tokens
+    return [postprocess(token.casefold()) for token in tokens
             if token_expr.match(token)]
 
 
@@ -255,7 +274,15 @@ def smash_numbers(text):
     return MULTI_DIGIT_RE.sub(sub_zeroes, text)
 
 
-def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
+def _identity(text):
+    """
+    The identity function, as an alternative to smashing numbers.
+    """
+    return text
+
+
+def tokenize(text, lang, include_punctuation=False, external_wordlist=False,
+             combine_numbers=False):
     """
     Tokenize this text in a way that's relatively simple but appropriate for
     the language. Strings that are looked up in wordfreq will be run through
@@ -269,6 +296,17 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     - Abjad scripts: Arabic, Hebrew, Persian, Urdu, etc.
     - CJK scripts: Chinese, Japanese, Korean
     - Brahmic scripts: Hindi, Tamil, Telugu, Kannada, etc.
+
+    The options `include_punctuation`, `external_wordlist`, and
+    `combine_numbers` are passed on to the appropriate tokenizer:
+
+    - `include_punctuation` preserves punctuation as tokens, instead of
+      removing it.
+
+    - `external_wordlist` uses the default Jieba wordlist to tokenize Chinese,
+      instead of wordfreq's wordlist.
+
+    - `combine_numbers` replaces multi-digit numbers with strings of zeroes.
 
 
     Alphabetic scripts
@@ -355,20 +393,20 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     # language
     lang = lang.split('-')[0]
     if lang == 'ja' or lang == 'ko':
-        return tokenize_mecab_language(text, lang, include_punctuation)
+        return tokenize_mecab_language(text, lang, include_punctuation, combine_numbers)
     elif lang == 'zh':
-        return chinese_tokenize(text, include_punctuation, external_wordlist)
+        return chinese_tokenize(text, include_punctuation, external_wordlist, combine_numbers)
     elif lang == 'tr':
-        return simple_tokenize(preprocess_turkish(text), include_punctuation)
+        return simple_tokenize(preprocess_turkish(text), include_punctuation, combine_numbers)
     elif lang == 'ro':
-        return simple_tokenize(preprocess_romanian(text), include_punctuation)
+        return simple_tokenize(preprocess_romanian(text), include_punctuation, combine_numbers)
     elif lang == 'sr' or lang == 'sh' or lang == 'hbs':
         # These are the three language codes that could include Serbian text,
         # which could be in Cyrillic.
-        return simple_tokenize(preprocess_serbian(text), include_punctuation)
+        return simple_tokenize(preprocess_serbian(text), include_punctuation, combine_numbers)
     elif lang in ABJAD_LANGUAGES:
         text = remove_marks(unicodedata.normalize('NFKC', text))
-        return simple_tokenize(text, include_punctuation)
+        return simple_tokenize(text, include_punctuation, combine_numbers)
     else:
-        return simple_tokenize(text, include_punctuation)
+        return simple_tokenize(text, include_punctuation, combine_numbers)
 

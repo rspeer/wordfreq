@@ -230,7 +230,7 @@ least 3 different sources of word frequencies:
     Language    Code    #  Large?   WP    Subs  News  Books Web   Twit. Redd. Misc.
     ──────────────────────────────┼────────────────────────────────────────────────
     Arabic      ar      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
-    Bosnian     bs[1]   3         │ Yes   Yes   -     -     -     Yes   -     -
+    Bosnian     bs [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
     Bulgarian   bg      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Catalan     ca      4  -      │ Yes   Yes   Yes   -     -     Yes   -     -
     Czech       cs      3  -      │ Yes   Yes   -     -     -     Yes   -     -
@@ -244,41 +244,37 @@ least 3 different sources of word frequencies:
     French      fr      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Hebrew      he      4  -      │ Yes   Yes   -     Yes   -     Yes   -     -
     Hindi       hi      3  -      │ Yes   -     -     -     -     Yes   Yes   -
-    Croatian    hr[1]   3         │ Yes   Yes   -     -     -     Yes   -     -
+    Croatian    hr [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
     Hungarian   hu      3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Indonesian  id      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Italian     it      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Japanese    ja      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
     Korean      ko      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
     Malay       ms      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Norwegian   nb[2]   4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
+    Norwegian   nb [2]  4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
     Dutch       nl      4  Yes    │ Yes   Yes   Yes   -     -     Yes   -     -
     Polish      pl      5  Yes    │ Yes   Yes   Yes   -     -     Yes   Yes   -
     Portuguese  pt      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Romanian    ro      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Russian     ru      6  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   -     -
-    Serbian     sr[1]   3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Serbian     sr [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Swedish     sv      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
     Turkish     tr      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Ukrainian   uk      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
-    Chinese     zh[3]   6  Yes    │ Yes   -     Yes   Yes   Yes   Yes   -     Jieba
+    Chinese     zh [3]  6  Yes    │ Yes   -     Yes   Yes   Yes   Yes   -     Jieba
 
 [1] Bosnian, Croatian, and Serbian use the same underlying word list, because
-they are mutually intelligible and have large amounts of vocabulary in common.
-This word list can also be accessed with the language code `sh`.
-We list them separately to emphasize that the word list is appropriate for
-looking up frequencies in any of those languages, even though the idea of a
-unified Serbo-Croatian language is losing popularity. Lookups in `sr` or `sh`
-will also automatically unify Cyrillic and Latin spellings.
+they share most of their vocabulary and grammar, they were once considered the
+same language, and language detection cannot distinguish them. This word list
+can also be accessed with the language code `sh`.
 
 [2] The Norwegian text we have is specifically written in Norwegian Bokmål, so
-we give it the language code 'nb'. We would use 'nn' for Nynorsk, but there
-isn't enough data to include it in wordfreq.
+we give it the language code 'nb' instead of the vaguer code 'no'. We would use
+'nn' for Nynorsk, but there isn't enough data to include it in wordfreq.
 
 [3] This data represents text written in both Simplified and Traditional
-Chinese. (SUBTLEX is mostly Simplified, for example, while Wikipedia is mostly
-Traditional.) The characters are mapped to one another so they can use the same
-underlying word frequency list.
+Chinese, with primarily Mandarin Chinese vocabulary. See "Multi-script
+languages" below.
 
 Some languages provide 'large' wordlists, including words with a Zipf frequency
 between 1.0 and 3.0. These are available in 12 languages that are covered by
@@ -336,6 +332,55 @@ their frequency:
     3.26
 
 
+## Multi-script languages
+
+Two of the languages we support, Serbian and Chinese, are written in multiple
+scripts. To avoid spurious differences in word frequencies, we automatically
+transliterate the characters in these languages when looking up their words.
+
+Serbian text written in Cyrillic letters is automatically converted to Latin
+letters, using standard Serbian transliteration, when the requested language is
+`sr` or `sh`. If you request the word list as `hr` (Croatian) or `bs`
+(Bosnian), no transliteration will occur.
+
+Chinese text is converted internally to a representation we call
+"Oversimplified Chinese", where all Traditional Chinese characters are replaced
+with their Simplified Chinese equivalent, *even if* they would not be written
+that way in context. This representation lets us use a straightforward mapping
+that matches both Traditional and Simplified words, unifying their frequencies
+when appropriate, and does not appear to create clashes between unrelated words.
+
+Enumerating the Chinese wordlist will produce some unfamiliar words, because
+people don't actually write in Oversimplified Chinese, and because in
+practice Traditional and Simplified Chinese also have different word usage.
+
+
+## Similar, overlapping, and varying languages
+
+As much as we would like to give each language its own distinct code and its
+own distinct word list with distinct source data, there aren't actually sharp
+boundaries between languages.
+
+Sometimes, it's convenient to pretend that the boundaries between
+languages coincide with national borders, following the maxim that "a language
+is a dialect with an army and a navy" (Max Weinreich). This gets complicated
+when the linguistic situation and the political situation diverge.
+Moreover, some of our data sources rely on language detection, which of course
+has no idea which country the writer of the text belongs to.
+
+So we've had to make some arbitrary decisions about how to represent the
+fuzzier language boundaries, such as those within Chinese, Malay, and
+Croatian/Bosnian/Serbian.  See [Language Log][] for some firsthand reports of
+the mutual intelligibility or unintelligibility of languages.
+
+[Language Log]: http://languagelog.ldc.upenn.edu/nll/?p=12633
+
+Smoothing over our arbitrary decisions is the fact that we use the `langcodes`
+module to find the best match for a language code. If you ask for word
+frequencies in `cmn-Hans` (the fully specific language code for Mandarin in
+Simplified Chinese), you will get the `zh` wordlist, for example.
+
+
 ## License
 
 `wordfreq` is freely redistributable under the MIT license (see
@@ -362,6 +407,10 @@ sources:
   (https://invokeit.wordpress.com/frequency-word-lists/)
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
+
+It contains data from OPUS OpenSubtitles 2016
+(http://opus.lingfil.uu.se/OpenSubtitles2016.php), whose data originates from
+the OpenSubtitles project (http://www.opensubtitles.org/).
 
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
 SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al.
@@ -456,6 +505,11 @@ The same citation in BibTex format:
 - Kudo, T. (2005). Mecab: Yet another part-of-speech and morphological
   analyzer.
   http://mecab.sourceforge.net/
+
+- Lison, P. and Tiedemann, J. (2016). OpenSubtitles2016: Extracting Large
+  Parallel Corpora from Movie and TV Subtitles. In Proceedings of the 10th
+  International Conference on Language Resources and Evaluation (LREC 2016).
+  http://stp.lingfil.uu.se/~joerg/paper/opensubs2016.pdf
 
 - van Heuven, W. J., Mandera, P., Keuleers, E., & Brysbaert, M. (2014).
   SUBTLEX-UK: A new and improved word frequency database for British English.

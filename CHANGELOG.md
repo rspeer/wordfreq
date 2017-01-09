@@ -3,7 +3,7 @@
 - Support Czech, Persian, Ukrainian, and Croatian/Bosnian/Serbian
 - Add large lists in Chinese, Finnish, Japanese, and Polish
 - Data is now collected and built using Exquisite Corpus
-  (https://github.com/rspeer/exquisite-corpus)
+  (https://github.com/LuminosoInsight/exquisite-corpus)
 - Add word frequencies from OPUS OpenSubtitles 2016
 - Add word frequencies from the MOKK Hungarian Webcorpus
 - Expand Google Books Ngrams data to cover 8 languages

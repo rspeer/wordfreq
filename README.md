@@ -106,16 +106,16 @@ frequencies by a million (1e6) to get more readable numbers:
 
     >>> from wordfreq import word_frequency
     >>> word_frequency('cafe', 'en') * 1e6
-    12.88249551693135
+    11.748975549395302
 
     >>> word_frequency('café', 'en') * 1e6
-    3.3884415613920273
+    3.981071705534969
 
     >>> word_frequency('cafe', 'fr') * 1e6
-    2.6302679918953817
+    1.4125375446227555
 
     >>> word_frequency('café', 'fr') * 1e6
-    87.09635899560814
+    53.70317963702532
 
 
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
@@ -133,19 +133,19 @@ one occurrence per billion words.
 
     >>> from wordfreq import zipf_frequency
     >>> zipf_frequency('the', 'en')
-    7.67
+    7.75
 
     >>> zipf_frequency('word', 'en')
-    5.39
+    5.32
 
     >>> zipf_frequency('frequency', 'en')
-    4.19
+    4.36
 
     >>> zipf_frequency('zipf', 'en')
     0.0
 
     >>> zipf_frequency('zipf', 'en', wordlist='large')
-    1.65
+    1.28
 
 
 The parameters to `word_frequency` and `zipf_frequency` are:
@@ -175,10 +175,10 @@ the list, in descending frequency order.
 
     >>> from wordfreq import top_n_list
     >>> top_n_list('en', 10)
-    ['the', 'i', 'to', 'a', 'and', 'of', 'you', 'in', 'that', 'is']
+    ['the', 'to', 'of', 'and', 'a', 'in', 'i', 'is', 'that', 'for']
 
     >>> top_n_list('es', 10)
-    ['de', 'que', 'la', 'y', 'a', 'en', 'el', 'no', 'los', 'es']
+    ['de', 'la', 'que', 'en', 'el', 'y', 'a', 'los', 'no', 'se']
 
 `iter_wordlist(lang, wordlist='combined')` iterates through all the words in a
 wordlist, in descending frequency order.
@@ -209,7 +209,7 @@ This data comes from a Luminoso project called [Exquisite Corpus][xc], whose
 goal is to download good, varied, multilingual corpus data, process it
 appropriately, and combine it into unified resources such as wordfreq.
 
-[xc]: https://github.com/rspeer/exquisite-corpus
+[xc]: https://github.com/LuminosoInsight/exquisite-corpus
 
 Exquisite Corpus compiles 8 different domains of text, some of which themselves
 come from multiple sources:

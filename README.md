@@ -312,7 +312,7 @@ also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> zipf_frequency('New York', 'en')
-    5.31
+    5.35
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
     3.56
 
@@ -329,7 +329,7 @@ you give it an uncommon combination of tokens, it will hugely over-estimate
 their frequency:
 
     >>> zipf_frequency('owl-flavored', 'en')
-    3.26
+    3.18
 
 
 ## Multi-script languages

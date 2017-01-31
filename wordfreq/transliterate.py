@@ -1,5 +1,5 @@
 # This table comes from https://github.com/opendatakosovo/cyrillic-transliteration/blob/master/cyrtranslit/mapping.py,
-# from the 'cyrtranslit' module, which is too flaky for us to just import.
+# from the 'cyrtranslit' module, which can't currently be imported in Python 3.
 SR_CYRL_TO_LATN_DICT = {
     ord('А'): 'A',   ord('а'): 'a',
     ord('Б'): 'B',   ord('б'): 'b',

@@ -1,6 +1,6 @@
 import regex
 import unicodedata
-
+from .transliterate import serbian_cyrillic_to_latin
 
 mecab_tokenize = None
 jieba_tokenize = None
@@ -21,7 +21,6 @@ SPACELESS_SCRIPTS = [
 ABJAD_LANGUAGES = {
     'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'
 }
-
 
 def _make_spaceless_expr():
     pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in SPACELESS_SCRIPTS]
@@ -60,6 +59,13 @@ TOKEN_RE = regex.compile(r"""
     # Case 2: standard Unicode segmentation
     # -------------------------------------
 
+    # The start of the token must not be a letter followed by «'h». If it is,
+    # we should use Case 3 to match up to the apostrophe, then match a new token
+    # starting with «h». This rule lets us break «l'heure» into two tokens, just
+    # like we would do for «l'arc».
+
+    (?!\w'[Hh])
+
     # The start of the token must be 'word-like', not punctuation or whitespace
     # or various other things. However, we allow characters of category So
     # (Symbol - Other) because many of these are emoji, which can convey
@@ -71,16 +77,28 @@ TOKEN_RE = regex.compile(r"""
     # (\S) and do not cause word breaks according to the Unicode word
     # segmentation heuristic (\B), or are categorized as Marks (\p{M}).
 
-    (?:\B\S|\p{M})*
+    (?:\B\S|\p{M})* |
+
+    # Case 3: Fix French
+    # ------------------
+    # This allows us to match the articles in French, Catalan, and related
+    # languages, such as «l'», that we may have excluded from being part of
+    # the token in Case 2.
+
+    \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
     [<SPACELESS>]+ |
     [\p{punct}]+ |
-    \S(?:\B\S|\p{M})*
+    (?!\w'[Hh]) \S(?:\B\S|\p{M})* |
+    \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
+
+DIGIT_RE = regex.compile('\d')
+MULTI_DIGIT_RE = regex.compile('\d[\d.,]+')
 
 
 def simple_tokenize(text, include_punctuation=False):
@@ -113,34 +131,16 @@ def simple_tokenize(text, include_punctuation=False):
       would end up in its own token, which is worse.
     """
     text = unicodedata.normalize('NFC', text)
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.strip("'").casefold() for token in token_expr.findall(text)]
-
-
-def turkish_tokenize(text, include_punctuation=False):
-    """
-    Like `simple_tokenize`, but modifies i's so that they case-fold correctly
-    in Turkish, and modifies 'comma-below' characters to use cedillas.
-    """
-    text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [
-        commas_to_cedillas(token.strip("'").casefold())
-        for token in token_expr.findall(text)
-    ]
-
-
-def romanian_tokenize(text, include_punctuation=False):
-    """
-    Like `simple_tokenize`, but modifies the letters ş and ţ (with cedillas)
-    to use commas-below instead.
-    """
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [
-        cedillas_to_commas(token.strip("'").casefold())
-        for token in token_expr.findall(text)
-    ]
-
+    if include_punctuation:
+        return [
+            token.casefold()
+            for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
+        ]
+    else:
+        return [
+            token.strip("'").casefold()
+            for token in TOKEN_RE.findall(text)
+        ]
 
 def tokenize_mecab_language(text, lang, include_punctuation=False):
     """
@@ -213,8 +213,48 @@ def cedillas_to_commas(text):
         '\N{LATIN SMALL LETTER T WITH COMMA BELOW}'
     )
 
+def preprocess_turkish(text):
+    """
+    Modifies i's so that they case-fold correctly in Turkish, and modifies
+    'comma-below' characters to use cedillas.
+    """
+    text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
+    return commas_to_cedillas(text.casefold())
 
-def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
+
+def preprocess_romanian(text):
+    """
+    Modifies the letters ş and ţ (with cedillas) to use commas-below instead.
+    """
+    return cedillas_to_commas(text.casefold())
+
+
+def preprocess_serbian(text):
+    """
+    Serbian is written in two scripts, so transliterate from Cyrillic to Latin
+    (which is the unambiguous direction).
+    """
+    return serbian_cyrillic_to_latin(text)
+
+
+def sub_zeroes(match):
+    """
+    Given a regex match, return what it matched with digits replaced by
+    zeroes.
+    """
+    return DIGIT_RE.sub('0', match.group(0))
+
+
+def smash_numbers(text):
+    """
+    Replace sequences of multiple digits with zeroes, so we don't need to
+    distinguish the frequencies of thousands of numbers.
+    """
+    return MULTI_DIGIT_RE.sub(sub_zeroes, text)
+
+
+def tokenize(text, lang, include_punctuation=False, external_wordlist=False,
+             combine_numbers=False):
     """
     Tokenize this text in a way that's relatively simple but appropriate for
     the language. Strings that are looked up in wordfreq will be run through
@@ -228,6 +268,17 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     - Abjad scripts: Arabic, Hebrew, Persian, Urdu, etc.
     - CJK scripts: Chinese, Japanese, Korean
     - Brahmic scripts: Hindi, Tamil, Telugu, Kannada, etc.
+
+    The options `include_punctuation`, `external_wordlist`, and
+    `combine_numbers` are passed on to the appropriate tokenizer:
+
+    - `include_punctuation` preserves punctuation as tokens, instead of
+      removing it.
+
+    - `external_wordlist` uses the default Jieba wordlist to tokenize Chinese,
+      instead of wordfreq's wordlist.
+
+    - `combine_numbers` replaces multi-digit numbers with strings of zeroes.
 
 
     Alphabetic scripts
@@ -310,17 +361,27 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     does not support these languages yet. It will split on spaces and
     punctuation, giving tokens that are far too long.
     """
+    # A really simple way to handle language codes with more than just the
+    # language
+    lang = lang.split('-')[0]
     if lang == 'ja' or lang == 'ko':
-        return tokenize_mecab_language(text, lang, include_punctuation)
+        result = tokenize_mecab_language(text, lang, include_punctuation)
     elif lang == 'zh':
-        return chinese_tokenize(text, include_punctuation, external_wordlist)
+        result = chinese_tokenize(text, include_punctuation, external_wordlist)
     elif lang == 'tr':
-        return turkish_tokenize(text, include_punctuation)
+        result = simple_tokenize(preprocess_turkish(text), include_punctuation)
     elif lang == 'ro':
-        return romanian_tokenize(text, include_punctuation)
+        result = simple_tokenize(preprocess_romanian(text), include_punctuation)
+    elif lang == 'sr' or lang == 'sh' or lang == 'hbs':
+        # These are the three language codes that could include Serbian text,
+        # which could be in Cyrillic.
+        result = simple_tokenize(preprocess_serbian(text), include_punctuation)
     elif lang in ABJAD_LANGUAGES:
         text = remove_marks(unicodedata.normalize('NFKC', text))
-        return simple_tokenize(text, include_punctuation)
+        result = simple_tokenize(text, include_punctuation)
     else:
-        return simple_tokenize(text, include_punctuation)
+        result = simple_tokenize(text, include_punctuation)
 
+    if combine_numbers:
+        result = [smash_numbers(token) for token in result]
+    return result

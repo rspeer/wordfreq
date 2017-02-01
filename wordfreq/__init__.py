@@ -216,7 +216,7 @@ def iter_wordlist(lang, wordlist='combined'):
 _wf_cache = {}
 
 def _word_frequency(word, lang, wordlist, minimum):
-    tokens = tokenize(word, lang)
+    tokens = tokenize(word, lang, combine_numbers=True)
     if not tokens:
         return minimum
 

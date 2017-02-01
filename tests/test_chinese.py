@@ -25,8 +25,8 @@ def test_tokens():
     eq_(
         tokenize(fact_simplified, 'zh'),
         [
-            # he / is / in history / #6 / counter for people
-            '他', '是',  '历史上', '第六', '位',
+            # he / is / history / in / #6 / counter for people
+            '他', '是',  '历史', '上', '第六', '位',
             # during / term of office / in / die
             '在', '任期', '内', '去世',
             # of / U.S. / deputy / president

@@ -106,16 +106,16 @@ frequencies by a million (1e6) to get more readable numbers:
 
     >>> from wordfreq import word_frequency
     >>> word_frequency('cafe', 'en') * 1e6
-    12.88249551693135
+    11.748975549395302
 
     >>> word_frequency('café', 'en') * 1e6
-    3.3884415613920273
+    3.981071705534969
 
     >>> word_frequency('cafe', 'fr') * 1e6
-    2.6302679918953817
+    1.4125375446227555
 
     >>> word_frequency('café', 'fr') * 1e6
-    87.09635899560814
+    53.70317963702532
 
 
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
@@ -133,19 +133,19 @@ one occurrence per billion words.
 
     >>> from wordfreq import zipf_frequency
     >>> zipf_frequency('the', 'en')
-    7.67
+    7.75
 
     >>> zipf_frequency('word', 'en')
-    5.39
+    5.32
 
     >>> zipf_frequency('frequency', 'en')
-    4.19
+    4.36
 
     >>> zipf_frequency('zipf', 'en')
     0.0
 
     >>> zipf_frequency('zipf', 'en', wordlist='large')
-    1.65
+    1.28
 
 
 The parameters to `word_frequency` and `zipf_frequency` are:
@@ -175,10 +175,10 @@ the list, in descending frequency order.
 
     >>> from wordfreq import top_n_list
     >>> top_n_list('en', 10)
-    ['the', 'i', 'to', 'a', 'and', 'of', 'you', 'in', 'that', 'is']
+    ['the', 'to', 'of', 'and', 'a', 'in', 'i', 'is', 'that', 'for']
 
     >>> top_n_list('es', 10)
-    ['de', 'que', 'la', 'y', 'a', 'en', 'el', 'no', 'los', 'es']
+    ['de', 'la', 'que', 'en', 'el', 'y', 'a', 'los', 'no', 'se']
 
 `iter_wordlist(lang, wordlist='combined')` iterates through all the words in a
 wordlist, in descending frequency order.
@@ -205,65 +205,79 @@ limiting the selection to words that can be typed in ASCII.
 
 ## Sources and supported languages
 
-We compiled word frequencies from seven different sources, providing us
-examples of word usage on different topics at different levels of formality.
-The sources (and the abbreviations we'll use for them) are:
+This data comes from a Luminoso project called [Exquisite Corpus][xc], whose
+goal is to download good, varied, multilingual corpus data, process it
+appropriately, and combine it into unified resources such as wordfreq.
 
-- **LeedsIC**: The Leeds Internet Corpus
-- **SUBTLEX**: The SUBTLEX word frequency lists
-- **OpenSub**: Data derived from OpenSubtitles but not from SUBTLEX
-- **Twitter**: Messages sampled from Twitter's public stream
-- **Wpedia**: The full text of Wikipedia in 2015
-- **Reddit**: The corpus of Reddit comments through May 2015
-- **CCrawl**: Text extracted from the Common Crawl and language-detected with cld2
-- **Other**: We get additional English frequencies from Google Books Syntactic
-  Ngrams 2013, and Chinese frequencies from the frequency dictionary that
-  comes with the Jieba tokenizer.
+[xc]: https://github.com/LuminosoInsight/exquisite-corpus
 
-The following 27 languages are supported, with reasonable tokenization and at
+Exquisite Corpus compiles 8 different domains of text, some of which themselves
+come from multiple sources:
+
+- **Wikipedia**, representing encyclopedic text
+- **Subtitles**, from OPUS OpenSubtitles 2016 and SUBTLEX
+- **News**, from NewsCrawl 2014 and GlobalVoices
+- **Books**, from Google Books Ngrams 2012
+- **Web** text, from the Leeds Internet Corpus and the MOKK Hungarian Webcorpus
+- **Twitter**, representing short-form social media
+- **Reddit**, representing potentially longer Internet comments
+- **Miscellaneous** word frequencies: in Chinese, we import a free wordlist
+  that comes with the Jieba word segmenter, whose provenance we don't really know
+
+The following languages are supported, with reasonable tokenization and at
 least 3 different sources of word frequencies:
 
-    Language    Code    Sources Large?   SUBTLEX OpenSub LeedsIC Twitter Wpedia  CCrawl  Reddit  Other
-    ───────────────────────────────────┼──────────────────────────────────────────────────────────────
-    Arabic      ar      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Bulgarian   bg      3       -      │ -       Yes     -       -       Yes     Yes     -       -
-    Catalan     ca      3       -      │ -       Yes     -       Yes     Yes     -       -       -
-    Danish      da      3       -      │ -       Yes     -       -       Yes     Yes     -       -
-    German      de      5       Yes    │ Yes     -       Yes     Yes     Yes     Yes     -       -
-    Greek       el      4       -      │ -       Yes     Yes     -       Yes     Yes     -       -
-    English     en      7       Yes    │ Yes     Yes     Yes     Yes     Yes     -       Yes     Google Books
-    Spanish     es      6       Yes    │ -       Yes     Yes     Yes     Yes     Yes     Yes     -
-    Finnish     fi      3       -      │ -       Yes     -       -       Yes     Yes     -       -
-    French      fr      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Hebrew      he      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
-    Hindi       hi      3       -      │ -       -       -       Yes     Yes     Yes     -       -
-    Hungarian   hu      3       -      │ -       Yes     -       -       Yes     Yes     -       -
-    Indonesian  id      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
-    Italian     it      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Japanese    ja      4       -      │ -       -       Yes     Yes     Yes     Yes     -       -
-    Korean      ko      3       -      │ -       -       -       Yes     Yes     Yes     -       -
-    Malay       ms      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
-    Norwegian   nb[1]   3       -      │ -       Yes     -       -       Yes     Yes     -       -
-    Dutch       nl      5       Yes    │ Yes     Yes     -       Yes     Yes     Yes     -       -
-    Polish      pl      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
-    Portuguese  pt      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Romanian    ro      3       -      │ -       Yes     -       -       Yes     Yes     -       -
-    Russian     ru      5       Yes    │ -       Yes     Yes     Yes     Yes     Yes     -       -
-    Swedish     sv      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
-    Turkish     tr      4       -      │ -       Yes     -       Yes     Yes     Yes     -       -
-    Chinese     zh[2]   5       -      │ Yes     -       Yes     -       Yes     Yes     -       Jieba
+    Language    Code    #  Large?   WP    Subs  News  Books Web   Twit. Redd. Misc.
+    ──────────────────────────────┼────────────────────────────────────────────────
+    Arabic      ar      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
+    Bosnian     bs [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
+    Bulgarian   bg      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Catalan     ca      4  -      │ Yes   Yes   Yes   -     -     Yes   -     -
+    Czech       cs      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Danish      da      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    German      de      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
+    Greek       el      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    English     en      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
+    Spanish     es      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
+    Persian     fa      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Finnish     fi      5  Yes    │ Yes   Yes   Yes   -     -     Yes   Yes   -
+    French      fr      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
+    Hebrew      he      4  -      │ Yes   Yes   -     Yes   -     Yes   -     -
+    Hindi       hi      3  -      │ Yes   -     -     -     -     Yes   Yes   -
+    Croatian    hr [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
+    Hungarian   hu      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Indonesian  id      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Italian     it      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
+    Japanese    ja      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
+    Korean      ko      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
+    Malay       ms      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Norwegian   nb [2]  4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
+    Dutch       nl      4  Yes    │ Yes   Yes   Yes   -     -     Yes   -     -
+    Polish      pl      5  Yes    │ Yes   Yes   Yes   -     -     Yes   Yes   -
+    Portuguese  pt      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
+    Romanian    ro      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Russian     ru      6  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   -     -
+    Serbian     sr [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Swedish     sv      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
+    Turkish     tr      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Ukrainian   uk      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
+    Chinese     zh [3]  6  Yes    │ Yes   -     Yes   Yes   Yes   Yes   -     Jieba
 
-[1] The Norwegian text we have is specifically written in Norwegian Bokmål, so
-we give it the language code 'nb'. We would use 'nn' for Nynorsk, but there
-isn't enough data to include it in wordfreq.
+[1] Bosnian, Croatian, and Serbian use the same underlying word list, because
+they share most of their vocabulary and grammar, they were once considered the
+same language, and language detection cannot distinguish them. This word list
+can also be accessed with the language code `sh`.
 
-[2] This data represents text written in both Simplified and Traditional
-Chinese. (SUBTLEX is mostly Simplified, while Wikipedia is mostly Traditional.)
-The characters are mapped to one another so they can use the same word
-frequency list.
+[2] The Norwegian text we have is specifically written in Norwegian Bokmål, so
+we give it the language code 'nb' instead of the vaguer code 'no'. We would use
+'nn' for Nynorsk, but there isn't enough data to include it in wordfreq.
+
+[3] This data represents text written in both Simplified and Traditional
+Chinese, with primarily Mandarin Chinese vocabulary. See "Multi-script
+languages" below.
 
 Some languages provide 'large' wordlists, including words with a Zipf frequency
-between 1.0 and 3.0. These are available in 9 languages that are covered by
+between 1.0 and 3.0. These are available in 12 languages that are covered by
 enough data sources.
 
 
@@ -298,9 +312,9 @@ also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> zipf_frequency('New York', 'en')
-    5.07
+    5.35
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.58
+    3.56
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,
@@ -315,7 +329,56 @@ you give it an uncommon combination of tokens, it will hugely over-estimate
 their frequency:
 
     >>> zipf_frequency('owl-flavored', 'en')
-    3.19
+    3.18
+
+
+## Multi-script languages
+
+Two of the languages we support, Serbian and Chinese, are written in multiple
+scripts. To avoid spurious differences in word frequencies, we automatically
+transliterate the characters in these languages when looking up their words.
+
+Serbian text written in Cyrillic letters is automatically converted to Latin
+letters, using standard Serbian transliteration, when the requested language is
+`sr` or `sh`. If you request the word list as `hr` (Croatian) or `bs`
+(Bosnian), no transliteration will occur.
+
+Chinese text is converted internally to a representation we call
+"Oversimplified Chinese", where all Traditional Chinese characters are replaced
+with their Simplified Chinese equivalent, *even if* they would not be written
+that way in context. This representation lets us use a straightforward mapping
+that matches both Traditional and Simplified words, unifying their frequencies
+when appropriate, and does not appear to create clashes between unrelated words.
+
+Enumerating the Chinese wordlist will produce some unfamiliar words, because
+people don't actually write in Oversimplified Chinese, and because in
+practice Traditional and Simplified Chinese also have different word usage.
+
+
+## Similar, overlapping, and varying languages
+
+As much as we would like to give each language its own distinct code and its
+own distinct word list with distinct source data, there aren't actually sharp
+boundaries between languages.
+
+Sometimes, it's convenient to pretend that the boundaries between
+languages coincide with national borders, following the maxim that "a language
+is a dialect with an army and a navy" (Max Weinreich). This gets complicated
+when the linguistic situation and the political situation diverge.
+Moreover, some of our data sources rely on language detection, which of course
+has no idea which country the writer of the text belongs to.
+
+So we've had to make some arbitrary decisions about how to represent the
+fuzzier language boundaries, such as those within Chinese, Malay, and
+Croatian/Bosnian/Serbian.  See [Language Log][] for some firsthand reports of
+the mutual intelligibility or unintelligibility of languages.
+
+[Language Log]: http://languagelog.ldc.upenn.edu/nll/?p=12633
+
+Smoothing over our arbitrary decisions is the fact that we use the `langcodes`
+module to find the best match for a language code. If you ask for word
+frequencies in `cmn-Hans` (the fully specific language code for Mandarin in
+Simplified Chinese), you will get the `zh` wordlist, for example.
 
 
 ## License
@@ -345,6 +408,10 @@ sources:
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
 
+It contains data from OPUS OpenSubtitles 2016
+(http://opus.lingfil.uu.se/OpenSubtitles2016.php), whose data originates from
+the OpenSubtitles project (http://www.opensubtitles.org/).
+
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
 SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al.
 (see citations below) and available at
@@ -371,7 +438,8 @@ If you use wordfreq in your research, please cite it! We publish the code
 through Zenodo so that it can be reliably cited using a DOI. The current
 citation is:
 
-> Robyn Speer, Joshua Chin, Andrew Lin, Lance Nathan, & Sara Jewett. (2016). wordfreq: v1.5.1 [Data set]. Zenodo. http://doi.org/10.5281/zenodo.61937
+> Robyn Speer, Joshua Chin, Andrew Lin, Lance Nathan, & Sara Jewett. (2016).
+> wordfreq: v1.5.1 [Data set]. Zenodo. http://doi.org/10.5281/zenodo.61937
 
 The same citation in BibTex format:
 
@@ -392,6 +460,12 @@ The same citation in BibTex format:
 
 
 ## Citations to work that wordfreq is built on
+
+- Bojar, O., Chatterjee, R., Federmann, C., Haddow, B., Huck, M., Hokamp, C.,
+  Koehn, P., Logacheva, V., Monz, C., Negri, M., Post, M., Scarton, C.,
+  Specia, L., & Turchi, M. (2015). Findings of the 2015 Workshop on Statistical
+  Machine Translation.
+  http://www.statmt.org/wmt15/results.html
 
 - Brysbaert, M. & New, B. (2009). Moving beyond Kucera and Francis: A Critical
   Evaluation of Current Word Frequency Norms and the Introduction of a New and
@@ -418,6 +492,11 @@ The same citation in BibTex format:
 - Davis, M. (2012). Unicode text segmentation. Unicode Standard Annex, 29.
   http://unicode.org/reports/tr29/
 
+- Halácsy, P., Kornai, A., Németh, L., Rung, A., Szakadát, I., & Trón, V.
+  (2004). Creating open language resources for Hungarian. In Proceedings of the
+  4th international conference on Language Resources and Evaluation (LREC2004).
+  http://mokk.bme.hu/resources/webcorpus/
+
 - Keuleers, E., Brysbaert, M. & New, B. (2010). SUBTLEX-NL: A new frequency
   measure for Dutch words based on film subtitles. Behavior Research Methods,
   42(3), 643-650.
@@ -426,6 +505,11 @@ The same citation in BibTex format:
 - Kudo, T. (2005). Mecab: Yet another part-of-speech and morphological
   analyzer.
   http://mecab.sourceforge.net/
+
+- Lison, P. and Tiedemann, J. (2016). OpenSubtitles2016: Extracting Large
+  Parallel Corpora from Movie and TV Subtitles. In Proceedings of the 10th
+  International Conference on Language Resources and Evaluation (LREC 2016).
+  http://stp.lingfil.uu.se/~joerg/paper/opensubs2016.pdf
 
 - van Heuven, W. J., Mandera, P., Keuleers, E., & Brysbaert, M. (2014).
   SUBTLEX-UK: A new and improved word frequency database for British English.

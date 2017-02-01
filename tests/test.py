@@ -22,16 +22,19 @@ def test_freq_examples():
 LAUGHTER_WORDS = {
     'en': 'lol',
     'hi': 'lol',
+    'cs': 'lol',
     'ru': 'лол',
     'zh': '笑',
     'ja': '笑',
     'ar': 'ﻪﻬﻬﻬﻫ',
+    'fa': 'خخخخ',
     'ca': 'jaja',
     'es': 'jaja',
     'fr': 'ptdr',
     'pt': 'kkkk',
     'he': 'חחח',
-    'bg': 'xaxa',
+    'bg': 'ахаха',
+    'uk': 'хаха',
 }
 
 
@@ -77,7 +80,7 @@ def test_most_common_words():
         """
         return top_n_list(lang, 1)[0]
 
-    eq_(get_most_common('ar'), 'من')
+    eq_(get_most_common('ar'), 'في')
     eq_(get_most_common('de'), 'die')
     eq_(get_most_common('en'), 'the')
     eq_(get_most_common('es'), 'de')
@@ -85,6 +88,7 @@ def test_most_common_words():
     eq_(get_most_common('it'), 'di')
     eq_(get_most_common('ja'), 'の')
     eq_(get_most_common('nl'), 'de')
+    eq_(get_most_common('pl'), 'w')
     eq_(get_most_common('pt'), 'de')
     eq_(get_most_common('ru'), 'в')
     eq_(get_most_common('tr'), 'bir')
@@ -141,6 +145,19 @@ def test_casefolding():
     eq_(tokenize('SIKISINCA', 'tr'), ['sıkısınca'])
 
 
+def test_number_smashing():
+    eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en'),
+        ['715', 'crσσks', 'by', 'bon', 'iver'])
+    eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en', combine_numbers=True),
+        ['000', 'crσσks', 'by', 'bon', 'iver'])
+    eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en', combine_numbers=True, include_punctuation=True),
+        ['"', '000', '-', 'crσσks', '"', 'by', 'bon', 'iver'])
+    eq_(tokenize('1', 'en', combine_numbers=True), ['1'])
+    eq_(tokenize('3.14', 'en', combine_numbers=True), ['0.00'])
+    eq_(tokenize('24601', 'en', combine_numbers=True), ['00000'])
+    eq_(word_frequency('24601', 'en'), word_frequency('90210', 'en'))
+
+
 def test_phrase_freq():
     ff = word_frequency("flip-flop", 'en')
     assert_greater(ff, 0)
@@ -159,7 +176,7 @@ def test_not_really_random():
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
     eq_(random_ascii_words(nwords=4, lang='ja', bits_per_word=0),
-        '1 1 1 1')
+        '00 00 00 00')
 
 
 @raises(ValueError)

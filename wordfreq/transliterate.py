@@ -39,7 +39,7 @@ SR_CYRL_TO_LATN_DICT = {
     # letters surrounded by Latin.
 
     # Russian letters
-    ord('Ё'): 'Jo',  ord('ё'): 'Jo',
+    ord('Ё'): 'Jo',  ord('ё'): 'jo',
     ord('Й'): 'J',   ord('й'): 'j',
     ord('Щ'): 'Šč',  ord('щ'): 'šč',
     ord('Ъ'): '',    ord('ъ'): '',

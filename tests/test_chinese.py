@@ -66,3 +66,22 @@ def test_combination():
         word_frequency('谢谢谢谢', 'zh'),
         xiexie_freq / 20
     )
+
+
+def test_alternate_codes():
+    # Tokenization of Chinese works when you use other language codes
+    # that are not equal to 'zh'.
+    tokens = ['谢谢', '谢谢']
+
+    # Code with a region attached
+    eq_(tokenize('谢谢谢谢', 'zh-CN'), tokens)
+
+    # Over-long codes for Chinese
+    eq_(tokenize('谢谢谢谢', 'chi'), tokens)
+    eq_(tokenize('谢谢谢谢', 'zho'), tokens)
+
+    # Separate codes for Mandarin and Cantonese
+    eq_(tokenize('谢谢谢谢', 'cmn'), tokens)
+    eq_(tokenize('谢谢谢谢', 'yue'), tokens)
+
+

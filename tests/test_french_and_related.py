@@ -29,3 +29,12 @@ def test_catastrophes():
         ['m', 'acabo', 'd', 'instal·lar'])
     eq_(tokenize("M'acabo d'instal·lar.", 'ca', include_punctuation=True),
         ["m'", 'acabo', "d'", 'instal·lar', '.'])
+
+
+def test_alternate_codes():
+    # Try over-long language codes for French and Catalan
+    eq_(tokenize("qu'un", 'fra'), ['qu', 'un'])
+    eq_(tokenize("qu'un", 'fre'), ['qu', 'un'])
+    eq_(tokenize("M'acabo d'instal·lar.", 'cat'),
+        ['m', 'acabo', 'd', 'instal·lar'])
+

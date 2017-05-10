@@ -23,3 +23,11 @@ def test_actually_russian():
         ['sto', 'iz', 'sta', 'pacany'])
 
     eq_(tokenize("культуры", 'sr'), ["kul'tury"])
+
+
+def test_alternate_codes():
+    # Try language codes for Serbo-Croatian that have been split, and now
+    # are canonically mapped to Serbian
+    eq_(tokenize("культуры", 'sh'), ["kul'tury"])
+    eq_(tokenize("культуры", 'hbs'), ["kul'tury"])
+

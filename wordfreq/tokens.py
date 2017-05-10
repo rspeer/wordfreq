@@ -1,5 +1,6 @@
 import regex
 import unicodedata
+import langcodes
 from .transliterate import serbian_cyrillic_to_latin
 
 mecab_tokenize = None
@@ -361,20 +362,18 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False,
     does not support these languages yet. It will split on spaces and
     punctuation, giving tokens that are far too long.
     """
-    # A really simple way to handle language codes with more than just the
-    # language
-    lang = lang.split('-')[0]
+    # Reduce whatever language code was passed in to a normal form,
+    # containing just the language subtag.
+    lang = langcodes.get(lang).prefer_macrolanguage().language
     if lang == 'ja' or lang == 'ko':
         result = tokenize_mecab_language(text, lang, include_punctuation)
-    elif lang == 'zh':
+    elif lang == 'zh' or lang == 'yue':
         result = chinese_tokenize(text, include_punctuation, external_wordlist)
     elif lang == 'tr':
         result = simple_tokenize(preprocess_turkish(text), include_punctuation)
     elif lang == 'ro':
         result = simple_tokenize(preprocess_romanian(text), include_punctuation)
-    elif lang == 'sr' or lang == 'sh' or lang == 'hbs':
-        # These are the three language codes that could include Serbian text,
-        # which could be in Cyrillic.
+    elif lang == 'sr':
         result = simple_tokenize(preprocess_serbian(text), include_punctuation)
     elif lang in ABJAD_LANGUAGES:
         text = remove_marks(unicodedata.normalize('NFKC', text))

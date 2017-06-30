@@ -72,13 +72,15 @@ TOKEN_RE = regex.compile(r"""
     # (Symbol - Other) because many of these are emoji, which can convey
     # meaning.
 
-    [\w\p{So}]
+    (?=[\w\p{So}])
 
-    # The rest of the token matches characters that are not any sort of space
-    # (\S) and do not cause word breaks according to the Unicode word
-    # segmentation heuristic (\B), or are categorized as Marks (\p{M}).
-
-    (?:\B\S|\p{M})* |
+    # The entire token is made of graphemes (\X). Matching by graphemes means
+    # that we don't have to specially account for marks or ZWJ sequences.
+    #
+    # The token ends as soon as it encounters a word break (\b). We use the
+    # non-greedy match (+?) to make sure to end at the first word break we
+    # encounter.
+    \X+? \b |
 
     # Case 3: Fix French
     # ------------------
@@ -92,7 +94,7 @@ TOKEN_RE = regex.compile(r"""
 TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
     [<SPACELESS>]+ |
     [\p{punct}]+ |
-    (?!\w'[Hh]) \S(?:\B\S|\p{M})* |
+    (?!\w'[Hh]) (?=[\w\p{So}]) \X+? \b |
     \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
@@ -110,8 +112,12 @@ def simple_tokenize(text, include_punctuation=False):
     The expression mostly implements the rules of Unicode Annex #29 that
     are contained in the `regex` module's word boundary matching, including
     the refinement that splits words between apostrophes and vowels in order
-    to separate tokens such as the French article «l'». Our customizations
-    to the expression are:
+    to separate tokens such as the French article «l'».
+
+    It makes sure not to split in the middle of a grapheme, so that zero-width
+    joiners and marks on Devanagari words work correctly.
+
+    Our customizations to the expression are:
 
     - It leaves sequences of Chinese or Japanese characters (specifically, Han
       ideograms and hiragana) relatively untokenized, instead of splitting each
@@ -122,13 +128,8 @@ def simple_tokenize(text, include_punctuation=False):
       such as emoji. If `include_punctuation` is True, it outputs all non-space
       tokens.
 
-    - It breaks on all spaces, even the "non-breaking" ones.
-
-    - It aims to keep marks together with words, so that they aren't erroneously
-      split off as punctuation in languages such as Hindi.
-
     - It keeps Southeast Asian scripts, such as Thai, glued together. This yields
-      tokens that are much too long, but the alternative is that every character
+      tokens that are much too long, but the alternative is that every grapheme
       would end up in its own token, which is worse.
     """
     text = unicodedata.normalize('NFC', text)

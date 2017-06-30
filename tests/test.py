@@ -137,6 +137,21 @@ def test_tokenization():
     eq_(tokenize('this text has... punctuation :)', 'en', include_punctuation=True),
         ['this', 'text', 'has', '...', 'punctuation', ':)'])
 
+    # Multi-codepoint emoji sequences such as 'medium-skinned woman with headscarf'
+    # and 'David Bowie' stay together, because our Unicode segmentation algorithm
+    # is up to date
+    eq_(tokenize('emoji test 🧕🏽', 'en'), ['emoji', 'test', '🧕🏽'])
+
+    eq_(tokenize("👨‍🎤 Planet Earth is blue, and there's nothing I can do 🌎🚀", 'en'),
+        ['👨‍🎤', 'planet', 'earth', 'is', 'blue', 'and', "there's",
+         'nothing', 'i', 'can', 'do', '🌎', '🚀'])
+
+    # Water wave, surfer, flag of California (indicates ridiculously complete support
+    # for Unicode 10 and Emoji 5.0)
+    eq_(tokenize("Surf's up 🌊🏄🏴󠁵󠁳󠁣󠁡󠁿'",'en'),
+        ["surf's", "up", "🌊", "🏄", "🏴󠁵󠁳󠁣󠁡󠁿"])
+
+
 
 def test_casefolding():
     eq_(tokenize('WEISS', 'de'), ['weiss'])

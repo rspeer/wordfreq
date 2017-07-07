@@ -60,19 +60,19 @@ TOKEN_RE = regex.compile(r"""
     # Case 2: standard Unicode segmentation
     # -------------------------------------
 
-    # The start of the token must not be a letter followed by «'h». If it is,
-    # we should use Case 3 to match up to the apostrophe, then match a new token
-    # starting with «h». This rule lets us break «l'heure» into two tokens, just
-    # like we would do for «l'arc».
-
-    (?!\w'[Hh])
-
     # The start of the token must be 'word-like', not punctuation or whitespace
     # or various other things. However, we allow characters of category So
     # (Symbol - Other) because many of these are emoji, which can convey
     # meaning.
 
     (?=[\w\p{So}])
+
+    # The start of the token must not be a letter followed by «'h». If it is,
+    # we should use Case 3 to match up to the apostrophe, then match a new token
+    # starting with «h». This rule lets us break «l'heure» into two tokens, just
+    # like we would do for «l'arc».
+
+    (?!\w'[Hh])
 
     # The entire token is made of graphemes (\X). Matching by graphemes means
     # that we don't have to specially account for marks or ZWJ sequences.
@@ -81,6 +81,21 @@ TOKEN_RE = regex.compile(r"""
     # non-greedy match (+?) to make sure to end at the first word break we
     # encounter.
     \X+? \b |
+
+    # If we were matching by codepoints (.) instead of graphemes (\X), then
+    # detecting boundaries would be more difficult. Here's a fact that's subtle
+    # and poorly documented: a position that's between codepoints, but in the
+    # middle of a grapheme, does not match as a word break (\b), but also does
+    # not match as not-a-word-break (\B). The word boundary algorithm simply
+    # doesn't apply in such a position.
+    #
+    # We used to match the rest of the token using \S, which matches non-space
+    # *codepoints*, and this caused us to incompletely work around cases where
+    # it left off in the middle of a grapheme.
+    #
+    # Another subtle fact: the "non-breaking space" U+A0 counts as a word break
+    # here. That's surprising, but it's also what we want, because we don't want
+    # any kind of spaces in the middle of our tokens.
 
     # Case 3: Fix French
     # ------------------
@@ -92,9 +107,12 @@ TOKEN_RE = regex.compile(r"""
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
+    # This expression is similar to the expression above, but also matches any
+    # sequence of punctuation characters.
+
     [<SPACELESS>]+ |
     [\p{punct}]+ |
-    (?!\w'[Hh]) (?=[\w\p{So}]) \X+? \b |
+    (?=[\w\p{So}]) (?!\w'[Hh]) \X+? \b |
     \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 

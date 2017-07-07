@@ -152,7 +152,6 @@ def test_tokenization():
         ["surf's", "up", "🌊", "🏄", "🏴󠁵󠁳󠁣󠁡󠁿"])
 
 
-
 def test_casefolding():
     eq_(tokenize('WEISS', 'de'), ['weiss'])
     eq_(tokenize('weiß', 'de'), ['weiss'])

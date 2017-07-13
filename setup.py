@@ -27,7 +27,7 @@ current_dir = os.path.dirname(__file__)
 README_contents = open(os.path.join(current_dir, 'README.md'),
                        encoding='utf-8').read()
 doclines = README_contents.split("\n")
-dependencies = ['ftfy >= 5', 'msgpack-python', 'langcodes >= 1.4', 'regex >= 2017.06.23']
+dependencies = ['ftfy >= 5', 'msgpack-python', 'langcodes >= 1.4', 'regex == 2017.06.23']
 if sys.version_info < (3, 4):
     dependencies.append('pathlib')
 

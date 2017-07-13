@@ -370,11 +370,8 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False,
     -----------------------------------
 
     Any kind of language not previously mentioned will just go through the same
-    tokenizer that alphabetic languages use.
-
-    We've tweaked this tokenizer for the case of Indic languages in Brahmic
-    scripts, such as Hindi, Tamil, and Telugu, so that we can handle these
-    languages where the default Unicode algorithm wouldn't quite work.
+    tokenizer that alphabetic languages use. This includes the Brahmic scripts
+    used in Hindi, Tamil, and Telugu, for example.
 
     Southeast Asian languages, such as Thai, Khmer, Lao, and Myanmar, are
     written in Brahmic-derived scripts, but usually *without spaces*. wordfreq

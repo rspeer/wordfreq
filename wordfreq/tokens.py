@@ -60,6 +60,13 @@ TOKEN_RE = regex.compile(r"""
     # Case 2: standard Unicode segmentation
     # -------------------------------------
 
+    # The start of the token must be 'word-like', not punctuation or whitespace
+    # or various other things. However, we allow characters of category So
+    # (Symbol - Other) because many of these are emoji, which can convey
+    # meaning.
+
+    (?=[\w\p{So}])
+
     # The start of the token must not be a letter followed by «'h». If it is,
     # we should use Case 3 to match up to the apostrophe, then match a new token
     # starting with «h». This rule lets us break «l'heure» into two tokens, just
@@ -67,18 +74,28 @@ TOKEN_RE = regex.compile(r"""
 
     (?!\w'[Hh])
 
-    # The start of the token must be 'word-like', not punctuation or whitespace
-    # or various other things. However, we allow characters of category So
-    # (Symbol - Other) because many of these are emoji, which can convey
-    # meaning.
+    # The entire token is made of graphemes (\X). Matching by graphemes means
+    # that we don't have to specially account for marks or ZWJ sequences.
+    #
+    # The token ends as soon as it encounters a word break (\b). We use the
+    # non-greedy match (+?) to make sure to end at the first word break we
+    # encounter.
+    \X+? \b |
 
-    [\w\p{So}]
-
-    # The rest of the token matches characters that are not any sort of space
-    # (\S) and do not cause word breaks according to the Unicode word
-    # segmentation heuristic (\B), or are categorized as Marks (\p{M}).
-
-    (?:\B\S|\p{M})* |
+    # If we were matching by codepoints (.) instead of graphemes (\X), then
+    # detecting boundaries would be more difficult. Here's a fact that's subtle
+    # and poorly documented: a position that's between codepoints, but in the
+    # middle of a grapheme, does not match as a word break (\b), but also does
+    # not match as not-a-word-break (\B). The word boundary algorithm simply
+    # doesn't apply in such a position.
+    #
+    # We used to match the rest of the token using \S, which matches non-space
+    # *codepoints*, and this caused us to incompletely work around cases where
+    # it left off in the middle of a grapheme.
+    #
+    # Another subtle fact: the "non-breaking space" U+A0 counts as a word break
+    # here. That's surprising, but it's also what we want, because we don't want
+    # any kind of spaces in the middle of our tokens.
 
     # Case 3: Fix French
     # ------------------
@@ -90,9 +107,12 @@ TOKEN_RE = regex.compile(r"""
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
+    # This expression is similar to the expression above, but also matches any
+    # sequence of punctuation characters.
+
     [<SPACELESS>]+ |
     [\p{punct}]+ |
-    (?!\w'[Hh]) \S(?:\B\S|\p{M})* |
+    (?=[\w\p{So}]) (?!\w'[Hh]) \X+? \b |
     \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
@@ -110,8 +130,12 @@ def simple_tokenize(text, include_punctuation=False):
     The expression mostly implements the rules of Unicode Annex #29 that
     are contained in the `regex` module's word boundary matching, including
     the refinement that splits words between apostrophes and vowels in order
-    to separate tokens such as the French article «l'». Our customizations
-    to the expression are:
+    to separate tokens such as the French article «l'».
+
+    It makes sure not to split in the middle of a grapheme, so that zero-width
+    joiners and marks on Devanagari words work correctly.
+
+    Our customizations to the expression are:
 
     - It leaves sequences of Chinese or Japanese characters (specifically, Han
       ideograms and hiragana) relatively untokenized, instead of splitting each
@@ -122,13 +146,8 @@ def simple_tokenize(text, include_punctuation=False):
       such as emoji. If `include_punctuation` is True, it outputs all non-space
       tokens.
 
-    - It breaks on all spaces, even the "non-breaking" ones.
-
-    - It aims to keep marks together with words, so that they aren't erroneously
-      split off as punctuation in languages such as Hindi.
-
     - It keeps Southeast Asian scripts, such as Thai, glued together. This yields
-      tokens that are much too long, but the alternative is that every character
+      tokens that are much too long, but the alternative is that every grapheme
       would end up in its own token, which is worse.
     """
     text = unicodedata.normalize('NFC', text)
@@ -351,11 +370,8 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False,
     -----------------------------------
 
     Any kind of language not previously mentioned will just go through the same
-    tokenizer that alphabetic languages use.
-
-    We've tweaked this tokenizer for the case of Indic languages in Brahmic
-    scripts, such as Hindi, Tamil, and Telugu, so that we can handle these
-    languages where the default Unicode algorithm wouldn't quite work.
+    tokenizer that alphabetic languages use. This includes the Brahmic scripts
+    used in Hindi, Tamil, and Telugu, for example.
 
     Southeast Asian languages, such as Thai, Khmer, Lao, and Myanmar, are
     written in Brahmic-derived scripts, but usually *without spaces*. wordfreq

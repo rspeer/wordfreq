@@ -1,3 +1,23 @@
+## Version 1.7.0 (2017-08-25)
+
+- Tokenization will always keep Unicode graphemes together, including
+  complex emoji introduced in Unicode 10
+- Update the Wikipedia source data to April 2017
+- Remove some non-words, such as the Unicode replacement character and the
+  pilcrow sign, from frequency lists
+- Support Bengali and Macedonian, which passed the threshold of having enough
+  source data to be included
+
+
+## Version 1.6.1 (2017-05-10)
+
+- Depend on langcodes 1.4, with a new language-matching system that does not
+  depend on SQLite.
+
+  This prevents silly conflicts where langcodes' SQLite connection was
+  preventing langcodes from being used in threads.
+
+
 ## Version 1.6.0 (2017-01-05)
 
 - Support Czech, Persian, Ukrainian, and Croatian/Bosnian/Serbian

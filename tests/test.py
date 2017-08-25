@@ -35,6 +35,8 @@ LAUGHTER_WORDS = {
     'he': 'חחח',
     'bg': 'ахаха',
     'uk': 'хаха',
+    'bn': 'হা হা',
+    'mk': 'хаха'
 }
 
 
@@ -190,7 +192,7 @@ def test_not_really_random():
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
     eq_(random_ascii_words(nwords=4, lang='ja', bits_per_word=0),
-        '00 00 00 00')
+        '1 1 1 1')
 
 
 @raises(ValueError)

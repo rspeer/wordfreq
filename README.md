@@ -16,70 +16,8 @@ or by getting the repository and running its setup.py:
 
     python3 setup.py install
 
-
-## Additional CJK installation
-
-Chinese, Japanese, and Korean have additional external dependencies so that
-they can be tokenized correctly. Here we'll explain how to set them up,
-in increasing order of difficulty.
-
-
-### Chinese
-
-To be able to look up word frequencies in Chinese, you need Jieba, a
-pure-Python Chinese tokenizer:
-
-    pip3 install jieba
-
-
-### Japanese
-
-We use MeCab, by Taku Kudo, to tokenize Japanese. To use this in wordfreq, three
-things need to be installed:
-
-  * The MeCab development library (called `libmecab-dev` on Ubuntu)
-  * The UTF-8 version of the `ipadic` Japanese dictionary
-    (called `mecab-ipadic-utf8` on Ubuntu)
-  * The `mecab-python3` Python interface
-
-To install these three things on Ubuntu, you can run:
-
-```sh
-sudo apt-get install libmecab-dev mecab-ipadic-utf8
-pip3 install mecab-python3
-```
-
-If you choose to install `ipadic` from somewhere else or from its source code,
-be sure it's configured to use UTF-8. By default it will use EUC-JP, which will
-give you nonsense results.
-
-
-### Korean
-
-Korean also uses MeCab, with a Korean dictionary package by Yongwoon Lee and
-Yungho Yu. This dictionary is not available as an Ubuntu package.
-
-Here's a process you can use to install the Korean dictionary and the other
-MeCab dependencies:
-
-```sh
-sudo apt-get install libmecab-dev mecab-utils
-pip3 install mecab-python3
-wget https://bitbucket.org/eunjeon/mecab-ko-dic/downloads/mecab-ko-dic-2.0.1-20150920.tar.gz
-tar xvf mecab-ko-dic-2.0.1-20150920.tar.gz
-cd mecab-ko-dic-2.0.1-20150920
-./autogen.sh
-make
-sudo make install
-```
-
-If wordfreq cannot find the Japanese or Korean data for MeCab when asked to
-tokenize those languages, it will raise an error and show you the list of
-paths it searched.
-
-Sorry that this is difficult. We tried to just package the data files we need
-with wordfreq, like we do for Chinese, but PyPI would reject the package for
-being too large.
+See [Additional CJK installation][#additional-cjk-installation] for extra
+steps that are necessary to get Chinese, Japanese, and Korean word frequencies.
 
 
 ## Usage
@@ -175,10 +113,10 @@ the list, in descending frequency order.
 
     >>> from wordfreq import top_n_list
     >>> top_n_list('en', 10)
-    ['the', 'to', 'of', 'and', 'a', 'in', 'i', 'is', 'that', 'for']
+    ['the', 'of', 'to', 'and', 'a', 'in', 'i', 'is', 'that', 'for']
 
     >>> top_n_list('es', 10)
-    ['de', 'la', 'que', 'en', 'el', 'y', 'a', 'los', 'no', 'se']
+    ['de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'no', 'se']
 
 `iter_wordlist(lang, wordlist='combined')` iterates through all the words in a
 wordlist, in descending frequency order.
@@ -197,10 +135,12 @@ will select each random word from 2^n words.
 
 If you happen to want an easy way to get [a memorable, xkcd-style
 password][xkcd936] with 60 bits of entropy, this function will almost do the
-job. In this case, you should actually run the similar function `random_ascii_words`,
-limiting the selection to words that can be typed in ASCII.
+job. In this case, you should actually run the similar function
+`random_ascii_words`, limiting the selection to words that can be typed in
+ASCII. But maybe you should just use [xkpa][].
 
 [xkcd936]: https://xkcd.com/936/
+[xkpa]: https://github.com/beala/xkcd-password
 
 
 ## Sources and supported languages
@@ -230,38 +170,40 @@ least 3 different sources of word frequencies:
     Language    Code    #  Large?   WP    Subs  News  Books Web   Twit. Redd. Misc.
     ──────────────────────────────┼────────────────────────────────────────────────
     Arabic      ar      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
-    Bosnian     bs [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
+    Bengali     bn      3  -      │ Yes   -     Yes   -     -     Yes   -     -
+    Bosnian     bs [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Bulgarian   bg      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Catalan     ca      4  -      │ Yes   Yes   Yes   -     -     Yes   -     -
+    Chinese     zh [3]  6  Yes    │ Yes   -     Yes   Yes   Yes   Yes   -     Jieba
+    Croatian    hr [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
     Czech       cs      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Danish      da      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    German      de      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
-    Greek       el      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Dutch       nl      4  Yes    │ Yes   Yes   Yes   -     -     Yes   -     -
     English     en      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
-    Spanish     es      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
-    Persian     fa      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Finnish     fi      5  Yes    │ Yes   Yes   Yes   -     -     Yes   Yes   -
     French      fr      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
+    German      de      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
+    Greek       el      3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Hebrew      he      4  -      │ Yes   Yes   -     Yes   -     Yes   -     -
     Hindi       hi      3  -      │ Yes   -     -     -     -     Yes   Yes   -
-    Croatian    hr [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
     Hungarian   hu      3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Indonesian  id      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Italian     it      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Japanese    ja      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
     Korean      ko      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
+    Macedonian  mk      3  -      │ Yes   Yes   Yes   -     -     -     -     -
     Malay       ms      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Norwegian   nb [2]  4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
-    Dutch       nl      4  Yes    │ Yes   Yes   Yes   -     -     Yes   -     -
+    Persian     fa      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Polish      pl      5  Yes    │ Yes   Yes   Yes   -     -     Yes   Yes   -
     Portuguese  pt      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Romanian    ro      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Russian     ru      6  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   -     -
     Serbian     sr [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Spanish     es      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Swedish     sv      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
     Turkish     tr      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Ukrainian   uk      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
-    Chinese     zh [3]  6  Yes    │ Yes   -     Yes   Yes   Yes   Yes   -     Jieba
 
 [1] Bosnian, Croatian, and Serbian use the same underlying word list, because
 they share most of their vocabulary and grammar, they were once considered the
@@ -277,7 +219,7 @@ Chinese, with primarily Mandarin Chinese vocabulary. See "Multi-script
 languages" below.
 
 Some languages provide 'large' wordlists, including words with a Zipf frequency
-between 1.0 and 3.0. These are available in 12 languages that are covered by
+between 1.0 and 3.0. These are available in 13 languages that are covered by
 enough data sources.
 
 
@@ -314,7 +256,7 @@ into multiple tokens:
     >>> zipf_frequency('New York', 'en')
     5.35
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.56
+    3.55
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,
@@ -379,6 +321,71 @@ Smoothing over our arbitrary decisions is the fact that we use the `langcodes`
 module to find the best match for a language code. If you ask for word
 frequencies in `cmn-Hans` (the fully specific language code for Mandarin in
 Simplified Chinese), you will get the `zh` wordlist, for example.
+
+
+## Additional CJK installation
+
+Chinese, Japanese, and Korean have additional external dependencies so that
+they can be tokenized correctly. Here we'll explain how to set them up,
+in increasing order of difficulty.
+
+
+### Chinese
+
+To be able to look up word frequencies in Chinese, you need Jieba, a
+pure-Python Chinese tokenizer:
+
+    pip3 install jieba
+
+
+### Japanese
+
+We use MeCab, by Taku Kudo, to tokenize Japanese. To use this in wordfreq, three
+things need to be installed:
+
+  * The MeCab development library (called `libmecab-dev` on Ubuntu)
+  * The UTF-8 version of the `ipadic` Japanese dictionary
+    (called `mecab-ipadic-utf8` on Ubuntu)
+  * The `mecab-python3` Python interface
+
+To install these three things on Ubuntu, you can run:
+
+```sh
+sudo apt-get install libmecab-dev mecab-ipadic-utf8
+pip3 install mecab-python3
+```
+
+If you choose to install `ipadic` from somewhere else or from its source code,
+be sure it's configured to use UTF-8. By default it will use EUC-JP, which will
+give you nonsense results.
+
+
+### Korean
+
+Korean also uses MeCab, with a Korean dictionary package by Yongwoon Lee and
+Yungho Yu. This dictionary is not available as an Ubuntu package.
+
+Here's a process you can use to install the Korean dictionary and the other
+MeCab dependencies:
+
+```sh
+sudo apt-get install libmecab-dev mecab-utils
+pip3 install mecab-python3
+wget https://bitbucket.org/eunjeon/mecab-ko-dic/downloads/mecab-ko-dic-2.0.1-20150920.tar.gz
+tar xvf mecab-ko-dic-2.0.1-20150920.tar.gz
+cd mecab-ko-dic-2.0.1-20150920
+./autogen.sh
+make
+sudo make install
+```
+
+If wordfreq cannot find the Japanese or Korean data for MeCab when asked to
+tokenize those languages, it will raise an error and show you the list of
+paths it searched.
+
+Sorry that this is difficult. We tried to just package the data files we need
+with wordfreq, like we do for Chinese, but PyPI would reject the package for
+being too large.
 
 
 ## License

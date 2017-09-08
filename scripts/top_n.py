@@ -10,5 +10,5 @@ N = 1000
 
 
 for lang in sorted(wordfreq.available_languages()):
-    for (i, word) in enumerate(wordfreq.top_n_list(lang, 1000)):
+    for word in wordfreq.top_n_list(lang, 1000):
         print('{}\t{}'.format(lang, word))

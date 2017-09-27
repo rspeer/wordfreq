@@ -445,23 +445,25 @@ If you use wordfreq in your research, please cite it! We publish the code
 through Zenodo so that it can be reliably cited using a DOI. The current
 citation is:
 
-> Robyn Speer, Joshua Chin, Andrew Lin, Lance Nathan, & Sara Jewett. (2016).
-> wordfreq: v1.5.1 [Data set]. Zenodo. http://doi.org/10.5281/zenodo.61937
+> Robyn Speer, Joshua Chin, Andrew Lin, Sara Jewett, & Lance Nathan.
+> (2017, September 27). LuminosoInsight/wordfreq: v1.7. Zenodo.
+> http://doi.org/10.5281/zenodo.998161
+
 
 The same citation in BibTex format:
 
 ```
-@misc{robert_speer_2016_61937,
+@misc{robert_speer_2017_998161,
   author       = {Robyn Speer and
                   Joshua Chin and
                   Andrew Lin and
-                  Lance Nathan and
-                  Sara Jewett},
-  title        = {wordfreq: v1.5.1},
+                  Sara Jewett and
+                  Lance Nathan},
+  title        = {LuminosoInsight/wordfreq: v1.7},
   month        = sep,
-  year         = 2016,
-  doi          = {10.5281/zenodo.61937},
-  url          = {https://doi.org/10.5281/zenodo.61937}
+  year         = 2017,
+  doi          = {10.5281/zenodo.998161},
+  url          = {https://doi.org/10.5281/zenodo.998161}
 }
 ```
 

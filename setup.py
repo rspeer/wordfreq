@@ -28,7 +28,7 @@ README_contents = open(os.path.join(current_dir, 'README.md'),
                        encoding='utf-8').read()
 doclines = README_contents.split("\n")
 dependencies = [
-    'ftfy >= 5', 'msgpack-python', 'langcodes >= 1.4', 'regex == 2017.07.28'
+    'ftfy >= 5', 'msgpack', 'langcodes >= 1.4', 'regex == 2017.07.28'
 ]
 if sys.version_info < (3, 4):
     dependencies.append('pathlib')
@@ -36,7 +36,7 @@ if sys.version_info < (3, 4):
 
 setup(
     name="wordfreq",
-    version='1.6.1',
+    version='1.7.0',
     maintainer='Luminoso Technologies, Inc.',
     maintainer_email='info@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',

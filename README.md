@@ -7,7 +7,7 @@ Author: Robyn Speer
 ## Installation
 
 wordfreq requires Python 3 and depends on a few other Python modules
-(msgpack-python, langcodes, and ftfy). You can install it and its dependencies
+(msgpack, langcodes, and ftfy). You can install it and its dependencies
 in the usual way, either by getting it from pip:
 
     pip3 install wordfreq
@@ -16,7 +16,7 @@ or by getting the repository and running its setup.py:
 
     python3 setup.py install
 
-See [Additional CJK installation][#additional-cjk-installation] for extra
+See [Additional CJK installation](#additional-cjk-installation) for extra
 steps that are necessary to get Chinese, Japanese, and Korean word frequencies.
 
 

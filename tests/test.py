@@ -15,6 +15,9 @@ def test_freq_examples():
     assert_greater(word_frequency('de', 'es'),
                    word_frequency('the', 'es'))
 
+    # We get word frequencies from the 'large' list when available
+    assert_greater(word_frequency('infrequency', 'en'), 0.)
+
 
 # To test the reasonableness of the Twitter list, we want to look up a
 # common word representing laughter in each language. The default for

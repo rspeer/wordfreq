@@ -49,4 +49,11 @@ def jieba_tokenize(text, external_wordlist=False):
     else:
         if jieba_tokenizer is None:
             jieba_tokenizer = jieba.Tokenizer(dictionary=DICT_FILENAME)
-        return jieba_tokenizer.lcut(simplify_chinese(text), HMM=False)
+
+        # Tokenize the Simplified Chinese version of the text, but return
+        # those spans from the original text, even if it's in Traditional
+        # Chinese
+        tokens = []
+        for _token, start, end in jieba_tokenizer.tokenize(simplify_chinese(text), HMM=False):
+            tokens.append(text[start:end])
+        return tokens

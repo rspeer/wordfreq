@@ -83,5 +83,3 @@ def test_alternate_codes():
     # Separate codes for Mandarin and Cantonese
     eq_(tokenize('谢谢谢谢', 'cmn'), tokens)
     eq_(tokenize('谢谢谢谢', 'yue'), tokens)
-
-

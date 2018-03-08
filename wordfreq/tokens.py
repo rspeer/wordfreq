@@ -1,30 +1,22 @@
 import regex
 import unicodedata
+import logging
 import langcodes
-from .transliterate import serbian_cyrillic_to_latin
 
-mecab_tokenize = None
-jieba_tokenize = None
+from .language_info import get_language_info, SPACELESS_SCRIPTS
+from .preprocess import preprocess_text, smash_numbers
 
-# See the documentation inside TOKEN_RE for why we have to handle these
-# scripts specially.
-SPACELESS_SCRIPTS = [
-    'Hiragana',
-    'Thai',  # Thai script
-    'Khmr',  # Khmer script
-    'Laoo',  # Lao script
-    'Mymr',  # Burmese script
-    'Tale',  # Tai Le script
-    'Talu',  # Tai Lü script
-    'Lana',  # Lanna script
-]
+# Placeholders for CJK functions that we'll import on demand
+_mecab_tokenize = None
+_jieba_tokenize = None
+_simplify_chinese = None
 
-ABJAD_LANGUAGES = {
-    'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur', 'he', 'yi'
-}
+logger = logging.getLogger(__name__)
+
 
 def _make_spaceless_expr():
-    pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in SPACELESS_SCRIPTS]
+    scripts = sorted(SPACELESS_SCRIPTS)
+    pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in scripts]
     return ''.join(pieces)
 
 
@@ -116,10 +108,9 @@ TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
     \w'
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
-MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 
-DIGIT_RE = regex.compile('\d')
-MULTI_DIGIT_RE = regex.compile('\d[\d.,]+')
+# Just identify punctuation, for cases where the tokenizer is separate
+PUNCT_RE = regex.compile(r"[\p{punct}]+")
 
 
 def simple_tokenize(text, include_punctuation=False):
@@ -162,197 +153,27 @@ def simple_tokenize(text, include_punctuation=False):
             for token in TOKEN_RE.findall(text)
         ]
 
-def tokenize_mecab_language(text, lang, include_punctuation=False):
-    """
-    Tokenize Japanese or Korean text, initializing the MeCab tokenizer if necessary.
-    """
-    global mecab_tokenize
-    if not (lang == 'ja' or lang == 'ko'):
-        raise ValueError("Only Japanese and Korean can be tokenized using MeCab")
-    if mecab_tokenize is None:
-        from wordfreq.mecab import mecab_tokenize
-    tokens = mecab_tokenize(text, lang)
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.casefold() for token in tokens if token_expr.match(token)]
 
-
-def chinese_tokenize(text, include_punctuation=False, external_wordlist=False):
-    """
-    Tokenize Chinese text, initializing the Jieba tokenizer if necessary.
-    """
-    global jieba_tokenize
-    if jieba_tokenize is None:
-        from wordfreq.chinese import jieba_tokenize
-    tokens = jieba_tokenize(text, external_wordlist=external_wordlist)
-    token_expr = TOKEN_RE_WITH_PUNCTUATION if include_punctuation else TOKEN_RE
-    return [token.casefold() for token in tokens if token_expr.match(token)]
-
-
-def remove_marks(text):
-    """
-    Remove decorations from words in abjad scripts:
-
-    - Combining marks of class Mn, which tend to represent non-essential
-      vowel markings.
-    - Tatweels, horizontal segments that are used to extend or justify an
-      Arabic word.
-    """
-    return MARK_RE.sub('', text)
-
-
-def commas_to_cedillas(text):
-    """
-    Convert s and t with commas (ș and ț) to cedillas (ş and ţ), which is
-    preferred in Turkish.
-
-    Only the lowercase versions are replaced, because this assumes the
-    text has already been case-folded.
-    """
-    return text.replace(
-        '\N{LATIN SMALL LETTER S WITH COMMA BELOW}',
-        '\N{LATIN SMALL LETTER S WITH CEDILLA}'
-    ).replace(
-        '\N{LATIN SMALL LETTER T WITH COMMA BELOW}',
-        '\N{LATIN SMALL LETTER T WITH CEDILLA}'
-    )
-
-
-def cedillas_to_commas(text):
-    """
-    Convert s and t with cedillas (ş and ţ) to commas (ș and ț), which is
-    preferred in Romanian.
-
-    Only the lowercase versions are replaced, because this assumes the
-    text has already been case-folded.
-    """
-    return text.replace(
-        '\N{LATIN SMALL LETTER S WITH CEDILLA}',
-        '\N{LATIN SMALL LETTER S WITH COMMA BELOW}'
-    ).replace(
-        '\N{LATIN SMALL LETTER T WITH CEDILLA}',
-        '\N{LATIN SMALL LETTER T WITH COMMA BELOW}'
-    )
-
-def preprocess_turkish(text):
-    """
-    Modifies i's so that they case-fold correctly in Turkish, and modifies
-    'comma-below' characters to use cedillas.
-    """
-    text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
-    return commas_to_cedillas(text.casefold())
-
-
-def preprocess_romanian(text):
-    """
-    Modifies the letters ş and ţ (with cedillas) to use commas-below instead.
-    """
-    return cedillas_to_commas(text.casefold())
-
-
-def preprocess_serbian(text):
-    """
-    Serbian is written in two scripts, so transliterate from Cyrillic to Latin
-    (which is the unambiguous direction).
-    """
-    return serbian_cyrillic_to_latin(text)
-
-
-def sub_zeroes(match):
-    """
-    Given a regex match, return what it matched with digits replaced by
-    zeroes.
-    """
-    return DIGIT_RE.sub('0', match.group(0))
-
-
-def smash_numbers(text):
-    """
-    Replace sequences of multiple digits with zeroes, so we don't need to
-    distinguish the frequencies of thousands of numbers.
-    """
-    return MULTI_DIGIT_RE.sub(sub_zeroes, text)
-
-
-def tokenize(text, lang, include_punctuation=False, external_wordlist=False,
-             combine_numbers=False):
+def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     """
     Tokenize this text in a way that's relatively simple but appropriate for
     the language. Strings that are looked up in wordfreq will be run through
     this function first, so that they can be expected to match the data.
 
-    Some of the processing steps are specific to one language, such as Chinese,
-    but what broadly happens to the text depends on what general writing system
-    the language uses, out of these categories:
+    The text will be run through a number of pre-processing steps that vary
+    by language; see the docstring of `wordfreq.preprocess.preprocess_text`.
 
-    - Alphabetic scripts: English, Spanish, Russian, etc.
-    - Abjad scripts: Arabic, Hebrew, Persian, Urdu, etc.
-    - CJK scripts: Chinese, Japanese, Korean
-    - Brahmic scripts: Hindi, Tamil, Telugu, Kannada, etc.
-
-    The options `include_punctuation`, `external_wordlist`, and
-    `combine_numbers` are passed on to the appropriate tokenizer:
-
-    - `include_punctuation` preserves punctuation as tokens, instead of
-      removing it.
-
-    - `external_wordlist` uses the default Jieba wordlist to tokenize Chinese,
-      instead of wordfreq's wordlist.
-
-    - `combine_numbers` replaces multi-digit numbers with strings of zeroes.
-
-
-    Alphabetic scripts
-    ------------------
-
-    The major alphabetic scripts -- Latin, Cyrillic, and Greek -- cover most
-    European languages, which are relatively straightforward to tokenize.
-
-    Text in these scripts will be normalized to NFC form, then passed
-    through a regular expression that implements the Word Segmentation section
-    of Unicode Annex #29, and then case-folded to lowercase.
-
-    The effect is mostly to split the text on spaces and punctuation. There are
-    some subtleties involving apostrophes inside words, which the regex will
-    only split when they occur before a vowel. ("Hasn't" is one token, but
-    "l'enfant" is two.)
-
-    If the language is Turkish, the case-folding rules will take this into
-    account, so that capital I and İ map to ı and i respectively.
-
-
-    Abjad scripts
-    -------------
-
-    Languages in the Arabic or Hebrew scripts are written with optional vowel
-    marks, and sometimes other decorative markings and ligatures. In these
-    languages:
-
-    - The text will be NFKC-normalized, which is a stronger and lossier form
-      than NFC. Here its purpose is to reduce ligatures to simpler characters.
-
-    - Marks will be removed, as well as the Arabic tatweel (an extension of
-      a word that is used for justification or decoration).
-
-    After these steps, the text will go through the same process as the
-    alphabetic scripts above.
-
+    If `include_punctuation` is True, punctuation will be included as separate
+    tokens. Otherwise, punctuation will be omitted in the output.
 
     CJK scripts
     -----------
 
     In the CJK languages, word boundaries can't usually be identified by a
     regular expression. Instead, there needs to be some language-specific
-    handling.
-
-    - Chinese text first gets converted to a canonical representation we call
-      "Oversimplified Chinese", where all characters are replaced by their
-      Simplified Chinese form, no matter what, even when this misspells a word or
-      a name. This representation is then tokenized using the Jieba tokenizer,
-      trained on the list of Chinese words that can be looked up in wordfreq.
-
-    - Japanese and Korean will be NFKC-normalized, then tokenized using the
-      MeCab tokenizer, using dictionary files that are included in this
-      package.
+    handling. In Chinese, we use the Jieba tokenizer, with a custom word list
+    to match the words whose frequencies we can look up. In Japanese and
+    Korean, we use the MeCab tokenizer.
 
     The `external_wordlist` option only affects Chinese tokenization.  If it's
     True, then wordfreq will not use its own Chinese wordlist for tokenization.
@@ -364,39 +185,64 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False,
     If you end up seeing tokens that are entire phrases or sentences glued
     together, that probably means you passed in CJK text with the wrong
     language code.
-
-
-    Brahmic scripts and other languages
-    -----------------------------------
-
-    Any kind of language not previously mentioned will just go through the same
-    tokenizer that alphabetic languages use. This includes the Brahmic scripts
-    used in Hindi, Tamil, and Telugu, for example.
-
-    Southeast Asian languages, such as Thai, Khmer, Lao, and Myanmar, are
-    written in Brahmic-derived scripts, but usually *without spaces*. wordfreq
-    does not support these languages yet. It will split on spaces and
-    punctuation, giving tokens that are far too long.
     """
-    # Reduce whatever language code was passed in to a normal form,
-    # containing just the language subtag.
-    lang = langcodes.get(lang).prefer_macrolanguage().language
-    if lang == 'ja' or lang == 'ko':
-        result = tokenize_mecab_language(text, lang, include_punctuation)
-    elif lang == 'zh' or lang == 'yue':
-        result = chinese_tokenize(text, include_punctuation, external_wordlist)
-    elif lang == 'tr':
-        result = simple_tokenize(preprocess_turkish(text), include_punctuation)
-    elif lang == 'ro':
-        result = simple_tokenize(preprocess_romanian(text), include_punctuation)
-    elif lang == 'sr':
-        result = simple_tokenize(preprocess_serbian(text), include_punctuation)
-    elif lang in ABJAD_LANGUAGES:
-        text = remove_marks(unicodedata.normalize('NFKC', text))
-        result = simple_tokenize(text, include_punctuation)
-    else:
-        result = simple_tokenize(text, include_punctuation)
+    # Use globals to load CJK tokenizers on demand, so that we can still run
+    # in environments that lack the CJK dependencies
+    global _mecab_tokenize, _jieba_tokenize
 
-    if combine_numbers:
-        result = [smash_numbers(token) for token in result]
-    return result
+    language = langcodes.get(lang)
+    info = get_language_info(language)
+    text = preprocess_text(text, language)
+
+    if info['tokenizer'] == 'mecab':
+        from wordfreq.mecab import mecab_tokenize as _mecab_tokenize
+        # Get just the language code out of the Language object, so we can
+        # use it to select a MeCab dictionary
+        tokens = _mecab_tokenize(text, language.language)
+        if not include_punctuation:
+            tokens = [token for token in tokens if not PUNCT_RE.match(token)]
+    elif info['tokenizer'] == 'jieba':
+        from wordfreq.chinese import jieba_tokenize as _jieba_tokenize
+        tokens = _jieba_tokenize(text, external_wordlist=external_wordlist)
+        if not include_punctuation:
+            tokens = [token for token in tokens if not PUNCT_RE.match(token)]
+    else:
+        # This is the default case where we use the regex tokenizer. First
+        # let's complain a bit if we ended up here because we don't have an
+        # appropriate tokenizer.
+        if info['tokenizer'] != 'regex':
+            logger.warning(
+                "The language '{}' is in the '{}' script, which we don't "
+                "have a tokenizer for. The results will be bad."
+                .format(lang, info['script'])
+            )
+        tokens = simple_tokenize(text, include_punctuation=include_punctuation)
+
+    return tokens
+
+
+def lossy_tokenize(text, lang, include_punctuation=False, external_wordlist=False):
+    """
+    Get a list of tokens for this text, with largely the same results and
+    options as `tokenize`, but aggressively normalize some text in a lossy way
+    that's good for counting word frequencies.
+
+    In particular:
+
+    - If a token has 2 adjacent digits, all its digits will be replaced with
+      the digit '0', so that frequencies for numbers don't have to be counted
+      separately. This is similar to word2vec, which replaces them with '#'.
+
+    - In Chinese, unless Traditional Chinese is specifically requested using
+      'zh-Hant', all characters will be converted to Simplified Chinese.
+    """
+    global _simplify_chinese
+
+    info = get_language_info(lang)
+    tokens = tokenize(text, lang, include_punctuation, external_wordlist)
+
+    if info['lookup_transliteration'] == 'zh-Hans':
+        from wordfreq.chinese import simplify_chinese as _simplify_chinese
+        tokens = [_simplify_chinese(token) for token in tokens]
+
+    return [smash_numbers(token) for token in tokens]

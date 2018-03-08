@@ -81,7 +81,7 @@ AZ_LATN_TABLE.update({
     ord('Ч'): 'Ç',   ord('ч'): 'ç',
     ord('Х'): 'X',   ord('х'): 'x',
     ord('Ы'): 'I',   ord('ы'): 'ı',
-    ord('И'): 'İ',   ord('и'): 'ı',
+    ord('И'): 'İ',   ord('и'): 'i',
     ord('Ж'): 'J',   ord('ж'): 'j',
     ord('Ј'): 'Y',   ord('ј'): 'y',
     ord('Г'): 'Q',   ord('г'): 'q',

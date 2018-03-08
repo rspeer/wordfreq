@@ -162,6 +162,9 @@ def preprocess_text(text, language):
     Azerbaijani (Azeri) has a similar transliteration step to Serbian,
     and then the Latin-alphabet text is handled similarly to Turkish.
 
+    >>> preprocess_text('бағырты', 'az')
+    'bağırtı'
+
     We don't transliterate Traditional to Simplified Chinese in this step.
     There are some steps where we unify them internally: see chinese.py
     for more information.

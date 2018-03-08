@@ -90,11 +90,21 @@ def read_cBpack(filename):
     return data[1:]
 
 
-def available_languages(wordlist='combined'):
+def available_languages(wordlist='best'):
     """
-    List the languages (as language-code strings) that the wordlist of a given
-    name is available in.
+    Given a wordlist name, return a dictionary of language codes to filenames,
+    representing all the languages in which that wordlist is available.
     """
+    if wordlist == 'best':
+        available = available_languages('small')
+        available.update(available_languages('large'))
+        return available
+    elif wordlist == 'combined':
+        logger.warning(
+            "The 'combined' wordlists have been renamed to 'small'."
+        )
+        wordlist = 'small'
+
     available = {}
     for path in DATA_PATH.glob('*.msgpack.gz'):
         if not path.name.startswith('_'):
@@ -106,7 +116,7 @@ def available_languages(wordlist='combined'):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
+def get_frequency_list(lang, wordlist='best', match_cutoff=30):
     """
     Read the raw data from a wordlist file, returning it as a list of
     lists. (See `read_cBpack` for what this represents.)
@@ -187,7 +197,7 @@ def freq_to_zipf(freq):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
+def get_frequency_dict(lang, wordlist='best', match_cutoff=30):
     """
     Get a word frequency list as a dictionary, mapping tokens to
     frequencies as floating-point probabilities.
@@ -201,7 +211,7 @@ def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
     return freqs
 
 
-def iter_wordlist(lang, wordlist='combined'):
+def iter_wordlist(lang, wordlist='best'):
     """
     Yield the words in a wordlist in approximate descending order of
     frequency.
@@ -247,33 +257,18 @@ def _word_frequency(word, lang, wordlist, minimum):
     return max(freq, minimum)
 
 
-def word_frequency(word, lang, wordlist='combined', minimum=0.):
+def word_frequency(word, lang, wordlist='best', minimum=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
-    specified `wordlist`. The default wordlist is 'combined', built from
-    whichever of these five sources have sufficient data for the language:
+    specified `wordlist`.
 
-      - Full text of Wikipedia
-      - A sample of 72 million tweets collected from Twitter in 2014,
-        divided roughly into languages using automatic language detection
-      - Frequencies extracted from OpenSubtitles
-      - The Leeds Internet Corpus
-      - Google Books Syntactic Ngrams 2013
+    These wordlists can be specified:
 
-    Another available wordlist is 'twitter', which uses only the data from
-    Twitter.
-
-    Words that we believe occur at least once per million tokens, based on
-    the average of these lists, will appear in the word frequency list.
-
-    The value returned will always be at least as large as `minimum`.
-
-    If a word decomposes into multiple tokens, we'll return a smoothed estimate
-    of the word frequency that is no greater than the frequency of any of its
-    individual tokens.
-
-    It should be noted that the current tokenizer does not support
-    multi-word Chinese phrases.
+    - 'large': a wordlist built from at least 5 sources, containing word
+      frequencies of 10^-8 and higher
+    - 'small': a wordlist built from at least 3 sources, containing word
+      frquencies of 10^-6 and higher
+    - 'best': uses 'large' if available, and 'small' otherwise
     """
     args = (word, lang, wordlist, minimum)
     try:
@@ -285,7 +280,7 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
         return _wf_cache[args]
 
 
-def zipf_frequency(word, lang, wordlist='combined', minimum=0.):
+def zipf_frequency(word, lang, wordlist='best', minimum=0.):
     """
     Get the frequency of `word`, in the language with code `lang`, on the Zipf
     scale.
@@ -313,7 +308,7 @@ def zipf_frequency(word, lang, wordlist='combined', minimum=0.):
 
 
 @lru_cache(maxsize=100)
-def top_n_list(lang, n, wordlist='combined', ascii_only=False):
+def top_n_list(lang, n, wordlist='best', ascii_only=False):
     """
     Return a frequency list of length `n` in descending order of frequency.
     This list contains words from `wordlist`, of the given language.
@@ -328,7 +323,7 @@ def top_n_list(lang, n, wordlist='combined', ascii_only=False):
     return results
 
 
-def random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12,
+def random_words(lang='en', wordlist='best', nwords=5, bits_per_word=12,
                  ascii_only=False):
     """
     Returns a string of random, space separated words.
@@ -353,7 +348,7 @@ def random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12,
     return ' '.join([random.choice(choices) for i in range(nwords)])
 
 
-def random_ascii_words(lang='en', wordlist='combined', nwords=5,
+def random_ascii_words(lang='en', wordlist='best', nwords=5,
                        bits_per_word=12):
     """
     Returns a string of random, space separated, ASCII words.

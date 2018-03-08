@@ -3,7 +3,7 @@ from wordfreq import (
     top_n_list, random_words, random_ascii_words, tokenize, lossy_tokenize
 )
 from nose.tools import (
-    eq_, assert_almost_equal, assert_greater, raises
+    eq_, assert_almost_equal, assert_greater, raises, assert_not_equal
 )
 
 
@@ -41,9 +41,24 @@ LAUGHTER_WORDS = {
 
 
 def test_languages():
-    # Make sure the number of available languages doesn't decrease
+    # Make sure we get all the languages when looking for the default
+    # 'best' wordlist
     avail = available_languages()
-    assert_greater(len(avail), 26)
+    assert_greater(len(avail), 32)
+
+    # 'small' covers the same languages, but with some different lists
+    avail_small = available_languages('small')
+    eq_(len(avail_small), len(avail))
+    assert_not_equal(avail_small, avail)
+
+    # 'combined' is the same as 'small'
+    avail_old_name = available_languages('combined')
+    eq_(avail_old_name, avail_small)
+
+    # 'large' covers fewer languages
+    avail_large = available_languages('large')
+    assert_greater(len(avail_large), 12)
+    assert_greater(len(avail), len(avail_large))
 
     # Look up the digit '2' in the main word list for each language
     for lang in avail:
@@ -53,17 +68,6 @@ def test_languages():
         # we still get it
         new_lang_code = '%s-001-x-fake-extension' % lang.upper()
         assert_greater(word_frequency('2', new_lang_code), 0, new_lang_code)
-
-
-def test_twitter():
-    avail = available_languages('twitter')
-    assert_greater(len(avail), 15)
-
-    for lang in avail:
-        assert_greater(word_frequency('rt', lang, 'twitter'),
-                       word_frequency('rt', lang, 'combined'))
-        text = LAUGHTER_WORDS.get(lang, 'haha')
-        assert_greater(word_frequency(text, lang, wordlist='twitter'), 0, (text, lang))
 
 
 def test_minimums():

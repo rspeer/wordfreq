@@ -1,6 +1,8 @@
 # This table comes from https://github.com/opendatakosovo/cyrillic-transliteration/blob/master/cyrtranslit/mapping.py,
-# from the 'cyrtranslit' module, which can't currently be imported in Python 3.
-SR_CYRL_TO_LATN_DICT = {
+# from the 'cyrtranslit' module. We originally had to reimplement it because
+# 'cyrtranslit' didn't work in Python 3; now it does, but we've made the table
+# more robust than the one in cyrtranslit.
+SR_LATN_TABLE = {
     ord('А'): 'A',   ord('а'): 'a',
     ord('Б'): 'B',   ord('б'): 'b',
     ord('В'): 'V',   ord('в'): 'v',
@@ -55,7 +57,7 @@ SR_CYRL_TO_LATN_DICT = {
     # Ukrainian letters
     ord('Є'): 'Je',  ord('є'): 'je',
     ord('І'): 'I',   ord('і'): 'i',
-    ord('Ї'): 'Ji',  ord('ї'): 'ji',
+    ord('Ї'): 'Ï',  ord('ї'): 'ï',
     ord('Ґ'): 'G',   ord('ґ'): 'g',
 
     # Macedonian letters
@@ -64,7 +66,43 @@ SR_CYRL_TO_LATN_DICT = {
     ord('Ќ'): 'Ḱ',   ord('ќ'): 'ḱ',
 }
 
+AZ_LATN_TABLE = SR_LATN_TABLE.copy()
+AZ_LATN_TABLE.update({
+    # Distinct Azerbaijani letters
+    ord('Ҹ'): 'C',  ord('ҹ'): 'c',
+    ord('Ә'): 'Ə',  ord('ә'): 'ə',
+    ord('Ғ'): 'Ğ',  ord('ғ'): 'ğ',
+    ord('Һ'): 'H',  ord('һ'): 'h',
+    ord('Ө'): 'Ö',  ord('ө'): 'ö',
+    ord('Ҝ'): 'G',  ord('ҝ'): 'g',
+    ord('Ү'): 'Ü',  ord('ү'): 'ü',
 
-def serbian_cyrillic_to_latin(text):
-    return text.translate(SR_CYRL_TO_LATN_DICT)
+    # Azerbaijani letters with different transliterations
+    ord('Ч'): 'Ç',   ord('ч'): 'ç',
+    ord('Х'): 'X',   ord('х'): 'x',
+    ord('Ы'): 'I',   ord('ы'): 'ı',
+    ord('И'): 'İ',   ord('и'): 'ı',
+    ord('Ж'): 'J',   ord('ж'): 'j',
+    ord('Ј'): 'Y',   ord('ј'): 'y',
+    ord('Г'): 'Q',   ord('г'): 'q',
+    ord('Ш'): 'Ş',   ord('ш'): 'ş',
+})
 
+
+def transliterate(table, text):
+    """
+    Transliterate text according to one of the tables above.
+
+    `table` chooses the table. It looks like a language code but comes from a
+    very restricted set:
+
+    - 'sr-Latn' means to convert Serbian, which may be in Cyrillic, into the
+      Latin alphabet.
+    - 'az-Latn' means the same for Azerbaijani Cyrillic to Latn.
+    """
+    if table == 'sr-Latn':
+        return text.translate(SR_LATN_TABLE)
+    elif table == 'az-Latn':
+        return text.translate(AZ_LATN_TABLE)
+    else:
+        raise ValueError("Unknown transliteration table: {!r}".format(table))

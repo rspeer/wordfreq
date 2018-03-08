@@ -1,6 +1,6 @@
 from wordfreq import (
     word_frequency, available_languages, cB_to_freq,
-    top_n_list, random_words, random_ascii_words, tokenize
+    top_n_list, random_words, random_ascii_words, tokenize, lossy_tokenize
 )
 from nose.tools import (
     eq_, assert_almost_equal, assert_greater, raises
@@ -164,13 +164,13 @@ def test_casefolding():
 def test_number_smashing():
     eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en'),
         ['715', 'crσσks', 'by', 'bon', 'iver'])
-    eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en', combine_numbers=True),
+    eq_(lossy_tokenize('"715 - CRΣΣKS" by Bon Iver', 'en'),
         ['000', 'crσσks', 'by', 'bon', 'iver'])
-    eq_(tokenize('"715 - CRΣΣKS" by Bon Iver', 'en', combine_numbers=True, include_punctuation=True),
+    eq_(lossy_tokenize('"715 - CRΣΣKS" by Bon Iver', 'en', include_punctuation=True),
         ['"', '000', '-', 'crσσks', '"', 'by', 'bon', 'iver'])
-    eq_(tokenize('1', 'en', combine_numbers=True), ['1'])
-    eq_(tokenize('3.14', 'en', combine_numbers=True), ['0.00'])
-    eq_(tokenize('24601', 'en', combine_numbers=True), ['00000'])
+    eq_(lossy_tokenize('1', 'en'), ['1'])
+    eq_(lossy_tokenize('3.14', 'en'), ['0.00'])
+    eq_(lossy_tokenize('24601', 'en'), ['00000'])
     eq_(word_frequency('24601', 'en'), word_frequency('90210', 'en'))
 
 
@@ -230,6 +230,7 @@ def test_ideographic_fallback():
         tokenize(ja_text, 'en'),
         ['ひらがな', 'カタカナ', 'romaji']
     )
+
 
 def test_other_languages():
     # Test that we leave Thai letters stuck together. If we had better Thai support,

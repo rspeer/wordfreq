@@ -1,4 +1,3 @@
-from wordfreq.tokens import tokenize, simple_tokenize
 from pkg_resources import resource_filename
 from functools import lru_cache
 import langcodes
@@ -9,6 +8,9 @@ import pathlib
 import random
 import logging
 import math
+
+from .tokens import tokenize, simple_tokenize, lossy_tokenize
+from .language_info import get_language_info
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +32,9 @@ INFERRED_SPACE_LANGUAGES = {'zh'}
 # frequency.)
 INFERRED_SPACE_FACTOR = 10.0
 
-# simple_tokenize is imported so that other things can import it from here.
-# Suppress the pyflakes warning.
+# tokenize and simple_tokenize are imported so that other things can import
+# them from here. Suppress the pyflakes warning.
+tokenize = tokenize
 simple_tokenize = simple_tokenize
 
 
@@ -215,8 +218,9 @@ def iter_wordlist(lang, wordlist='combined'):
 # it takes to look up frequencies from scratch, so something faster is needed.
 _wf_cache = {}
 
+
 def _word_frequency(word, lang, wordlist, minimum):
-    tokens = tokenize(word, lang, combine_numbers=True)
+    tokens = lossy_tokenize(word, lang)
     if not tokens:
         return minimum
 
@@ -234,7 +238,10 @@ def _word_frequency(word, lang, wordlist, minimum):
 
     freq = 1.0 / one_over_result
 
-    if lang in INFERRED_SPACE_LANGUAGES:
+    if get_language_info(lang)['tokenizer'] == 'jieba':
+        # If we used the Jieba tokenizer, we could tokenize anything to match
+        # our wordlist, even nonsense. To counteract this, we multiply by a
+        # probability for each word break that was inferred.
         freq /= INFERRED_SPACE_FACTOR ** (len(tokens) - 1)
 
     return max(freq, minimum)

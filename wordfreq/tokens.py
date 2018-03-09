@@ -11,6 +11,7 @@ _mecab_tokenize = None
 _jieba_tokenize = None
 _simplify_chinese = None
 
+_WARNED_LANGUAGES = set()
 logger = logging.getLogger(__name__)
 
 
@@ -211,11 +212,13 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         # let's complain a bit if we ended up here because we don't have an
         # appropriate tokenizer.
         if info['tokenizer'] != 'regex':
-            logger.warning(
-                "The language '{}' is in the '{}' script, which we don't "
-                "have a tokenizer for. The results will be bad."
-                .format(lang, info['script'])
-            )
+            if lang not in _WARNED_LANGUAGES:
+                logger.warning(
+                    "The language '{}' is in the '{}' script, which we don't "
+                    "have a tokenizer for. The results will be bad."
+                    .format(lang, info['script'])
+                )
+                _WARNED_LANGUAGES.add(lang)
         tokens = simple_tokenize(text, include_punctuation=include_punctuation)
 
     return tokens

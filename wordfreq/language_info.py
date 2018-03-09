@@ -1,3 +1,4 @@
+from functools import lru_cache
 from langcodes import Language, best_match
 
 
@@ -34,6 +35,7 @@ def _language_in_list(language, targets, min_score=80):
     return matched[1] > 0
 
 
+@lru_cache(maxsize=None)
 def get_language_info(language):
     """
     Looks up the things we need to know about how to handle text in a given

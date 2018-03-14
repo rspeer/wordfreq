@@ -19,30 +19,6 @@ def test_freq_examples():
     assert_greater(word_frequency('infrequency', 'en'), 0.)
 
 
-# To test the reasonableness of the Twitter list, we want to look up a
-# common word representing laughter in each language. The default for
-# languages not listed here is 'haha'.
-LAUGHTER_WORDS = {
-    'en': 'lol',
-    'hi': 'lol',
-    'cs': 'lol',
-    'ru': 'лол',
-    'zh': '笑',
-    'ja': '笑',
-    'ar': 'ﻪﻬﻬﻬﻫ',
-    'fa': 'خخخخ',
-    'ca': 'jaja',
-    'es': 'jaja',
-    'fr': 'ptdr',
-    'pt': 'kkkk',
-    'he': 'חחח',
-    'bg': 'ахаха',
-    'uk': 'хаха',
-    'bn': 'হা হা',
-    'mk': 'хаха'
-}
-
-
 def test_languages():
     # Make sure we get all the languages when looking for the default
     # 'best' wordlist

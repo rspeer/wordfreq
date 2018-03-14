@@ -124,7 +124,8 @@ def get_frequency_list(lang, wordlist='best', match_cutoff=30):
     best, score = langcodes.best_match(lang, list(available),
                                        min_score=match_cutoff)
     if score == 0:
-        raise LookupError("No wordlist available for language %r" % lang)
+        raise LookupError("No wordlist %r available for language %r"
+                          % (wordlist, lang))
 
     if best != lang:
         logger.warning(

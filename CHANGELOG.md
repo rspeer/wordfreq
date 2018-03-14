@@ -1,3 +1,66 @@
+## Version 2.0 (2018-03-14)
+
+The big change in this version is that text preprocessing, tokenization, and
+postprocessing to look up words in a list are separate steps.
+
+If all you need is preprocessing to make text more consistent, use
+`wordfreq.preprocess.preprocess_text(text, lang)`. If you need preprocessing
+and tokenization, use `wordfreq.tokenize(text, lang)` as before. If you need
+all three steps, use the new function `wordfreq.lossy_tokenize(text, lang)`.
+
+As a breaking change, this means that the `tokenize` function no longer has
+the `combine_numbers` option, because that's a postprocessing step. For
+the same behavior, use `lossy_tokenize`, which always combines numbers.
+
+Similarly, `tokenize` will no longer replace Chinese characters with their
+Simplified Chinese version, while `lossy_tokenize` will.
+
+Other changes:
+
+- There's a new default wordlist for each language, called "best". This
+  chooses the "large" wordlist for that language, or if that list doesn't
+  exist, it falls back on "small".
+
+- The wordlist formerly named "combined" (this name made sense long ago)
+  is now named "small". "combined" remains as a deprecated alias.
+
+- The "twitter" wordlist has been removed. If you need to compare word
+  frequencies from individual sources, you can work with the separate files in
+  [exquisite-corpus][].
+
+- Tokenizing Chinese will preserve the original characters, no matter whether
+  they are Simplified or Traditional, instead of replacing them all with
+  Simplified characters.
+
+- Different languages require different processing steps, and the decisions
+  about what these steps are now appear in the `wordfreq.language_info` module,
+  replacing a bunch of scattered and inconsistent `if` statements.
+
+- Tokenizing CJK languages while preserving punctuation now has a less confusing
+  implementation.
+
+- The preprocessing step can transliterate Azerbaijani, although we don't yet
+  have wordlists in this language. This is similar to how the tokenizer
+  supports many more languages than the ones with wordlists, making future
+  wordlists possible.
+
+- Speaking of that, the tokenizer will log a warning (once) if you ask to tokenize
+  text written in a script we can't tokenize (such as Thai).
+
+- New source data from [exquisite-corpus][] includes OPUS OpenSubtitles 2018.
+
+Nitty gritty dependency changes:
+
+- Updated the regex dependency to 2018.02.21. (We would love suggestions on
+  how to coexist with other libraries that use other versions of `regex`,
+  without a `>=` requirement that could introduce unexpected data-altering
+  changes.)
+
+- We now depend on `msgpack`, the new name for `msgpack-python`.
+
+[exquisite-corpus]: https://github.com/LuminosoInsight/exquisite-corpus
+
+
 ## Version 1.7.0 (2017-08-25)
 
 - Tokenization will always keep Unicode graphemes together, including

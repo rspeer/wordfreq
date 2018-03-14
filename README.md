@@ -7,7 +7,7 @@ Author: Rob Speer
 ## Installation
 
 wordfreq requires Python 3 and depends on a few other Python modules
-(msgpack, langcodes, and ftfy). You can install it and its dependencies
+(msgpack, langcodes, and regex). You can install it and its dependencies
 in the usual way, either by getting it from pip:
 
     pip3 install wordfreq

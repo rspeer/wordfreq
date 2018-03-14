@@ -18,12 +18,6 @@ logger = logging.getLogger(__name__)
 CACHE_SIZE = 100000
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
 
-# Chinese and Japanese are written without spaces. In Chinese, in particular,
-# we have to infer word boundaries from the frequencies of the words they
-# would create. When this happens, we should adjust the resulting frequency
-# to avoid creating a bias toward improbable word combinations.
-INFERRED_SPACE_LANGUAGES = {'zh'}
-
 # We'll divide the frequency by 10 for each token boundary that was inferred.
 # (We determined the factor of 10 empirically by looking at words in the
 # Chinese wordlist that weren't common enough to be identified by the
@@ -269,6 +263,10 @@ def word_frequency(word, lang, wordlist='best', minimum=0.):
     - 'small': a wordlist built from at least 3 sources, containing word
       frquencies of 10^-6 and higher
     - 'best': uses 'large' if available, and 'small' otherwise
+
+    The value returned will always be at least as large as `minimum`.
+    You could set this value to 10^-8, for example, to return 10^-8 for
+    unknown words in the 'large' list instead of 0, avoiding a discontinuity.
     """
     args = (word, lang, wordlist, minimum)
     try:

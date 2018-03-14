@@ -211,14 +211,13 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         # This is the default case where we use the regex tokenizer. First
         # let's complain a bit if we ended up here because we don't have an
         # appropriate tokenizer.
-        if info['tokenizer'] != 'regex':
-            if lang not in _WARNED_LANGUAGES:
-                logger.warning(
-                    "The language '{}' is in the '{}' script, which we don't "
-                    "have a tokenizer for. The results will be bad."
-                    .format(lang, info['script'])
-                )
-                _WARNED_LANGUAGES.add(lang)
+        if info['tokenizer'] != 'regex' and lang not in _WARNED_LANGUAGES:
+            logger.warning(
+                "The language '{}' is in the '{}' script, which we don't "
+                "have a tokenizer for. The results will be bad."
+                .format(lang, info['script'])
+            )
+            _WARNED_LANGUAGES.add(lang)
         tokens = simple_tokenize(text, include_punctuation=include_punctuation)
 
     return tokens
@@ -232,9 +231,12 @@ def lossy_tokenize(text, lang, include_punctuation=False, external_wordlist=Fals
 
     In particular:
 
-    - If a token has 2 adjacent digits, all its digits will be replaced with
-      the digit '0', so that frequencies for numbers don't have to be counted
-      separately. This is similar to word2vec, which replaces them with '#'.
+    - Any sequence of 2 or more adjacent digits, possibly with intervening
+      punctuation such as a decimal point, will replace each digit with '0'
+      so that frequencies for numbers don't have to be counted separately.
+
+      This is similar to but not quite identical to the word2vec Google News
+      data, which replaces digits with '#' in tokens with more than one digit.
 
     - In Chinese, unless Traditional Chinese is specifically requested using
       'zh-Hant', all characters will be converted to Simplified Chinese.

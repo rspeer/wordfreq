@@ -257,7 +257,7 @@ into multiple tokens:
     >>> zipf_frequency('New York', 'en')
     5.35
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.55
+    3.54
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,

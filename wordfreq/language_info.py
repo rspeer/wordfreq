@@ -31,7 +31,7 @@ def _language_in_list(language, targets, min_score=80):
     The languages can be given as strings (language tags) or as Language
     objects. `targets` can be any iterable of such languages.
     """
-    matched = best_match(language, targets)
+    matched = best_match(language, targets, min_score=min_score)
     return matched[1] > 0
 
 

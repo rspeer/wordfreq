@@ -7,7 +7,7 @@ Author: Robyn Speer
 ## Installation
 
 wordfreq requires Python 3 and depends on a few other Python modules
-(msgpack, langcodes, and ftfy). You can install it and its dependencies
+(msgpack, langcodes, and regex). You can install it and its dependencies
 in the usual way, either by getting it from pip:
 
     pip3 install wordfreq
@@ -23,20 +23,21 @@ steps that are necessary to get Chinese, Japanese, and Korean word frequencies.
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 27 languages (see *Supported languages* below).
+used, in 35 languages (see *Supported languages* below).
 
-It provides three kinds of pre-built wordlists:
+It provides both 'small' and 'large' wordlists:
 
-- `'combined'` lists, containing words that appear at least once per
-  million words, averaged across all data sources.
-- `'twitter'` lists, containing words that appear at least once per
-  million words on Twitter alone.
-- `'large'` lists, containing words that appear at least once per 100
-  million words, averaged across all data sources.
+- The 'small' lists take up very little memory and cover words that appear at
+  least once per million words.
+- The 'large' lists cover words that appear at least once per 100 million
+  words.
 
-The most straightforward function is:
+The default list is 'best', which uses 'large' if it's available for the
+language, and 'small' otherwise.
 
-    word_frequency(word, lang, wordlist='combined', minimum=0.0)
+The most straightforward function for looking up frequencies is:
+
+    word_frequency(word, lang, wordlist='best', minimum=0.0)
 
 This function looks up a word's frequency in the given language, returning its
 frequency as a decimal between 0 and 1. In these examples, we'll multiply the
@@ -47,10 +48,10 @@ frequencies by a million (1e6) to get more readable numbers:
     11.748975549395302
 
     >>> word_frequency('café', 'en') * 1e6
-    3.981071705534969
+    3.890451449942805
 
     >>> word_frequency('cafe', 'fr') * 1e6
-    1.4125375446227555
+    1.4454397707459279
 
     >>> word_frequency('café', 'fr') * 1e6
     53.70317963702532
@@ -65,25 +66,25 @@ example, and a word with Zipf value 3 appears once per million words.
 
 Reasonable Zipf values are between 0 and 8, but because of the cutoffs
 described above, the minimum Zipf value appearing in these lists is 1.0 for the
-'large' wordlists and 3.0 for all others. We use 0 as the default Zipf value
+'large' wordlists and 3.0 for 'small'. We use 0 as the default Zipf value
 for words that do not appear in the given wordlist, although it should mean
 one occurrence per billion words.
 
     >>> from wordfreq import zipf_frequency
     >>> zipf_frequency('the', 'en')
-    7.75
+    7.77
 
     >>> zipf_frequency('word', 'en')
     5.32
 
     >>> zipf_frequency('frequency', 'en')
-    4.36
+    4.38
 
     >>> zipf_frequency('zipf', 'en')
-    0.0
+    1.32
 
-    >>> zipf_frequency('zipf', 'en', wordlist='large')
-    1.28
+    >>> zipf_frequency('zipf', 'en', wordlist='small')
+    0.0
 
 
 The parameters to `word_frequency` and `zipf_frequency` are:
@@ -95,7 +96,7 @@ The parameters to `word_frequency` and `zipf_frequency` are:
 - `lang`: the BCP 47 or ISO 639 code of the language to use, such as 'en'.
 
 - `wordlist`: which set of word frequencies to use. Current options are
-  'combined', 'twitter', and 'large'.
+  'small', 'large', and 'best'.
 
 - `minimum`: If the word is not in the list or has a frequency lower than
   `minimum`, return `minimum` instead. You may want to set this to the minimum
@@ -108,7 +109,7 @@ Other functions:
 way that the words in wordfreq's data were counted in the first place. See
 *Tokenization*.
 
-`top_n_list(lang, n, wordlist='combined')` returns the most common *n* words in
+`top_n_list(lang, n, wordlist='best')` returns the most common *n* words in
 the list, in descending frequency order.
 
     >>> from wordfreq import top_n_list
@@ -118,18 +119,18 @@ the list, in descending frequency order.
     >>> top_n_list('es', 10)
     ['de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'no', 'se']
 
-`iter_wordlist(lang, wordlist='combined')` iterates through all the words in a
+`iter_wordlist(lang, wordlist='best')` iterates through all the words in a
 wordlist, in descending frequency order.
 
-`get_frequency_dict(lang, wordlist='combined')` returns all the frequencies in
+`get_frequency_dict(lang, wordlist='best')` returns all the frequencies in
 a wordlist as a dictionary, for cases where you'll want to look up a lot of
 words and don't need the wrapper that `word_frequency` provides.
 
-`supported_languages(wordlist='combined')` returns a dictionary whose keys are
+`supported_languages(wordlist='best')` returns a dictionary whose keys are
 language codes, and whose values are the data file that will be loaded to
 provide the requested wordlist in each language.
 
-`random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12)`
+`random_words(lang='en', wordlist='best', nwords=5, bits_per_word=12)`
 returns a selection of random words, separated by spaces. `bits_per_word=n`
 will select each random word from 2^n words.
 
@@ -256,7 +257,7 @@ into multiple tokens:
     >>> zipf_frequency('New York', 'en')
     5.35
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.55
+    3.54
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,

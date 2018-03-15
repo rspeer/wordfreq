@@ -1,4 +1,3 @@
-from wordfreq.tokens import tokenize, simple_tokenize
 from pkg_resources import resource_filename
 from functools import lru_cache
 import langcodes
@@ -10,17 +9,14 @@ import random
 import logging
 import math
 
+from .tokens import tokenize, simple_tokenize, lossy_tokenize
+from .language_info import get_language_info
+
 logger = logging.getLogger(__name__)
 
 
 CACHE_SIZE = 100000
 DATA_PATH = pathlib.Path(resource_filename('wordfreq', 'data'))
-
-# Chinese and Japanese are written without spaces. In Chinese, in particular,
-# we have to infer word boundaries from the frequencies of the words they
-# would create. When this happens, we should adjust the resulting frequency
-# to avoid creating a bias toward improbable word combinations.
-INFERRED_SPACE_LANGUAGES = {'zh'}
 
 # We'll divide the frequency by 10 for each token boundary that was inferred.
 # (We determined the factor of 10 empirically by looking at words in the
@@ -30,8 +26,9 @@ INFERRED_SPACE_LANGUAGES = {'zh'}
 # frequency.)
 INFERRED_SPACE_FACTOR = 10.0
 
-# simple_tokenize is imported so that other things can import it from here.
-# Suppress the pyflakes warning.
+# tokenize and simple_tokenize are imported so that other things can import
+# them from here. Suppress the pyflakes warning.
+tokenize = tokenize
 simple_tokenize = simple_tokenize
 
 
@@ -87,11 +84,21 @@ def read_cBpack(filename):
     return data[1:]
 
 
-def available_languages(wordlist='combined'):
+def available_languages(wordlist='best'):
     """
-    List the languages (as language-code strings) that the wordlist of a given
-    name is available in.
+    Given a wordlist name, return a dictionary of language codes to filenames,
+    representing all the languages in which that wordlist is available.
     """
+    if wordlist == 'best':
+        available = available_languages('small')
+        available.update(available_languages('large'))
+        return available
+    elif wordlist == 'combined':
+        logger.warning(
+            "The 'combined' wordlists have been renamed to 'small'."
+        )
+        wordlist = 'small'
+
     available = {}
     for path in DATA_PATH.glob('*.msgpack.gz'):
         if not path.name.startswith('_'):
@@ -103,7 +110,7 @@ def available_languages(wordlist='combined'):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
+def get_frequency_list(lang, wordlist='best', match_cutoff=30):
     """
     Read the raw data from a wordlist file, returning it as a list of
     lists. (See `read_cBpack` for what this represents.)
@@ -117,7 +124,8 @@ def get_frequency_list(lang, wordlist='combined', match_cutoff=30):
     best, score = langcodes.best_match(lang, list(available),
                                        min_score=match_cutoff)
     if score == 0:
-        raise LookupError("No wordlist available for language %r" % lang)
+        raise LookupError("No wordlist %r available for language %r"
+                          % (wordlist, lang))
 
     if best != lang:
         logger.warning(
@@ -184,7 +192,7 @@ def freq_to_zipf(freq):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
+def get_frequency_dict(lang, wordlist='best', match_cutoff=30):
     """
     Get a word frequency list as a dictionary, mapping tokens to
     frequencies as floating-point probabilities.
@@ -198,7 +206,7 @@ def get_frequency_dict(lang, wordlist='combined', match_cutoff=30):
     return freqs
 
 
-def iter_wordlist(lang, wordlist='combined'):
+def iter_wordlist(lang, wordlist='best'):
     """
     Yield the words in a wordlist in approximate descending order of
     frequency.
@@ -215,8 +223,9 @@ def iter_wordlist(lang, wordlist='combined'):
 # it takes to look up frequencies from scratch, so something faster is needed.
 _wf_cache = {}
 
+
 def _word_frequency(word, lang, wordlist, minimum):
-    tokens = tokenize(word, lang, combine_numbers=True)
+    tokens = lossy_tokenize(word, lang)
     if not tokens:
         return minimum
 
@@ -234,39 +243,31 @@ def _word_frequency(word, lang, wordlist, minimum):
 
     freq = 1.0 / one_over_result
 
-    if lang in INFERRED_SPACE_LANGUAGES:
+    if get_language_info(lang)['tokenizer'] == 'jieba':
+        # If we used the Jieba tokenizer, we could tokenize anything to match
+        # our wordlist, even nonsense. To counteract this, we multiply by a
+        # probability for each word break that was inferred.
         freq /= INFERRED_SPACE_FACTOR ** (len(tokens) - 1)
 
     return max(freq, minimum)
 
 
-def word_frequency(word, lang, wordlist='combined', minimum=0.):
+def word_frequency(word, lang, wordlist='best', minimum=0.):
     """
     Get the frequency of `word` in the language with code `lang`, from the
-    specified `wordlist`. The default wordlist is 'combined', built from
-    whichever of these five sources have sufficient data for the language:
+    specified `wordlist`.
 
-      - Full text of Wikipedia
-      - A sample of 72 million tweets collected from Twitter in 2014,
-        divided roughly into languages using automatic language detection
-      - Frequencies extracted from OpenSubtitles
-      - The Leeds Internet Corpus
-      - Google Books Syntactic Ngrams 2013
+    These wordlists can be specified:
 
-    Another available wordlist is 'twitter', which uses only the data from
-    Twitter.
-
-    Words that we believe occur at least once per million tokens, based on
-    the average of these lists, will appear in the word frequency list.
+    - 'large': a wordlist built from at least 5 sources, containing word
+      frequencies of 10^-8 and higher
+    - 'small': a wordlist built from at least 3 sources, containing word
+      frquencies of 10^-6 and higher
+    - 'best': uses 'large' if available, and 'small' otherwise
 
     The value returned will always be at least as large as `minimum`.
-
-    If a word decomposes into multiple tokens, we'll return a smoothed estimate
-    of the word frequency that is no greater than the frequency of any of its
-    individual tokens.
-
-    It should be noted that the current tokenizer does not support
-    multi-word Chinese phrases.
+    You could set this value to 10^-8, for example, to return 10^-8 for
+    unknown words in the 'large' list instead of 0, avoiding a discontinuity.
     """
     args = (word, lang, wordlist, minimum)
     try:
@@ -278,7 +279,7 @@ def word_frequency(word, lang, wordlist='combined', minimum=0.):
         return _wf_cache[args]
 
 
-def zipf_frequency(word, lang, wordlist='combined', minimum=0.):
+def zipf_frequency(word, lang, wordlist='best', minimum=0.):
     """
     Get the frequency of `word`, in the language with code `lang`, on the Zipf
     scale.
@@ -306,7 +307,7 @@ def zipf_frequency(word, lang, wordlist='combined', minimum=0.):
 
 
 @lru_cache(maxsize=100)
-def top_n_list(lang, n, wordlist='combined', ascii_only=False):
+def top_n_list(lang, n, wordlist='best', ascii_only=False):
     """
     Return a frequency list of length `n` in descending order of frequency.
     This list contains words from `wordlist`, of the given language.
@@ -321,7 +322,7 @@ def top_n_list(lang, n, wordlist='combined', ascii_only=False):
     return results
 
 
-def random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12,
+def random_words(lang='en', wordlist='best', nwords=5, bits_per_word=12,
                  ascii_only=False):
     """
     Returns a string of random, space separated words.
@@ -346,7 +347,7 @@ def random_words(lang='en', wordlist='combined', nwords=5, bits_per_word=12,
     return ' '.join([random.choice(choices) for i in range(nwords)])
 
 
-def random_ascii_words(lang='en', wordlist='combined', nwords=5,
+def random_ascii_words(lang='en', wordlist='best', nwords=5,
                        bits_per_word=12):
     """
     Returns a string of random, space separated, ASCII words.

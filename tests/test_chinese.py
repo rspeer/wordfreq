@@ -55,9 +55,18 @@ def test_tokens():
         ]
     )
 
-    # You match the same tokens if you look it up in Traditional Chinese.
-    eq_(tokenize(fact_simplified, 'zh'), tokenize(fact_traditional, 'zh'))
+    # Check that Traditional Chinese works at all
     assert_greater(word_frequency(fact_traditional, 'zh'), 0)
+
+    # You get the same token lengths if you look it up in Traditional Chinese,
+    # but the words are different
+    simp_tokens = tokenize(fact_simplified, 'zh', include_punctuation=True)
+    trad_tokens = tokenize(fact_traditional, 'zh', include_punctuation=True)
+    eq_(''.join(simp_tokens), fact_simplified)
+    eq_(''.join(trad_tokens), fact_traditional)
+    simp_lengths = [len(token) for token in simp_tokens]
+    trad_lengths = [len(token) for token in trad_tokens]
+    eq_(simp_lengths, trad_lengths)
 
 
 def test_combination():
@@ -83,5 +92,3 @@ def test_alternate_codes():
     # Separate codes for Mandarin and Cantonese
     eq_(tokenize('谢谢谢谢', 'cmn'), tokens)
     eq_(tokenize('谢谢谢谢', 'yue'), tokens)
-
-

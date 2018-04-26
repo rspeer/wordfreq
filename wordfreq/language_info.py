@@ -8,11 +8,13 @@ from langcodes import Language, best_match
 # a specific tokenizer for the language or give up.
 SPACELESS_SCRIPTS = [
     # Han ideographs are spaceless, but they don't need to appear in this list
-    # because they have their own cases in get_language_info and TOKEN_RE.
-    'Hiragana',
-    # We omit katakana because Unicode regular expressions can already
-    # tokenize sequences of katakana, and omitting it here means we can also
-    # recognize a switch between hiragana and katakana as a token boundary.
+    # because _almost_ all of them, except for some exceptional Japanese
+    # characters, are covered by the \p{IsIdeo} check.  Checking for
+    # Script=Hani and IsIdeo slows down our regexes with huge, redundant
+    # classes of characters. Instead, we'll list the exceptions below.
+
+    'Hira',  # Hiragana
+    'Kana',  # Katakana
     'Thai',  # Thai script
     'Khmr',  # Khmer script
     'Laoo',  # Lao script
@@ -21,6 +23,26 @@ SPACELESS_SCRIPTS = [
     'Talu',  # Tai Lü script
     'Lana',  # Lanna script
 ]
+
+
+EXTRA_JAPANESE_CHARACTERS = 'ー々〻〆'
+
+# ー is a lengthening mark that's both hiragana and katakana. Unicode
+# segmentation handles it as a special case, but we're overriding standard
+# Unicode segmentation, so we need to have the special case too.
+#
+# 々 and 〻 are "iteration marks" that stand for the previous kanji. So they
+# act identically to kanji (ideograms) without technically _being_ kanji.  That
+# technicality doesn't matter to us.
+#
+# 〆 is a Japanese abbreviation for "total", and even this can be used in the
+# middle of words. Why isn't it just considered an ideograph? I don't know, I
+# didn't come up with this language, or Unicode for that matter.
+#
+# None of this even comes up when we're trying to tokenize Chinese and
+# Japanese.  It comes up when we're trying to _not_ tokenize a word because
+# it's Chinese or Japanese and the tokenization doesn't really matter, which
+# happens in ConceptNet.
 
 
 def _language_in_list(language, targets, min_score=80):

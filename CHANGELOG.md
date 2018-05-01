@@ -1,3 +1,27 @@
+## Version 2.0.1 (2018-05-01)
+
+Fixed edge cases that inserted spurious token boundaries when Japanese text is
+run through `simple_tokenize`, because of a few characters that don't match any
+of our "spaceless scripts".
+
+It is not a typical situation for Japanese text to be passed through
+`simple_tokenize`, because Japanese text should instead use the
+Japanese-specific tokenization in `wordfreq.mecab`.
+
+However, some downstream uses of wordfreq have justifiable reasons to pass all
+terms through `simple_tokenize`, even terms that may be in Japanese, and in
+those cases we want to detect only the most obvious token boundaries.
+
+In this situation, we no longer try to detect script changes, such as between
+kanji and katakana, as token boundaries. This particularly allows us to keep
+together Japanese words where ヶ appears betwen kanji, as well as words that
+use the iteration mark 々.
+
+This change does not affect any word frequencies. (The Japanese word list uses
+`wordfreq.mecab` for tokenization, not `simple_tokenize`.)
+
+
+
 ## Version 2.0 (2018-03-14)
 
 The big change in this version is that text preprocessing, tokenization, and

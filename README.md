@@ -416,9 +416,9 @@ sources:
 
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
 
-It contains data from OPUS OpenSubtitles 2016
-(http://opus.lingfil.uu.se/OpenSubtitles2016.php), whose data originates from
-the OpenSubtitles project (http://www.opensubtitles.org/).
+It contains data from OPUS OpenSubtitles 2018
+(http://opus.nlpl.eu/OpenSubtitles.php), whose data originates from the
+OpenSubtitles project (http://www.opensubtitles.org/).
 
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
 SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al.

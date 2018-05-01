@@ -1,10 +1,50 @@
 from nose.tools import eq_, assert_almost_equal
-from wordfreq import tokenize, word_frequency
+from wordfreq import tokenize, simple_tokenize, word_frequency
 
 
 def test_tokens():
     eq_(tokenize('おはようございます', 'ja'),
         ['おはよう', 'ござい', 'ます'])
+
+
+def test_simple_tokenize():
+    # When Japanese is run through simple_tokenize -- either because it's
+    # tagged with the wrong language, or because we want to pass through
+    # Japanese text without getting MeCab involved -- it will be split at
+    # boundaries between Japanese and non-Japanese scripts, but all Japanese
+    # scripts will be stuck together. Here the switch between hiragana
+    # (ひらがな) and katakana (カタカナ) is not a boundary, but the switch
+    # between katakana and romaji is.
+    #
+    # We used to try to infer word boundaries between hiragana and katakana,
+    # but this leads to edge cases that are unsolvable without a dictionary.
+    ja_text = 'ひらがなカタカナromaji'
+    eq_(
+        simple_tokenize(ja_text),
+        ['ひらがなカタカナ', 'romaji']
+    )
+
+    # An example that would be multiple tokens if tokenized as 'ja' via MeCab,
+    # but sticks together in simple_tokenize
+    eq_(simple_tokenize('おはようございます'), ['おはようございます'])
+
+    # Names that use the weird possessive marker ヶ, which is technically a
+    # katakana even though it's being used like a kanji, stay together as one
+    # token
+    eq_(simple_tokenize("犬ヶ島"), ["犬ヶ島"])
+
+    # The word in ConceptNet that made me notice that simple_tokenize used
+    # to have a problem with the character 々
+    eq_(simple_tokenize("晴々しい"), ["晴々しい"])
+
+    # Explicit word separators are still token boundaries, such as the dot
+    # between "toner" and "cartridge" in "toner cartridge"
+    eq_(simple_tokenize("トナー・カートリッジ"), ["トナー", "カートリッジ"])
+
+    # This word has multiple weird characters that aren't quite kanji in it,
+    # and is in the dictionary
+    eq_(simple_tokenize("見ヶ〆料"), ["見ヶ〆料"])
+
 
 
 def test_combination():

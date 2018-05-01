@@ -3,7 +3,7 @@ import unicodedata
 import logging
 import langcodes
 
-from .language_info import get_language_info, SPACELESS_SCRIPTS
+from .language_info import get_language_info, SPACELESS_SCRIPTS, EXTRA_JAPANESE_CHARACTERS
 from .preprocess import preprocess_text, smash_numbers
 
 # Placeholders for CJK functions that we'll import on demand
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 def _make_spaceless_expr():
     scripts = sorted(SPACELESS_SCRIPTS)
     pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in scripts]
-    return ''.join(pieces)
+    return ''.join(pieces) + EXTRA_JAPANESE_CHARACTERS
 
 
 SPACELESS_EXPR = _make_spaceless_expr()

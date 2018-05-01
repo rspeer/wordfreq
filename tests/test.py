@@ -204,15 +204,10 @@ def test_arabic():
 
 def test_ideographic_fallback():
     # Try tokenizing Chinese text as English -- it should remain stuck together.
+    #
+    # More complex examples like this, involving the multiple scripts of Japanese,
+    # are in test_japanese.py.
     eq_(tokenize('中国文字', 'en'), ['中国文字'])
-
-    # When Japanese is tagged with the wrong language, it will be split
-    # at script boundaries.
-    ja_text = 'ひらがなカタカナromaji'
-    eq_(
-        tokenize(ja_text, 'en'),
-        ['ひらがな', 'カタカナ', 'romaji']
-    )
 
 
 def test_other_languages():

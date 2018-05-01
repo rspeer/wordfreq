@@ -33,19 +33,20 @@ dependencies = [
 if sys.version_info < (3, 4):
     dependencies.append('pathlib')
 
-
 setup(
     name="wordfreq",
     version='2.0.1',
     maintainer='Luminoso Technologies, Inc.',
     maintainer_email='info@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
-    license = "MIT",
-    platforms = ["any"],
-    description = doclines[0],
-    classifiers = classifiers,
-    long_description = "\n".join(doclines[2:]),
+    license="MIT",
+    platforms=["any"],
+    description=doclines[0],
+    classifiers=classifiers,
+    long_description=README_contents,
+    long_description_content_type='text/markdown',
     packages=['wordfreq'],
+    python_requires='>=3.3',
     include_package_data=True,
     install_requires=dependencies,
 

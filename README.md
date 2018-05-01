@@ -1,5 +1,4 @@
-wordfreq is a Python library for looking up the frequencies of words in many
-languages, based on many sources of data.
+wordfreq is a Python library for looking up the frequencies of words in many languages, based on many sources of data.
 
 Author: Robyn Speer
 

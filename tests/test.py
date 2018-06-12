@@ -17,7 +17,7 @@ def test_languages():
     # Make sure we get all the languages when looking for the default
     # 'best' wordlist
     avail = available_languages()
-    assert len(avail) > 32
+    assert len(avail) >= 36
 
     # 'small' covers the same languages, but with some different lists
     avail_small = available_languages('small')
@@ -30,7 +30,7 @@ def test_languages():
 
     # 'large' covers fewer languages
     avail_large = available_languages('large')
-    assert len(avail_large) > 12
+    assert len(avail_large) >= 14
     assert len(avail) > len(avail_large)
 
     # Look up the digit '2' in the main word list for each language
@@ -60,6 +60,7 @@ def test_most_common_words():
         return top_n_list(lang, 1)[0]
 
     assert get_most_common('ar') == 'في'
+    assert get_most_common('cs') == 'a'
     assert get_most_common('de') == 'die'
     assert get_most_common('en') == 'the'
     assert get_most_common('es') == 'de'

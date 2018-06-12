@@ -1,5 +1,5 @@
-from nose.tools import eq_, assert_almost_equal, assert_greater
 from wordfreq import tokenize, word_frequency
+import pytest
 
 
 def test_tokens():
@@ -17,64 +17,49 @@ def test_tokens():
 
     # His name breaks into five pieces, with the only piece staying together
     # being the one that means 'Bart'. The dot is not included as a token.
-    eq_(
-        tokenize(hobart, 'zh'),
-        ['加', '勒', '特', '霍', '巴特']
-    )
+    assert tokenize(hobart, 'zh') == ['加', '勒', '特', '霍', '巴特']
 
-    eq_(
-        tokenize(fact_simplified, 'zh'),
-        [
-            # he / is / history / in / #6 / counter for people
-            '他', '是',  '历史', '上', '第六', '位',
-            # during / term of office / in / die
-            '在', '任期', '内', '去世',
-            # of / U.S. / deputy / president
-            '的', '美国', '副', '总统'
-        ]
-    )
+    assert tokenize(fact_simplified, 'zh') == [
+        # he / is / history / in / #6 / counter for people
+        '他', '是',  '历史', '上', '第六', '位',
+        # during / term of office / in / die
+        '在', '任期', '内', '去世',
+        # of / U.S. / deputy / president
+        '的', '美国', '副', '总统'
+    ]
 
     # Jieba's original tokenizer knows a lot of names, it seems.
-    eq_(
-        tokenize(hobart, 'zh', external_wordlist=True),
-        ['加勒特', '霍巴特']
-    )
+    assert tokenize(hobart, 'zh', external_wordlist=True) == ['加勒特', '霍巴特']
 
     # We get almost the same tokens from the sentence using Jieba's own
     # wordlist, but it tokenizes "in history" as two words and
     # "sixth person" as one.
-    eq_(
-        tokenize(fact_simplified, 'zh', external_wordlist=True),
-        [
-            # he / is / history / in / sixth person
-            '他', '是', '历史', '上', '第六位',
-            # during / term of office / in / die
-            '在', '任期', '内', '去世',
-            # of / U.S. / deputy / president
-            '的', '美国', '副', '总统'
-        ]
-    )
+    assert tokenize(fact_simplified, 'zh', external_wordlist=True) == [
+        # he / is / history / in / sixth person
+        '他', '是', '历史', '上', '第六位',
+        # during / term of office / in / die
+        '在', '任期', '内', '去世',
+        # of / U.S. / deputy / president
+        '的', '美国', '副', '总统'
+    ]
 
     # Check that Traditional Chinese works at all
-    assert_greater(word_frequency(fact_traditional, 'zh'), 0)
+    assert word_frequency(fact_traditional, 'zh') > 0
 
     # You get the same token lengths if you look it up in Traditional Chinese,
     # but the words are different
     simp_tokens = tokenize(fact_simplified, 'zh', include_punctuation=True)
     trad_tokens = tokenize(fact_traditional, 'zh', include_punctuation=True)
-    eq_(''.join(simp_tokens), fact_simplified)
-    eq_(''.join(trad_tokens), fact_traditional)
+    assert ''.join(simp_tokens) == fact_simplified
+    assert ''.join(trad_tokens) == fact_traditional
     simp_lengths = [len(token) for token in simp_tokens]
     trad_lengths = [len(token) for token in trad_tokens]
-    eq_(simp_lengths, trad_lengths)
+    assert simp_lengths == trad_lengths
 
 
 def test_combination():
     xiexie_freq = word_frequency('谢谢', 'zh')   # "Thanks"
-    assert_almost_equal(
-        word_frequency('谢谢谢谢', 'zh'),
-        xiexie_freq / 20
-    )
+    assert word_frequency('谢谢谢谢', 'zh') == pytest.approx(xiexie_freq / 20)
 
 
 def test_alternate_codes():
@@ -83,12 +68,12 @@ def test_alternate_codes():
     tokens = ['谢谢', '谢谢']
 
     # Code with a region attached
-    eq_(tokenize('谢谢谢谢', 'zh-CN'), tokens)
+    assert tokenize('谢谢谢谢', 'zh-CN') == tokens
 
     # Over-long codes for Chinese
-    eq_(tokenize('谢谢谢谢', 'chi'), tokens)
-    eq_(tokenize('谢谢谢谢', 'zho'), tokens)
+    assert tokenize('谢谢谢谢', 'chi') == tokens
+    assert tokenize('谢谢谢谢', 'zho') == tokens
 
     # Separate codes for Mandarin and Cantonese
-    eq_(tokenize('谢谢谢谢', 'cmn'), tokens)
-    eq_(tokenize('谢谢谢谢', 'yue'), tokens)
+    assert tokenize('谢谢谢谢', 'cmn') == tokens
+    assert tokenize('谢谢谢谢', 'yue') == tokens

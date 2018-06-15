@@ -102,45 +102,23 @@ The parameters to `word_frequency` and `zipf_frequency` are:
   value contained in the wordlist, to avoid a discontinuity where the wordlist
   ends.
 
-Other functions:
 
-`tokenize(text, lang)` splits text in the given language into words, in the same
-way that the words in wordfreq's data were counted in the first place. See
-*Tokenization*.
+## Frequency bins
 
-`top_n_list(lang, n, wordlist='best')` returns the most common *n* words in
-the list, in descending frequency order.
+wordfreq's wordlists are designed to load quickly and take up little space in
+the repository.  We accomplish this by avoiding meaningless precision and
+packing the words into frequency bins.
 
-    >>> from wordfreq import top_n_list
-    >>> top_n_list('en', 10)
-    ['the', 'of', 'to', 'and', 'a', 'in', 'i', 'is', 'that', 'for']
+In wordfreq, all words that have the same Zipf frequency rounded to the nearest
+hundredth have the same frequency. We don't store any more precision than that.
+So instead of having to store that the frequency of a word is
+.000011748975549395302, information that is mostly meaningless, we just store
+the 600 possible frequency bins and the words they contain.
 
-    >>> top_n_list('es', 10)
-    ['de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'no', 'se']
-
-`iter_wordlist(lang, wordlist='best')` iterates through all the words in a
-wordlist, in descending frequency order.
-
-`get_frequency_dict(lang, wordlist='best')` returns all the frequencies in
-a wordlist as a dictionary, for cases where you'll want to look up a lot of
-words and don't need the wrapper that `word_frequency` provides.
-
-`supported_languages(wordlist='best')` returns a dictionary whose keys are
-language codes, and whose values are the data file that will be loaded to
-provide the requested wordlist in each language.
-
-`random_words(lang='en', wordlist='best', nwords=5, bits_per_word=12)`
-returns a selection of random words, separated by spaces. `bits_per_word=n`
-will select each random word from 2^n words.
-
-If you happen to want an easy way to get [a memorable, xkcd-style
-password][xkcd936] with 60 bits of entropy, this function will almost do the
-job. In this case, you should actually run the similar function
-`random_ascii_words`, limiting the selection to words that can be typed in
-ASCII. But maybe you should just use [xkpa][].
-
-[xkcd936]: https://xkcd.com/936/
-[xkpa]: https://github.com/beala/xkcd-password
+Because the Zipf scale is a logarithmic scale, this preserves the same relative
+precision no matter how far down you are in the word list. The frequency of any
+word is precise to within 1%. (This is not a claim about _accuracy_, which it's
+unclear how you'd even measure, just about _precision_.)
 
 
 ## Sources and supported languages
@@ -222,6 +200,47 @@ languages" below.
 Some languages provide 'large' wordlists, including words with a Zipf frequency
 between 1.0 and 3.0. These are available in 14 languages that are covered by
 enough data sources.
+
+
+## Other functions
+
+`tokenize(text, lang)` splits text in the given language into words, in the same
+way that the words in wordfreq's data were counted in the first place. See
+*Tokenization*.
+
+`top_n_list(lang, n, wordlist='best')` returns the most common *n* words in
+the list, in descending frequency order.
+
+    >>> from wordfreq import top_n_list
+    >>> top_n_list('en', 10)
+    ['the', 'of', 'to', 'and', 'a', 'in', 'i', 'is', 'that', 'for']
+
+    >>> top_n_list('es', 10)
+    ['de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'no', 'se']
+
+`iter_wordlist(lang, wordlist='best')` iterates through all the words in a
+wordlist, in descending frequency order.
+
+`get_frequency_dict(lang, wordlist='best')` returns all the frequencies in
+a wordlist as a dictionary, for cases where you'll want to look up a lot of
+words and don't need the wrapper that `word_frequency` provides.
+
+`supported_languages(wordlist='best')` returns a dictionary whose keys are
+language codes, and whose values are the data file that will be loaded to
+provide the requested wordlist in each language.
+
+`random_words(lang='en', wordlist='best', nwords=5, bits_per_word=12)`
+returns a selection of random words, separated by spaces. `bits_per_word=n`
+will select each random word from 2^n words.
+
+If you happen to want an easy way to get [a memorable, xkcd-style
+password][xkcd936] with 60 bits of entropy, this function will almost do the
+job. In this case, you should actually run the similar function
+`random_ascii_words`, limiting the selection to words that can be typed in
+ASCII. But maybe you should just use [xkpa][].
+
+[xkcd936]: https://xkcd.com/936/
+[xkpa]: https://github.com/beala/xkcd-password
 
 
 ## Tokenization

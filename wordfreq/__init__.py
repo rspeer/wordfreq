@@ -249,7 +249,14 @@ def _word_frequency(word, lang, wordlist, minimum):
         # probability for each word break that was inferred.
         freq /= INFERRED_SPACE_FACTOR ** (len(tokens) - 1)
 
-    return max(freq, minimum)
+    # All our frequency data is only precise to within 1% anyway, so round
+    # it to 3 significant digits
+    unrounded = max(freq, minimum)
+    if unrounded == 0.:
+        return 0.
+    else:
+        leading_zeroes = math.floor(-math.log(unrounded, 10))
+        return round(unrounded, leading_zeroes + 3)
 
 
 def word_frequency(word, lang, wordlist='best', minimum=0.):

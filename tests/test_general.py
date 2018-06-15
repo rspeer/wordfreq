@@ -177,7 +177,7 @@ def test_not_really_random():
 
 def test_not_enough_ascii():
     with pytest.raises(ValueError):
-        random_ascii_words(lang='zh', bits_per_word=14)
+        random_ascii_words(lang='zh', bits_per_word=16)
 
 
 def test_arabic():

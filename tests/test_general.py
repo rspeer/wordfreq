@@ -17,7 +17,7 @@ def test_languages():
     # Make sure we get all the languages when looking for the default
     # 'best' wordlist
     avail = available_languages()
-    assert len(avail) >= 36
+    assert len(avail) >= 34
 
     # 'small' covers the same languages, but with some different lists
     avail_small = available_languages('small')
@@ -172,7 +172,7 @@ def test_not_really_random():
 
     # This not only tests random_ascii_words, it makes sure we didn't end
     # up with 'eos' as a very common Japanese word
-    assert random_ascii_words(nwords=4, lang='ja', bits_per_word=0) == '1 1 1 1'
+    assert random_ascii_words(nwords=4, lang='ja', bits_per_word=0) == '00 00 00 00'
 
 
 def test_not_enough_ascii():

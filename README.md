@@ -178,7 +178,7 @@ least 3 different sources of word frequencies:
     Croatian    hr [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
     Czech       cs      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Danish      da      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Dutch       nl      4  Yes    │ Yes   Yes   Yes   -     -     Yes   -     -
+    Dutch       nl      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     English     en      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Finnish     fi      6  Yes    │ Yes   Yes   Yes   -     Yes   Yes   Yes   -
     French      fr      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -

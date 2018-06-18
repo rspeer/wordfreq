@@ -1,4 +1,5 @@
-wordfreq is a Python library for looking up the frequencies of words in many languages, based on many sources of data.
+wordfreq is a Python library for looking up the frequencies of words in many
+languages, based on many sources of data.
 
 Author: Robyn Speer
 
@@ -22,7 +23,8 @@ steps that are necessary to get Chinese, Japanese, and Korean word frequencies.
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 35 languages (see *Supported languages* below).
+used, in 36 languages (see *Supported languages* below). It uses many different
+data sources, not just one corpus.
 
 It provides both 'small' and 'large' wordlists:
 
@@ -39,21 +41,20 @@ The most straightforward function for looking up frequencies is:
     word_frequency(word, lang, wordlist='best', minimum=0.0)
 
 This function looks up a word's frequency in the given language, returning its
-frequency as a decimal between 0 and 1. In these examples, we'll multiply the
-frequencies by a million (1e6) to get more readable numbers:
+frequency as a decimal between 0 and 1.
 
     >>> from wordfreq import word_frequency
-    >>> word_frequency('cafe', 'en') * 1e6
-    11.748975549395302
+    >>> word_frequency('cafe', 'en')
+    1.07e-05
 
-    >>> word_frequency('café', 'en') * 1e6
-    3.890451449942805
+    >>> word_frequency('café', 'en')
+    5.89e-06
 
-    >>> word_frequency('cafe', 'fr') * 1e6
-    1.4454397707459279
+    >>> word_frequency('cafe', 'fr')
+    1.51e-06
 
-    >>> word_frequency('café', 'fr') * 1e6
-    53.70317963702532
+    >>> word_frequency('café', 'fr')
+    5.25e-05
 
 
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
@@ -74,13 +75,13 @@ one occurrence per billion words.
     7.77
 
     >>> zipf_frequency('word', 'en')
-    5.32
+    5.29
 
     >>> zipf_frequency('frequency', 'en')
-    4.38
+    4.42
 
     >>> zipf_frequency('zipf', 'en')
-    1.32
+    1.55
 
     >>> zipf_frequency('zipf', 'en', wordlist='small')
     0.0
@@ -112,13 +113,29 @@ packing the words into frequency bins.
 In wordfreq, all words that have the same Zipf frequency rounded to the nearest
 hundredth have the same frequency. We don't store any more precision than that.
 So instead of having to store that the frequency of a word is
-.000011748975549395302, information that is mostly meaningless, we just store
-the 600 possible frequency bins and the words they contain.
+.000011748975549395302, where most of those digits are meaningless, we just store
+the frequency bins and the words they contain.
 
 Because the Zipf scale is a logarithmic scale, this preserves the same relative
 precision no matter how far down you are in the word list. The frequency of any
-word is precise to within 1%. (This is not a claim about _accuracy_, which it's
-unclear how you'd even measure, just about _precision_.)
+word is precise to within 1%.
+
+(This is not a claim about _accuracy_, but about _precision_. We believe that
+the way we use multiple data sources and discard outliers makes wordfreq a
+more accurate measurement of the way these words are really used in written
+language, but it's unclear how one would measure this accuracy.)
+
+
+## The figure-skating metric
+
+We combine word frequencies from different sources in a way that's designed
+to minimize the impact of outliers. The method reminds me of the scoring system
+in Olympic figure skating:
+
+- Find the frequency of each word according to each data source.
+- For each word, drop the sources that give it the highest and lowest frequency.
+- Average the remaining frequencies.
+- Rescale the resulting frequency list to add up to 1.
 
 
 ## Sources and supported languages
@@ -133,14 +150,16 @@ Exquisite Corpus compiles 8 different domains of text, some of which themselves
 come from multiple sources:
 
 - **Wikipedia**, representing encyclopedic text
-- **Subtitles**, from OPUS OpenSubtitles 2016 and SUBTLEX
+- **Subtitles**, from OPUS OpenSubtitles 2018 and SUBTLEX
 - **News**, from NewsCrawl 2014 and GlobalVoices
 - **Books**, from Google Books Ngrams 2012
-- **Web** text, from the Leeds Internet Corpus and the MOKK Hungarian Webcorpus
+- **Web** text, from ParaCrawl, the Leeds Internet Corpus, and the MOKK
+  Hungarian Webcorpus
 - **Twitter**, representing short-form social media
 - **Reddit**, representing potentially longer Internet comments
 - **Miscellaneous** word frequencies: in Chinese, we import a free wordlist
-  that comes with the Jieba word segmenter, whose provenance we don't really know
+  that comes with the Jieba word segmenter, whose provenance we don't really
+  know
 
 The following languages are supported, with reasonable tokenization and at
 least 3 different sources of word frequencies:
@@ -225,9 +244,14 @@ wordlist, in descending frequency order.
 a wordlist as a dictionary, for cases where you'll want to look up a lot of
 words and don't need the wrapper that `word_frequency` provides.
 
-`supported_languages(wordlist='best')` returns a dictionary whose keys are
+`available_languages(wordlist='best')` returns a dictionary whose keys are
 language codes, and whose values are the data file that will be loaded to
 provide the requested wordlist in each language.
+
+`get_language_info(lang)` returns a dictionary of information about how we
+preprocess text in this language, such as what script we expect it to be
+written in, which characters we normalize together, and how we tokenize it.
+See its docstring for more information.
 
 `random_words(lang='en', wordlist='best', nwords=5, bits_per_word=12)`
 returns a selection of random words, separated by spaces. `bits_per_word=n`
@@ -274,9 +298,9 @@ also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> zipf_frequency('New York', 'en')
-    5.35
+    5.28
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.54
+    3.57
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,
@@ -291,7 +315,7 @@ you give it an uncommon combination of tokens, it will hugely over-estimate
 their frequency:
 
     >>> zipf_frequency('owl-flavored', 'en')
-    3.18
+    3.2
 
 
 ## Multi-script languages
@@ -430,14 +454,14 @@ sources:
 - The Leeds Internet Corpus, from the University of Leeds Centre for Translation
   Studies (http://corpus.leeds.ac.uk/list.html)
 
-- The OpenSubtitles Frequency Word Lists, compiled by Hermit Dave
-  (https://invokeit.wordpress.com/frequency-word-lists/)
-
 - Wikipedia, the free encyclopedia (http://www.wikipedia.org)
+
+- ParaCrawl, a multilingual Web crawl (https://paracrawl.eu)
 
 It contains data from OPUS OpenSubtitles 2018
 (http://opus.nlpl.eu/OpenSubtitles.php), whose data originates from the
-OpenSubtitles project (http://www.opensubtitles.org/).
+OpenSubtitles project (http://www.opensubtitles.org/) and may be used with
+attribution to OpenSubtitles.
 
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
 SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al.
@@ -502,10 +526,6 @@ The same citation in BibTex format:
   Methods, 41 (4), 977-990.
   http://sites.google.com/site/borisnew/pub/BrysbaertNew2009.pdf
 
-- Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A. M., Bölte, J., & Böhl, A.
-  (2015). The word frequency effect. Experimental Psychology.
-  http://econtent.hogrefe.com/doi/abs/10.1027/1618-3169/a000123?journalCode=zea
-
 - Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A.M., Bölte, J., & Böhl, A.
   (2011). The word frequency effect: A review of recent developments and
   implications for the choice of frequency estimates in German. Experimental
@@ -514,9 +534,6 @@ The same citation in BibTex format:
 - Cai, Q., & Brysbaert, M. (2010). SUBTLEX-CH: Chinese word and character
   frequencies based on film subtitles. PLoS One, 5(6), e10729.
   http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0010729
-
-- Dave, H. (2011). Frequency word lists.
-  https://invokeit.wordpress.com/frequency-word-lists/
 
 - Davis, M. (2012). Unicode text segmentation. Unicode Standard Annex, 29.
   http://unicode.org/reports/tr29/
@@ -535,10 +552,18 @@ The same citation in BibTex format:
   analyzer.
   http://mecab.sourceforge.net/
 
+- Lin, Y., Michel, J.-B., Aiden, E. L., Orwant, J., Brockman, W., and Petrov,
+  S. (2012). Syntactic annotations for the Google Books Ngram Corpus.
+  Proceedings of the ACL 2012 system demonstrations, 169-174.
+  http://aclweb.org/anthology/P12-3029
+
 - Lison, P. and Tiedemann, J. (2016). OpenSubtitles2016: Extracting Large
   Parallel Corpora from Movie and TV Subtitles. In Proceedings of the 10th
   International Conference on Language Resources and Evaluation (LREC 2016).
   http://stp.lingfil.uu.se/~joerg/paper/opensubs2016.pdf
+
+- ParaCrawl (2018). Provision of Web-Scale Parallel Corpora for Official
+  European Languages. https://paracrawl.eu/
 
 - van Heuven, W. J., Mandera, P., Keuleers, E., & Brysbaert, M. (2014).
   SUBTLEX-UK: A new and improved word frequency database for British English.

@@ -35,7 +35,7 @@ if sys.version_info < (3, 4):
 
 setup(
     name="wordfreq",
-    version='2.0.1',
+    version='2.1.0',
     maintainer='Luminoso Technologies, Inc.',
     maintainer_email='info@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
@@ -60,5 +60,5 @@ setup(
         'mecab': 'mecab-python3',
         'jieba': 'jieba'
     },
-    tests_require=['mecab-python3', 'jieba'],
+    tests_require=['pytest', 'mecab-python3', 'jieba'],
 )

@@ -174,13 +174,13 @@ least 3 different sources of word frequencies:
     Bosnian     bs [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Bulgarian   bg      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Catalan     ca      4  -      │ Yes   Yes   Yes   -     -     Yes   -     -
-    Chinese     zh [3]  6  Yes    │ Yes   -     Yes   Yes   Yes   Yes   -     Jieba
+    Chinese     zh [3]  7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   -     Jieba
     Croatian    hr [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
-    Czech       cs      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Czech       cs      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Danish      da      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Dutch       nl      4  Yes    │ Yes   Yes   Yes   -     -     Yes   -     -
+    Dutch       nl      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     English     en      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
-    Finnish     fi      5  Yes    │ Yes   Yes   Yes   -     -     Yes   Yes   -
+    Finnish     fi      6  Yes    │ Yes   Yes   Yes   -     Yes   Yes   Yes   -
     French      fr      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     German      de      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Greek       el      3  -      │ Yes   Yes   -     -     Yes   -     -     -
@@ -191,13 +191,14 @@ least 3 different sources of word frequencies:
     Italian     it      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Japanese    ja      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
     Korean      ko      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
+    Latvian     lv      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
     Macedonian  mk      3  -      │ Yes   Yes   Yes   -     -     -     -     -
     Malay       ms      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Norwegian   nb [2]  4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
     Persian     fa      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Polish      pl      5  Yes    │ Yes   Yes   Yes   -     -     Yes   Yes   -
+    Polish      pl      6  Yes    │ Yes   Yes   Yes   -     Yes   Yes   Yes   -
     Portuguese  pt      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
-    Romanian    ro      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Romanian    ro      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
     Russian     ru      6  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   -     -
     Serbian     sr [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Spanish     es      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
@@ -219,7 +220,7 @@ Chinese, with primarily Mandarin Chinese vocabulary. See "Multi-script
 languages" below.
 
 Some languages provide 'large' wordlists, including words with a Zipf frequency
-between 1.0 and 3.0. These are available in 13 languages that are covered by
+between 1.0 and 3.0. These are available in 14 languages that are covered by
 enough data sources.
 
 

@@ -14,7 +14,7 @@ those cases we want to detect only the most obvious token boundaries.
 
 In this situation, we no longer try to detect script changes, such as between
 kanji and katakana, as token boundaries. This particularly allows us to keep
-together Japanese words where ヶ appears betwen kanji, as well as words that
+together Japanese words where ヶ appears between kanji, as well as words that
 use the iteration mark 々.
 
 This change does not affect any word frequencies. (The Japanese word list uses

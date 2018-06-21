@@ -395,7 +395,7 @@ things need to be installed:
 To install these three things on Ubuntu, you can run:
 
 ```sh
-sudo apt-get install libmecab-dev mecab-ipadic-utf8
+sudo apt-get install python3-dev libmecab-dev mecab-ipadic-utf8
 pip3 install mecab-python3
 ```
 
@@ -419,6 +419,7 @@ wget https://bitbucket.org/eunjeon/mecab-ko-dic/downloads/mecab-ko-dic-2.0.1-201
 tar xvf mecab-ko-dic-2.0.1-20150920.tar.gz
 cd mecab-ko-dic-2.0.1-20150920
 ./autogen.sh
+./configure
 make
 sudo make install
 ```

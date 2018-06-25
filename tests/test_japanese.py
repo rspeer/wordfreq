@@ -49,11 +49,11 @@ def test_combination():
     gozai_freq = word_frequency('ござい', 'ja')
     masu_freq = word_frequency('ます', 'ja')
 
-    assert word_frequency('おはようおはよう', 'ja') == pytest.approx(ohayou_freq / 2)
+    assert word_frequency('おはようおはよう', 'ja') == pytest.approx(ohayou_freq / 2, rel=0.01)
     
     assert (
         1.0 / word_frequency('おはようございます', 'ja') ==
-        pytest.approx(1.0 / ohayou_freq + 1.0 / gozai_freq + 1.0 / masu_freq)
+        pytest.approx(1.0 / ohayou_freq + 1.0 / gozai_freq + 1.0 / masu_freq, rel=0.01)
     )
     
 

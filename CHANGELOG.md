@@ -1,3 +1,20 @@
+## Version 2.1 (2018-06-18)
+
+Data changes:
+
+- Updated to the data from the latest Exquisite Corpus, which adds the
+  ParaCrawl web crawl and updates to OpenSubtitles 2018
+- Added small word list for Latvian
+- Added large word list for Czech
+- The Dutch large word list once again has 5 data sources
+
+Library change:
+
+- The output of `word_frequency` is rounded to three significant digits. This
+  provides friendlier output, and better reflects the precision of the
+  underlying data anyway.
+
+
 ## Version 2.0.1 (2018-05-01)
 
 Fixed edge cases that inserted spurious token boundaries when Japanese text is

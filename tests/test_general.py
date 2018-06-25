@@ -162,7 +162,7 @@ def test_phrase_freq():
     ff = word_frequency("flip-flop", 'en')
     assert ff > 0
     phrase_freq = 1.0 / word_frequency('flip', 'en') + 1.0 / word_frequency('flop', 'en')
-    assert 1.0 / ff == pytest.approx(phrase_freq)
+    assert 1.0 / ff == pytest.approx(phrase_freq, rel=0.01)
 
 
 def test_not_really_random():

@@ -9,3 +9,4 @@ pip-log.txt
 wordfreq-data.tar.gz
 .idea
 build.dot
+.pytest_cache

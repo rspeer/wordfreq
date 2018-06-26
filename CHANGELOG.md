@@ -14,6 +14,10 @@ Library change:
   provides friendlier output, and better reflects the precision of the
   underlying data anyway.
 
+- The MeCab interface can now look for Korean and Japanese dictionaries
+  in `/usr/lib/x86_64-linux-gnu/mecab`, which is where Ubuntu 18.04 puts them
+  when they are installed from source.
+
 
 ## Version 2.0.1 (2018-05-01)
 

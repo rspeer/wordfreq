@@ -20,6 +20,7 @@ def find_mecab_dictionary(names):
         '/var/local/lib/mecab/dic',
         '/usr/lib/mecab/dic',
         '/usr/local/lib/mecab/dic',
+        '/usr/lib/x86_64-linux-gnu/mecab/dic',
     ]
     full_paths = [os.path.join(path, name) for path in paths for name in names]
     checked_paths = [path for path in full_paths if len(path) <= MAX_PATH_LENGTH]

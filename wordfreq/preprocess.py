@@ -252,7 +252,7 @@ def cedillas_to_commas(text):
     )
 
 
-def sub_zeroes(match):
+def _sub_zeroes(match):
     """
     Given a regex match, return what it matched with digits replaced by
     zeroes.
@@ -265,4 +265,4 @@ def smash_numbers(text):
     Replace sequences of multiple digits with zeroes, so we don't need to
     distinguish the frequencies of thousands of numbers.
     """
-    return MULTI_DIGIT_RE.sub(sub_zeroes, text)
+    return MULTI_DIGIT_RE.sub(_sub_zeroes, text)

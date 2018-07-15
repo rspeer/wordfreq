@@ -41,6 +41,14 @@ def test_gender_neutral_at():
     assert tokenize(text, "en") == ["@s", "membr@s", "da", "comunidade", "virtual"]
 
 
+def test_at_in_corpus():
+    # We have a word frequency for "l@s"
+    assert word_frequency('l@s', 'es') > 0
+
+    # It's not just treated as a word break
+    assert word_frequency('l@s', 'es') < word_frequency('l s', 'es')
+
+
 def test_punctuation_at():
     # If the @ appears alone in a word, we consider it to be punctuation
     text = "operadores de canal, que são aqueles que têm um @ ao lado do nick"

@@ -1,3 +1,5 @@
+## Version 2.2
+
 ## Version 2.1 (2018-06-18)
 
 Data changes:

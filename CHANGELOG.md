@@ -1,4 +1,23 @@
-## Version 2.2
+## Version 2.2 (2018-07-24)
+
+Library change:
+
+- While the @ sign is usually considered a symbol and not part of a word, there
+  is a case where it acts like a letter. It's used in one way of writing
+  gender-neutral words in Spanish and Portuguese, such as "l@s niñ@s". The
+  tokenizer in wordfreq will now allow words to end with "@" or "@s", so it
+  can recognize these words.
+
+Data changes:
+
+- Updated the data from Exquisite Corpus to filter the ParaCrawl web crawl
+  better. ParaCrawl provides two metrics (Zipporah and Bicleaner) for the
+  goodness of its data, and we now filter it to only use texts that get
+  positive scores on both metrics.
+
+- The input data includes the change to tokenization described above, giving
+  us word frequencies for words such as "l@s".
+
 
 ## Version 2.1 (2018-06-18)
 

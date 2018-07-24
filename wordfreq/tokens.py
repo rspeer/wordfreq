@@ -48,10 +48,28 @@ TOKEN_RE = regex.compile(r"""
     # <SPACELESS> will be replaced by the complex range expression made by
     # _make_spaceless_expr().
 
-    [<SPACELESS>]+ |
+    [<SPACELESS>]+
+    |
 
-    # Case 2: standard Unicode segmentation
-    # -------------------------------------
+    # Case 2: Gender-neutral "@s"
+    # ---------------------------
+    #
+    # "@" and "@s" are gender-neutral word endings that can replace -a, -o,
+    # -as, and -os in Spanish, Portuguese, and occasionally Italian.
+    #
+    # This doesn't really conflict with other uses of the @ sign, so we simply
+    # recognize these endings as being part of the token in any language.
+    #
+    # We will recognize the endings as part of our main rule for recognizing
+    # words, which is Case 3 below. However, one case that remains separate is
+    # the Portuguese word "@s" itself, standing for the article "as" or "os".
+    # This must be followed by a word break (\b).
+
+    @s \b
+    |
+
+    # Case 3: Unicode segmentation with tweaks
+    # ----------------------------------------
 
     # The start of the token must be 'word-like', not punctuation or whitespace
     # or various other things. However, we allow characters of category So
@@ -68,29 +86,41 @@ TOKEN_RE = regex.compile(r"""
     (?!\w'[Hh])
 
     # The entire token is made of graphemes (\X). Matching by graphemes means
-    # that we don't have to specially account for marks or ZWJ sequences.
+    # that we don't have to specially account for marks or ZWJ sequences. We use
+    # a non-greedy match so that we can control where the match ends in the
+    # following expression.
     #
-    # The token ends as soon as it encounters a word break (\b). We use the
-    # non-greedy match (+?) to make sure to end at the first word break we
-    # encounter.
-    \X+? \b |
-
     # If we were matching by codepoints (.) instead of graphemes (\X), then
     # detecting boundaries would be more difficult. Here's a fact that's subtle
     # and poorly documented: a position that's between codepoints, but in the
     # middle of a grapheme, does not match as a word break (\b), but also does
     # not match as not-a-word-break (\B). The word boundary algorithm simply
     # doesn't apply in such a position.
+    \X+?
+
+    # The token ends when it encounters a word break (\b). We use the
+    # non-greedy match (+?) to make sure to end at the first word break we
+    # encounter.
     #
-    # We used to match the rest of the token using \S, which matches non-space
-    # *codepoints*, and this caused us to incompletely work around cases where
-    # it left off in the middle of a grapheme.
+    # We need a special case for gender-neutral "@", which is acting as a
+    # letter, but Unicode considers it to be a symbol and would break words
+    # around it.  We prefer continuing the token with "@" or "@s" over matching
+    # a word break.
     #
+    # As in case 2, this is only allowed at the end of the word. Unfortunately,
+    # we can't use the word-break expression \b in this case, because "@"
+    # already is a word break according to Unicode. Instead, we use a negative
+    # lookahead assertion to ensure that the next character is not word-like.
+    (?:
+       @s? (?!\w) | \b
+    )
+    |
+
     # Another subtle fact: the "non-breaking space" U+A0 counts as a word break
     # here. That's surprising, but it's also what we want, because we don't want
     # any kind of spaces in the middle of our tokens.
 
-    # Case 3: Fix French
+    # Case 4: Fix French
     # ------------------
     # This allows us to match the articles in French, Catalan, and related
     # languages, such as «l'», that we may have excluded from being part of
@@ -100,13 +130,14 @@ TOKEN_RE = regex.compile(r"""
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
-    # This expression is similar to the expression above, but also matches any
-    # sequence of punctuation characters.
+    # This expression is similar to the expression above. It adds a case between
+    # 2 and 3 that matches any sequence of punctuation characters.
 
-    [<SPACELESS>]+ |
-    [\p{punct}]+ |
-    (?=[\w\p{So}]) (?!\w'[Hh]) \X+? \b |
-    \w'
+    [<SPACELESS>]+ |                                        # Case 1
+    @s \b |                                                 # Case 2
+    [\p{punct}]+ |                                          # punctuation
+    (?=[\w\p{So}]) (?!\w'[Hh]) \X+? (?: @s? (?!w) | \b) |   # Case 3
+    \w'                                                     # Case 4
 """.replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
 
 

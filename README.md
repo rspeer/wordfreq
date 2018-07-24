@@ -48,13 +48,13 @@ frequency as a decimal between 0 and 1.
     1.07e-05
 
     >>> word_frequency('café', 'en')
-    5.89e-06
+    5.75e-06
 
     >>> word_frequency('cafe', 'fr')
     1.51e-06
 
     >>> word_frequency('café', 'fr')
-    5.25e-05
+    5.13e-05
 
 
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
@@ -78,10 +78,10 @@ one occurrence per billion words.
     5.29
 
     >>> zipf_frequency('frequency', 'en')
-    4.42
+    4.43
 
     >>> zipf_frequency('zipf', 'en')
-    1.55
+    1.57
 
     >>> zipf_frequency('zipf', 'en', wordlist='small')
     0.0
@@ -276,7 +276,8 @@ produces tokens that follow the recommendations in [Unicode
 Annex #29, Text Segmentation][uax29], including the optional rule that
 splits words between apostrophes and vowels.
 
-There are language-specific exceptions:
+There are exceptions where we change the tokenization to work better
+with certain languages:
 
 - In Arabic and Hebrew, it additionally normalizes ligatures and removes
   combining marks.
@@ -288,10 +289,20 @@ There are language-specific exceptions:
 - In Chinese, it uses the external Python library `jieba`, another optional
   dependency.
 
+- While the @ sign is usually considered a symbol and not part of a word,
+  wordfreq will allow a word to end with "@" or "@s". This is one way of
+  writing gender-neutral words in Spanish and Portuguese.
+
 [uax29]: http://unicode.org/reports/tr29/
 
 When wordfreq's frequency lists are built in the first place, the words are
 tokenized according to this function.
+
+    >>> from wordfreq import tokenize
+    >>> tokenize('l@s niñ@s', 'es')
+    ['l@s', 'niñ@s']
+    >>> zipf_frequency('l@s', 'es')
+    2.8
 
 Because tokenization in the real world is far from consistent, wordfreq will
 also try to deal gracefully when you query it with texts that actually break
@@ -300,7 +311,7 @@ into multiple tokens:
     >>> zipf_frequency('New York', 'en')
     5.28
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.57
+    3.61
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,

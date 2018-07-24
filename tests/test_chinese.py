@@ -59,7 +59,7 @@ def test_tokens():
 
 def test_combination():
     xiexie_freq = word_frequency('谢谢', 'zh')   # "Thanks"
-    assert word_frequency('谢谢谢谢', 'zh') == pytest.approx(xiexie_freq / 20)
+    assert word_frequency('谢谢谢谢', 'zh') == pytest.approx(xiexie_freq / 20, rel=0.01)
 
 
 def test_alternate_codes():

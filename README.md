@@ -502,24 +502,24 @@ through Zenodo so that it can be reliably cited using a DOI. The current
 citation is:
 
 > Robyn Speer, Joshua Chin, Andrew Lin, Sara Jewett, & Lance Nathan.
-> (2017, September 27). LuminosoInsight/wordfreq: v1.7. Zenodo.
-> http://doi.org/10.5281/zenodo.998161
+> (2018, October 3). LuminosoInsight/wordfreq: v2.2. Zenodo.
+> https://doi.org/10.5281/zenodo.1443582
 
 
 The same citation in BibTex format:
 
 ```
-@misc{robert_speer_2017_998161,
+@misc{robyn_speer_2018_1443582,
   author       = {Robyn Speer and
                   Joshua Chin and
                   Andrew Lin and
                   Sara Jewett and
                   Lance Nathan},
-  title        = {LuminosoInsight/wordfreq: v1.7},
-  month        = sep,
-  year         = 2017,
-  doi          = {10.5281/zenodo.998161},
-  url          = {https://doi.org/10.5281/zenodo.998161}
+  title        = {LuminosoInsight/wordfreq: v2.2},
+  month        = oct,
+  year         = 2018,
+  doi          = {10.5281/zenodo.1443582},
+  url          = {https://doi.org/10.5281/zenodo.1443582}
 }
 ```
 

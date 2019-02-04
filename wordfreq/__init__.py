@@ -74,7 +74,7 @@ def read_cBpack(filename):
         ]
     """
     with gzip.open(filename, 'rb') as infile:
-        data = msgpack.load(infile, encoding='utf-8')
+        data = msgpack.load(infile, raw=False)
     header = data[0]
     if (
         not isinstance(header, dict) or header.get('format') != 'cB'

@@ -36,7 +36,7 @@ def make_hanzi_converter(table_in, msgpack_out):
             if chr(codept) != char:
                 table[codept] = char
     with gzip.open(msgpack_out, 'wb') as outfile:
-        msgpack.dump(table, outfile, encoding='utf-8')
+        msgpack.dump(table, outfile, raw=False)
 
 
 def build():

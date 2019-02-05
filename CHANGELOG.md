@@ -1,3 +1,17 @@
+## Version 2.2.1 (2019-02-05)
+
+Library changes:
+
+- Relaxed the version requirement on the 'regex' dependency, allowing
+  compatibility with spaCy.
+
+  The range of regex versions that wordfreq now allows is from 2017.07.11 to
+  2018.02.21. No changes to word boundary matching were made between these
+  versions.
+
+- Fixed calling `msgpack.load` with a deprecated parameter.
+
+
 ## Version 2.2 (2018-07-24)
 
 Library change:
@@ -29,7 +43,7 @@ Data changes:
 - Added large word list for Czech
 - The Dutch large word list once again has 5 data sources
 
-Library change:
+Library changes:
 
 - The output of `word_frequency` is rounded to three significant digits. This
   provides friendlier output, and better reflects the precision of the

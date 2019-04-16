@@ -8,7 +8,7 @@ import wordfreq
 
 N = 1000
 
-
-for lang in sorted(wordfreq.available_languages()):
-    for word in wordfreq.top_n_list(lang, 1000):
-        print('{}\t{}'.format(lang, word))
+if __name__ == '__main__':
+    for lang in sorted(wordfreq.available_languages()):
+        for word in wordfreq.top_n_list(lang, 1000):
+            print('{}\t{}'.format(lang, word))

@@ -6,8 +6,8 @@ from .transliterate import transliterate
 
 MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
 
-DIGIT_RE = regex.compile('\d')
-MULTI_DIGIT_RE = regex.compile('\d[\d.,]+')
+DIGIT_RE = regex.compile(r'\d')
+MULTI_DIGIT_RE = regex.compile(r'\d[\d.,]+')
 
 
 def preprocess_text(text, language):

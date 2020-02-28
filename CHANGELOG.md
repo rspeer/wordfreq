@@ -1,3 +1,9 @@
+## Version 2.2.2 (2020-02-28)
+
+Library change:
+
+- Fixed an incompatibility with newly-released `msgpack 1.0`.
+
 ## Version 2.2.1 (2019-02-05)
 
 Library changes:

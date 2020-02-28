@@ -6,7 +6,7 @@ import gzip
 DICT_FILENAME = resource_filename('wordfreq', 'data/jieba_zh.txt')
 ORIG_DICT_FILENAME = resource_filename('wordfreq', 'data/jieba_zh_orig.txt')
 SIMP_MAP_FILENAME = resource_filename('wordfreq', 'data/_chinese_mapping.msgpack.gz')
-SIMPLIFIED_MAP = msgpack.load(gzip.open(SIMP_MAP_FILENAME), raw=False)
+SIMPLIFIED_MAP = msgpack.load(gzip.open(SIMP_MAP_FILENAME), raw=False, strict_map_key=False)
 jieba_tokenizer = None
 jieba_orig_tokenizer = None
 

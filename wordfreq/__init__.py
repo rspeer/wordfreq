@@ -8,6 +8,7 @@ import pathlib
 import random
 import logging
 import math
+import warnings
 
 from .tokens import tokenize, simple_tokenize, lossy_tokenize
 from .language_info import get_language_info
@@ -110,7 +111,7 @@ def available_languages(wordlist='best'):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_list(lang, wordlist='best', match_cutoff=30):
+def get_frequency_list(lang, wordlist='best', match_cutoff=None):
     """
     Read the raw data from a wordlist file, returning it as a list of
     lists. (See `read_cBpack` for what this represents.)
@@ -120,10 +121,20 @@ def get_frequency_list(lang, wordlist='best', match_cutoff=30):
     'pt_br', or even 'PT_BR' will get you the 'pt' (Portuguese) list.
     Looking up the alternate code 'por' will also get the same list.
     """
+    if match_cutoff is not None:
+        warnings.warn(
+            "The `match_cutoff` parameter is deprecated",
+            DeprecationWarning
+        )
     available = available_languages(wordlist)
-    best, score = langcodes.best_match(lang, list(available),
-                                       min_score=match_cutoff)
-    if score == 0:
+
+    # TODO: decrease the maximum distance. This distance is so high just
+    # because it allows a test where 'yue' matches 'zh', and maybe the
+    # distance between those is high because they shouldn't match.
+    best, _distance = langcodes.closest_match(
+        lang, list(available), max_distance=70
+    )
+    if best == 'und':
         raise LookupError("No wordlist %r available for language %r"
                           % (wordlist, lang))
 
@@ -192,13 +203,18 @@ def freq_to_zipf(freq):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_dict(lang, wordlist='best', match_cutoff=30):
+def get_frequency_dict(lang, wordlist='best', match_cutoff=None):
     """
     Get a word frequency list as a dictionary, mapping tokens to
     frequencies as floating-point probabilities.
     """
+    if match_cutoff is not None:
+        warnings.warn(
+            "The `match_cutoff` parameter is deprecated",
+            DeprecationWarning
+        )
     freqs = {}
-    pack = get_frequency_list(lang, wordlist, match_cutoff)
+    pack = get_frequency_list(lang, wordlist)
     for index, bucket in enumerate(pack):
         freq = cB_to_freq(-index)
         for word in bucket:

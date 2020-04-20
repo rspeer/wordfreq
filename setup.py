@@ -28,14 +28,14 @@ README_contents = open(os.path.join(current_dir, 'README.md'),
                        encoding='utf-8').read()
 doclines = README_contents.split("\n")
 dependencies = [
-    'msgpack', 'langcodes >= 1.4.1', 'regex >= 2017.07.11, <= 2018.02.21'
+    'msgpack', 'langcodes >= 2', 'regex'
 ]
 if sys.version_info < (3, 4):
     dependencies.append('pathlib')
 
 setup(
     name="wordfreq",
-    version='2.2.2',
+    version='2.3',
     maintainer='Robyn Speer',
     maintainer_email='rspeer@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
@@ -46,7 +46,7 @@ setup(
     long_description=README_contents,
     long_description_content_type='text/markdown',
     packages=['wordfreq'],
-    python_requires='>=3.3',
+    python_requires='>=3.5',
     include_package_data=True,
     install_requires=dependencies,
 

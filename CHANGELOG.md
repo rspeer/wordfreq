@@ -1,3 +1,14 @@
+## Version 2.3 (2020-04-16)
+
+- Python 3.5 is the oldest maintained version of Python, and we have stopped
+  claiming support for earlier versions.
+
+- Updated to langcodes 2.0.
+
+- Deprecated the `match_cutoff` parameter, which was intended for situations
+  where we need to approximately match a language code, but was not usefully
+  configurable in those situations.
+
 ## Version 2.2.2 (2020-02-28)
 
 Library change:

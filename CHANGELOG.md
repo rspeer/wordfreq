@@ -1,3 +1,8 @@
+## Version 2.3.1 (2020-04-22)
+
+- State the dependency on msgpack >= 1.0 in setup.py.
+
+
 ## Version 2.3 (2020-04-16)
 
 - Python 3.5 is the oldest maintained version of Python, and we have stopped

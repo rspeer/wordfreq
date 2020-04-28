@@ -35,7 +35,7 @@ if sys.version_info < (3, 4):
 
 setup(
     name="wordfreq",
-    version='2.3.1',
+    version='2.3.2',
     maintainer='Robyn Speer',
     maintainer_email='rspeer@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',

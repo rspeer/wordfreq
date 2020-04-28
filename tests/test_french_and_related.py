@@ -8,6 +8,7 @@ def test_apostrophes():
     assert tokenize("langues d'oïl", 'fr') == ['langues', "d", 'oïl']
     assert tokenize("langues d'oïl", 'fr', include_punctuation=True) == ['langues', "d'", 'oïl']
     assert tokenize("l'heure", 'fr') == ['l', 'heure']
+    assert tokenize("l'ànima", 'ca') == ['l', 'ànima']
     assert tokenize("l'heure", 'fr', include_punctuation=True) == ["l'", 'heure']
     assert tokenize("L'Hôpital", 'fr', include_punctuation=True) == ["l'", 'hôpital']
     assert tokenize("aujourd'hui", 'fr') == ["aujourd'hui"]

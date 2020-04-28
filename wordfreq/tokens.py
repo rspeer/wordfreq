@@ -3,7 +3,11 @@ import unicodedata
 import logging
 import langcodes
 
-from .language_info import get_language_info, SPACELESS_SCRIPTS, EXTRA_JAPANESE_CHARACTERS
+from .language_info import (
+    get_language_info,
+    SPACELESS_SCRIPTS,
+    EXTRA_JAPANESE_CHARACTERS,
+)
 from .preprocess import preprocess_text, smash_numbers
 
 # Placeholders for CJK functions that we'll import on demand
@@ -17,13 +21,20 @@ logger = logging.getLogger(__name__)
 
 def _make_spaceless_expr():
     scripts = sorted(SPACELESS_SCRIPTS)
-    pieces = [r'\p{IsIdeo}'] + [r'\p{Script=%s}' % script_code for script_code in scripts]
+    pieces = [r'\p{IsIdeo}'] + [
+        r'\p{Script=%s}' % script_code for script_code in scripts
+    ]
     return ''.join(pieces) + EXTRA_JAPANESE_CHARACTERS
 
 
 SPACELESS_EXPR = _make_spaceless_expr()
 
-TOKEN_RE = regex.compile(r"""
+# All vowels that might appear at the start of a word in French or Catalan,
+# plus 'h' which would be silent and imply a following vowel sound.
+INITIAL_VOWEL_EXPR = '[AEHIOUÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛaehiouáéíóúàèìòùâêîôû]'
+
+TOKEN_RE = regex.compile(
+    r"""
     # Case 1: a special case for non-spaced languages
     # -----------------------------------------------
 
@@ -78,24 +89,32 @@ TOKEN_RE = regex.compile(r"""
 
     (?=[\w\p{So}])
 
-    # The start of the token must not be a letter followed by «'h». If it is,
-    # we should use Case 3 to match up to the apostrophe, then match a new token
-    # starting with «h». This rule lets us break «l'heure» into two tokens, just
-    # like we would do for «l'arc».
+    # The start of the token must not consist of 1-2 letters, an apostrophe,
+    # and a vowel or 'h'. This is a sequence that occurs particularly in French
+    # phrases such as "l'arc", "d'heure", or "qu'un". In these cases we want
+    # the sequence up to the apostrophe to be considered as a separate token,
+    # even though apostrophes are not usually word separators (the word "won't"
+    # does not separate into "won" and "t").
+    #
+    # This would be taken care of by optional rule "WB5a" in Unicode TR29,
+    # "Unicode Text Segmentation". That optional rule was applied in `regex`
+    # before June 2018, but no longer is, so we have to do it ourselves.
 
-    (?!\w'[Hh])
+    (?!\w\w?'<VOWEL>)
 
     # The entire token is made of graphemes (\X). Matching by graphemes means
-    # that we don't have to specially account for marks or ZWJ sequences. We use
-    # a non-greedy match so that we can control where the match ends in the
+    # that we don't have to specially account for marks or ZWJ sequences. We
+    # use a non-greedy match so that we can control where the match ends in the
     # following expression.
     #
     # If we were matching by codepoints (.) instead of graphemes (\X), then
-    # detecting boundaries would be more difficult. Here's a fact that's subtle
-    # and poorly documented: a position that's between codepoints, but in the
-    # middle of a grapheme, does not match as a word break (\b), but also does
-    # not match as not-a-word-break (\B). The word boundary algorithm simply
-    # doesn't apply in such a position.
+    # detecting boundaries would be more difficult. Here's a fact about the
+    # regex module that's subtle and poorly documented: a position that's
+    # between codepoints, but in the middle of a grapheme, does not match as a
+    # word break (\b), but also does not match as not-a-word-break (\B). The
+    # word boundary algorithm simply doesn't apply in such a position. It is
+    # unclear whether this is intentional.
+
     \X+?
 
     # The token ends when it encounters a word break (\b). We use the
@@ -120,25 +139,39 @@ TOKEN_RE = regex.compile(r"""
     # here. That's surprising, but it's also what we want, because we don't want
     # any kind of spaces in the middle of our tokens.
 
-    # Case 4: Fix French
-    # ------------------
-    # This allows us to match the articles in French, Catalan, and related
-    # languages, such as «l'», that we may have excluded from being part of
-    # the token in Case 2.
+    # Case 4: Match French apostrophes
+    # --------------------------------
+    # This allows us to match the particles in French, Catalan, and related
+    # languages, such as «l'» and «qu'», that we may have excluded from being
+    # part of the token in Case 3.
 
-    \w'
-""".replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
+    \w\w?'
+""".replace(
+        '<SPACELESS>', SPACELESS_EXPR
+    ).replace(
+        '<VOWEL>', INITIAL_VOWEL_EXPR
+    ),
+    regex.V1 | regex.WORD | regex.VERBOSE,
+)
 
-TOKEN_RE_WITH_PUNCTUATION = regex.compile(r"""
+TOKEN_RE_WITH_PUNCTUATION = regex.compile(
+    r"""
     # This expression is similar to the expression above. It adds a case between
     # 2 and 3 that matches any sequence of punctuation characters.
 
     [<SPACELESS>]+ |                                        # Case 1
     @s \b |                                                 # Case 2
     [\p{punct}]+ |                                          # punctuation
-    (?=[\w\p{So}]) (?!\w'[Hh]) \X+? (?: @s? (?!w) | \b) |   # Case 3
-    \w'                                                     # Case 4
-""".replace('<SPACELESS>', SPACELESS_EXPR), regex.V1 | regex.WORD | regex.VERBOSE)
+    (?=[\w\p{So}]) (?!\w\w?'<VOWEL>)
+      \X+? (?: @s? (?!w) | \b) |                            # Case 3
+    \w\w?'                                                  # Case 4
+""".replace(
+        '<SPACELESS>', SPACELESS_EXPR
+    ).replace(
+        '<VOWEL>', INITIAL_VOWEL_EXPR
+    ),
+    regex.V1 | regex.WORD | regex.VERBOSE,
+)
 
 
 # Just identify punctuation, for cases where the tokenizer is separate
@@ -180,10 +213,7 @@ def simple_tokenize(text, include_punctuation=False):
             for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
         ]
     else:
-        return [
-            token.strip("'").casefold()
-            for token in TOKEN_RE.findall(text)
-        ]
+        return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
 
 
 def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
@@ -228,6 +258,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
 
     if info['tokenizer'] == 'mecab':
         from wordfreq.mecab import mecab_tokenize as _mecab_tokenize
+
         # Get just the language code out of the Language object, so we can
         # use it to select a MeCab dictionary
         tokens = _mecab_tokenize(text, language.language)
@@ -235,6 +266,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
             tokens = [token for token in tokens if not PUNCT_RE.match(token)]
     elif info['tokenizer'] == 'jieba':
         from wordfreq.chinese import jieba_tokenize as _jieba_tokenize
+
         tokens = _jieba_tokenize(text, external_wordlist=external_wordlist)
         if not include_punctuation:
             tokens = [token for token in tokens if not PUNCT_RE.match(token)]
@@ -245,8 +277,9 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         if info['tokenizer'] != 'regex' and lang not in _WARNED_LANGUAGES:
             logger.warning(
                 "The language '{}' is in the '{}' script, which we don't "
-                "have a tokenizer for. The results will be bad."
-                .format(lang, info['script'])
+                "have a tokenizer for. The results will be bad.".format(
+                    lang, info['script']
+                )
             )
             _WARNED_LANGUAGES.add(lang)
         tokens = simple_tokenize(text, include_punctuation=include_punctuation)
@@ -254,7 +287,9 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     return tokens
 
 
-def lossy_tokenize(text, lang, include_punctuation=False, external_wordlist=False):
+def lossy_tokenize(
+    text, lang, include_punctuation=False, external_wordlist=False
+):
     """
     Get a list of tokens for this text, with largely the same results and
     options as `tokenize`, but aggressively normalize some text in a lossy way
@@ -279,6 +314,7 @@ def lossy_tokenize(text, lang, include_punctuation=False, external_wordlist=Fals
 
     if info['lookup_transliteration'] == 'zh-Hans':
         from wordfreq.chinese import simplify_chinese as _simplify_chinese
+
         tokens = [_simplify_chinese(token) for token in tokens]
 
     return [smash_numbers(token) for token in tokens]

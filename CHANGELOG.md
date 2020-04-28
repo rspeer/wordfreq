@@ -1,7 +1,16 @@
+## Version 2.3.2 (2020-04-28)
+
+- Relaxing the dependency on regex had an unintended consequence in 2.3.1:
+  it could no longer get the frequency of French phrases such as "l'écran"
+  because their tokenization behavior changed.
+
+  2.3.2 fixes this with a more complex tokenization rule that should handle
+  apostrophes the same across these various versions of regex.
+
 ## Version 2.3.1 (2020-04-22)
 
 - State the dependency on msgpack >= 1.0 in setup.py.
-
+- Relax the dependency on regex to allow versions after 2018.02.08.
 
 ## Version 2.3 (2020-04-16)
 

@@ -28,14 +28,14 @@ README_contents = open(os.path.join(current_dir, 'README.md'),
                        encoding='utf-8').read()
 doclines = README_contents.split("\n")
 dependencies = [
-    'msgpack >= 1.0', 'langcodes >= 2', 'regex'
+    'msgpack >= 1.0', 'langcodes >= 2.1', 'regex >= 2020.04.04'
 ]
 if sys.version_info < (3, 4):
     dependencies.append('pathlib')
 
 setup(
     name="wordfreq",
-    version='2.3.2',
+    version='2.3.3',
     maintainer='Robyn Speer',
     maintainer_email='rspeer@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
@@ -58,7 +58,7 @@ setup(
     # Similarly, jieba is required for Chinese word frequencies.
     extras_require={
         'mecab': 'mecab-python3',
-        'jieba': 'jieba'
+        'jieba': 'jieba >= 0.42'
     },
     tests_require=['pytest', 'mecab-python3', 'jieba'],
 )

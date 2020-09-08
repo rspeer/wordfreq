@@ -1,3 +1,8 @@
+## Version 2.3.3 (2020-09-08)
+
+- Set minimum version requierements on `regex`, `jieba`, and `langcodes`
+  so that tokenization will give consistent results.
+
 ## Version 2.3.2 (2020-04-28)
 
 - Relaxing the dependency on regex had an unintended consequence in 2.3.1:

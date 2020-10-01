@@ -1,3 +1,13 @@
+## Version 2.4 (2020-10-01)
+
+- The Exquisite Corpus data has been updated to include Google Books Ngrams
+  2019, Reddit data through 2019, Wikipedia data from 2020, and Twitter-sampled
+  data from 2020, and somewhat more reliable language detection.
+
+- Updated dependencies to require recent versions of `regex` and `jieba`,
+  to get tokenization that's consistent with the word lists. `regex` now
+  requires a version after 2020.04.04.
+
 ## Version 2.3.2 (2020-04-28)
 
 - Relaxing the dependency on regex had an unintended consequence in 2.3.1:

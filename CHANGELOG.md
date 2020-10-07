@@ -8,6 +8,10 @@
   to get tokenization that's consistent with the word lists. `regex` now
   requires a version after 2020.04.04.
 
+- Added more vowels (including `œ` and `y`) to the regular expression that
+  splits letter-and-apostrophe strings from tokens that start with vowels
+  in French and Catalan.
+
 ## Version 2.3.2 (2020-04-28)
 
 - Relaxing the dependency on regex had an unintended consequence in 2.3.1:

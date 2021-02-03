@@ -31,7 +31,7 @@ SPACELESS_EXPR = _make_spaceless_expr()
 
 # All vowels that might appear at the start of a word in French or Catalan,
 # plus 'h' which would be silent and imply a following vowel sound.
-INITIAL_VOWEL_EXPR = '[AEHIOUÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛaehiouáéíóúàèìòùâêîôû]'
+INITIAL_VOWEL_EXPR = '[AEHIOUYÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÅÏÖŒaehiouyáéíóúàèìòùâêîôûåïöœ]'
 
 TOKEN_RE = regex.compile(
     r"""

@@ -1,3 +1,8 @@
+## Version 2.4.1 (2021-02-09)
+
+- Changed a log message to not try to call a language by name, to remove
+  the dependency on a database of language names.
+
 ## Version 2.4 (2020-10-01)
 
 - The Exquisite Corpus data has been updated to include Google Books Ngrams

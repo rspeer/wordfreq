@@ -141,8 +141,8 @@ def get_frequency_list(lang, wordlist='best', match_cutoff=None):
     if best != lang:
         logger.warning(
             "You asked for word frequencies in language %r. Using the "
-            "nearest match, which is %r (%s)."
-            % (lang, best, langcodes.get(best).language_name('en'))
+            "nearest match, which is %r."
+            % (lang, best)
         )
 
     return read_cBpack(available[best])

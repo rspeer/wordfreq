@@ -77,3 +77,11 @@ def test_alternate_codes():
     # Separate codes for Mandarin and Cantonese
     assert tokenize('谢谢谢谢', 'cmn') == tokens
     assert tokenize('谢谢谢谢', 'yue') == tokens
+
+
+def test_unreasonably_long():
+    # This crashed earlier versions of wordfreq
+    lots_of_ls = 'l' * 800
+    assert word_frequency(lots_of_ls, 'zh') < 1e-300
+    assert zipf_frequency(lots_of_ls, 'zh') == 0.
+

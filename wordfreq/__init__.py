@@ -263,7 +263,7 @@ def _word_frequency(word, lang, wordlist, minimum):
         # If we used the Jieba tokenizer, we could tokenize anything to match
         # our wordlist, even nonsense. To counteract this, we multiply by a
         # probability for each word break that was inferred.
-        freq /= INFERRED_SPACE_FACTOR ** (len(tokens) - 1)
+        freq *= INFERRED_SPACE_FACTOR ** -(len(tokens) - 1)
 
     # All our frequency data is only precise to within 1% anyway, so round
     # it to 3 significant digits

@@ -33,7 +33,7 @@ dependencies = [
 
 setup(
     name="wordfreq",
-    version='2.5.0',
+    version='2.4.2',
     maintainer='Robyn Speer',
     maintainer_email='rspeer@luminoso.com',
     url='http://github.com/LuminosoInsight/wordfreq/',
@@ -55,8 +55,12 @@ setup(
     #
     # Similarly, jieba is required for Chinese word frequencies.
     extras_require={
+        # previous names for extras
         'mecab': ['mecab-python3', 'ipadic', 'mecab-ko-dic'],
-        'jieba': ['jieba >= 0.42']
+        'jieba': ['jieba >= 0.42'],
+
+        # get them all at once
+        'cjk': ['mecab-python3', 'ipadic', 'mecab-ko-dic', 'jieba >= 0.42']
     },
     tests_require=['pytest', 'mecab-python3', 'jieba >= 0.42', 'ipadic', 'mecab-ko-dic'],
 )

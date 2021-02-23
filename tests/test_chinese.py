@@ -1,4 +1,4 @@
-from wordfreq import tokenize, word_frequency
+from wordfreq import tokenize, word_frequency, zipf_frequency
 import pytest
 
 
@@ -77,3 +77,13 @@ def test_alternate_codes():
     # Separate codes for Mandarin and Cantonese
     assert tokenize('谢谢谢谢', 'cmn') == tokens
     assert tokenize('谢谢谢谢', 'yue') == tokens
+
+
+def test_unreasonably_long():
+    # This crashed earlier versions of wordfreq due to an overflow in
+    # exponentiation. We've now changed the sequence of operations so it
+    # will underflow instead.
+    lots_of_ls = 'l' * 800
+    assert word_frequency(lots_of_ls, 'zh') == 0.
+    assert zipf_frequency(lots_of_ls, 'zh') == 0.
+

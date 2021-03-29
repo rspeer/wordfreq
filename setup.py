@@ -28,7 +28,7 @@ README_contents = open(os.path.join(current_dir, 'README.md'),
                        encoding='utf-8').read()
 doclines = README_contents.split("\n")
 dependencies = [
-    'msgpack >= 1.0', 'langcodes >= 2.1', 'regex >= 2020.04.04'
+    'msgpack >= 1.0', 'langcodes >= 3.0', 'regex >= 2020.04.04'
 ]
 
 setup(
@@ -49,14 +49,17 @@ setup(
     install_requires=dependencies,
 
     # mecab-python3 is required for looking up Japanese or Korean word
-    # frequencies. In turn, it depends on libmecab-dev being installed on the
-    # system. It's not listed under 'install_requires' because wordfreq should
-    # be usable in other languages without it.
+    # frequencies. It's not listed under 'install_requires' because wordfreq
+    # should be usable in other languages without it.
     #
     # Similarly, jieba is required for Chinese word frequencies.
     extras_require={
-        'mecab': 'mecab-python3',
-        'jieba': 'jieba >= 0.42'
+        # previous names for extras
+        'mecab': ['mecab-python3', 'ipadic', 'mecab-ko-dic'],
+        'jieba': ['jieba >= 0.42'],
+
+        # get them all at once
+        'cjk': ['mecab-python3', 'ipadic', 'mecab-ko-dic', 'jieba >= 0.42']
     },
-    tests_require=['pytest', 'mecab-python3', 'jieba >= 0.42'],
+    tests_require=['pytest', 'mecab-python3', 'jieba >= 0.42', 'ipadic', 'mecab-ko-dic'],
 )

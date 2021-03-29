@@ -1,3 +1,14 @@
+## Version 2.4.2 (2021-02-19)
+
+- When tokenizing Japanese or Korean, MeCab's dictionaries no longer have to
+  be installed separately as system packages. They can now be found via the
+  Python packages `ipadic` and `mecab-ko-dic`.
+
+- When the tokenizer had to infer word boundaries in languages without spaces,
+  inputs that were too long (such as the letter 'l' repeated 800 times) were
+  causing overflow errors. We changed the sequence of operations so that it
+  no longer overflows, and such inputs simply get a frequency of 0.
+
 ## Version 2.4.1 (2021-02-09)
 
 - Changed a log message to not try to call a language by name, to remove

@@ -381,67 +381,16 @@ Simplified Chinese), you will get the `zh` wordlist, for example.
 ## Additional CJK installation
 
 Chinese, Japanese, and Korean have additional external dependencies so that
-they can be tokenized correctly. Here we'll explain how to set them up,
-in increasing order of difficulty.
+they can be tokenized correctly. They can all be installed at once by requesting
+the 'cjk' feature:
 
+    pip install wordfreq[cjk]
 
-### Chinese
+Tokenizing Chinese depends on the `jieba` package, tokenizing Japanese depends
+on `mecab-python3` and `ipadic`, and tokenizing Korean depends on `mecab-python3`
+and `mecab-ko-dic`.
 
-To be able to look up word frequencies in Chinese, you need Jieba, a
-pure-Python Chinese tokenizer:
-
-    pip3 install jieba
-
-
-### Japanese
-
-We use MeCab, by Taku Kudo, to tokenize Japanese. To use this in wordfreq, three
-things need to be installed:
-
-  * The MeCab development library (called `libmecab-dev` on Ubuntu)
-  * The UTF-8 version of the `ipadic` Japanese dictionary
-    (called `mecab-ipadic-utf8` on Ubuntu)
-  * The `mecab-python3` Python interface
-
-To install these three things on Ubuntu, you can run:
-
-```sh
-sudo apt-get install python3-dev libmecab-dev mecab-ipadic-utf8
-pip3 install mecab-python3
-```
-
-If you choose to install `ipadic` from somewhere else or from its source code,
-be sure it's configured to use UTF-8. By default it will use EUC-JP, which will
-give you nonsense results.
-
-
-### Korean
-
-Korean also uses MeCab, with a Korean dictionary package by Yongwoon Lee and
-Yungho Yu. This dictionary is not available as an Ubuntu package.
-
-Here's a process you can use to install the Korean dictionary and the other
-MeCab dependencies:
-
-```sh
-sudo apt-get install libmecab-dev mecab-utils
-pip3 install mecab-python3
-wget https://bitbucket.org/eunjeon/mecab-ko-dic/downloads/mecab-ko-dic-2.0.1-20150920.tar.gz
-tar xvf mecab-ko-dic-2.0.1-20150920.tar.gz
-cd mecab-ko-dic-2.0.1-20150920
-./autogen.sh
-./configure
-make
-sudo make install
-```
-
-If wordfreq cannot find the Japanese or Korean data for MeCab when asked to
-tokenize those languages, it will raise an error and show you the list of
-paths it searched.
-
-Sorry that this is difficult. We tried to just package the data files we need
-with wordfreq, like we do for Chinese, but PyPI would reject the package for
-being too large.
+As of version 2.4.2, you no longer have to install dictionaries separately.
 
 
 ## License

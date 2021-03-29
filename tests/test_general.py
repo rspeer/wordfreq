@@ -96,7 +96,6 @@ def test_most_common_words():
     assert get_most_common('sk') == 'a'
     assert get_most_common('sl') == 'je'
     assert get_most_common('sv') == 'är'
-    assert get_most_common('sw') == 'ya'
     assert get_most_common('ta') == 'ஒரு'
     assert get_most_common('tr') == 've'
     assert get_most_common('uk') == 'в'

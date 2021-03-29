@@ -387,7 +387,7 @@ the 'cjk' feature:
     pip install wordfreq[cjk]
 
 Tokenizing Chinese depends on the `jieba` package, tokenizing Japanese depends
-on `mecab-python` and `ipadic`, and tokenizing Korean depends on `mecab-python`
+on `mecab-python3` and `ipadic`, and tokenizing Korean depends on `mecab-python3`
 and `mecab-ko-dic`.
 
 As of version 2.4.2, you no longer have to install dictionaries separately.

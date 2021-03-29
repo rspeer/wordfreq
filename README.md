@@ -45,16 +45,16 @@ frequency as a decimal between 0 and 1.
 
     >>> from wordfreq import word_frequency
     >>> word_frequency('cafe', 'en')
-    1.05e-05
+    1.23e-05
 
     >>> word_frequency('café', 'en')
     5.62e-06
 
     >>> word_frequency('cafe', 'fr')
-    1.55e-06
+    1.51e-06
 
     >>> word_frequency('café', 'fr')
-    6.61e-05
+    5.75e-05
 
 
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
@@ -72,16 +72,16 @@ one occurrence per billion words.
 
     >>> from wordfreq import zipf_frequency
     >>> zipf_frequency('the', 'en')
-    7.76
+    7.73
 
     >>> zipf_frequency('word', 'en')
     5.26
 
     >>> zipf_frequency('frequency', 'en')
-    4.48
+    4.36
 
     >>> zipf_frequency('zipf', 'en')
-    1.62
+    1.49
 
     >>> zipf_frequency('zipf', 'en', wordlist='small')
     0.0
@@ -232,7 +232,7 @@ the list, in descending frequency order.
 
     >>> from wordfreq import top_n_list
     >>> top_n_list('en', 10)
-    ['the', 'of', 'to', 'and', 'a', 'in', 'i', 'is', 'for', 'that']
+    ['the', 'to', 'and', 'of', 'a', 'in', 'i', 'is', 'for', 'that']
 
     >>> top_n_list('es', 10)
     ['de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'no', 'un']
@@ -302,16 +302,16 @@ tokenized according to this function.
     >>> tokenize('l@s niñ@s', 'es')
     ['l@s', 'niñ@s']
     >>> zipf_frequency('l@s', 'es')
-    2.82
+    3.03
 
 Because tokenization in the real world is far from consistent, wordfreq will
 also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> zipf_frequency('New York', 'en')
-    5.3
+    5.32
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.23
+    3.29
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,
@@ -326,7 +326,7 @@ you give it an uncommon combination of tokens, it will hugely over-estimate
 their frequency:
 
     >>> zipf_frequency('owl-flavored', 'en')
-    3.29
+    3.3
 
 
 ## Multi-script languages

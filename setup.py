@@ -49,9 +49,8 @@ setup(
     install_requires=dependencies,
 
     # mecab-python3 is required for looking up Japanese or Korean word
-    # frequencies. In turn, it depends on libmecab-dev being installed on the
-    # system. It's not listed under 'install_requires' because wordfreq should
-    # be usable in other languages without it.
+    # frequencies. It's not listed under 'install_requires' because wordfreq
+    # should be usable in other languages without it.
     #
     # Similarly, jieba is required for Chinese word frequencies.
     extras_require={

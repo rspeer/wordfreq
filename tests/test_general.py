@@ -72,7 +72,6 @@ def test_most_common_words():
     assert get_most_common('fi') == 'ja'
     assert get_most_common('fil') == 'sa'
     assert get_most_common('fr') == 'de'
-    assert get_most_common('gl') == 'de'
     assert get_most_common('he') == 'את'
     assert get_most_common('hi') == 'के'
     assert get_most_common('hu') == 'a'

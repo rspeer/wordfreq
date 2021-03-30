@@ -523,6 +523,12 @@ The same citation in BibTex format:
   International Conference on Language Resources and Evaluation (LREC 2016).
   http://stp.lingfil.uu.se/~joerg/paper/opensubs2016.pdf
 
+- Ortiz Suárez, P. J., Sagot, B., and Romary, L. (2019). Asynchronous pipelines
+  for processing huge corpora on medium to low resource infrastructures. In
+  Proceedings of the Workshop on Challenges in the Management of Large Corpora
+  (CMLC-7) 2019.
+  https://oscar-corpus.com/publication/2019/clmc7/asynchronous/
+
 - ParaCrawl (2018). Provision of Web-Scale Parallel Corpora for Official
   European Languages. https://paracrawl.eu/
 

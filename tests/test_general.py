@@ -83,7 +83,6 @@ def test_most_common_words():
     assert get_most_common('lt') == 'ir'
     assert get_most_common('lv') == 'un'
     assert get_most_common('mk') == 'на'
-    assert get_most_common('ml') == 'ഒരു'
     assert get_most_common('ms') == 'yang'
     assert get_most_common('nb') == 'i'
     assert get_most_common('nl') == 'de'

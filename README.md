@@ -193,7 +193,6 @@ least 3 different sources of word frequencies:
     Lithuanian  lt      3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Macedonian  mk      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Malay       ms      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Malayalam   ml      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Norwegian   nb [2]  5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
     Persian     fa      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
     Polish      pl      6  Yes    │ Yes   Yes   Yes   -     Yes   Yes   Yes   -

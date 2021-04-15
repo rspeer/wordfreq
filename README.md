@@ -153,8 +153,7 @@ come from multiple sources:
 - **Subtitles**, from OPUS OpenSubtitles 2018 and SUBTLEX
 - **News**, from NewsCrawl 2014 and GlobalVoices
 - **Books**, from Google Books Ngrams 2012
-- **Web** text, from ParaCrawl, the Leeds Internet Corpus, and the MOKK
-  Hungarian Webcorpus
+- **Web** text, from OSCAR
 - **Twitter**, representing short-form social media
 - **Reddit**, representing potentially longer Internet comments
 - **Miscellaneous** word frequencies: in Chinese, we import a free wordlist

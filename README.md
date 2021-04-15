@@ -45,16 +45,16 @@ frequency as a decimal between 0 and 1.
 
     >>> from wordfreq import word_frequency
     >>> word_frequency('cafe', 'en')
-    1.05e-05
+    1.23e-05
 
     >>> word_frequency('café', 'en')
     5.62e-06
 
     >>> word_frequency('cafe', 'fr')
-    1.55e-06
+    1.51e-06
 
     >>> word_frequency('café', 'fr')
-    6.61e-05
+    5.75e-05
 
 
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
@@ -72,16 +72,16 @@ one occurrence per billion words.
 
     >>> from wordfreq import zipf_frequency
     >>> zipf_frequency('the', 'en')
-    7.76
+    7.73
 
     >>> zipf_frequency('word', 'en')
     5.26
 
     >>> zipf_frequency('frequency', 'en')
-    4.48
+    4.36
 
     >>> zipf_frequency('zipf', 'en')
-    1.62
+    1.49
 
     >>> zipf_frequency('zipf', 'en', wordlist='small')
     0.0
@@ -167,41 +167,49 @@ least 3 different sources of word frequencies:
     Language    Code    #  Large?   WP    Subs  News  Books Web   Twit. Redd. Misc.
     ──────────────────────────────┼────────────────────────────────────────────────
     Arabic      ar      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
-    Bengali     bn      3  -      │ Yes   -     Yes   -     -     Yes   -     -
+    Bangla      bn      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Bosnian     bs [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Bulgarian   bg      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Catalan     ca      4  -      │ Yes   Yes   Yes   -     -     Yes   -     -
+    Bulgarian   bg      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
+    Catalan     ca      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Chinese     zh [3]  7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   -     Jieba
     Croatian    hr [1]  3         │ Yes   Yes   -     -     -     Yes   -     -
     Czech       cs      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
-    Danish      da      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Danish      da      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
     Dutch       nl      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     English     en      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Finnish     fi      6  Yes    │ Yes   Yes   Yes   -     Yes   Yes   Yes   -
     French      fr      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     German      de      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
-    Greek       el      3  -      │ Yes   Yes   -     -     Yes   -     -     -
-    Hebrew      he      4  -      │ Yes   Yes   -     Yes   -     Yes   -     -
-    Hindi       hi      3  -      │ Yes   -     -     -     -     Yes   Yes   -
-    Hungarian   hu      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Greek       el      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
+    Hebrew      he      5  Yes    │ Yes   Yes   -     Yes   Yes   Yes   -     -
+    Hindi       hi      4  Yes    │ Yes   -     -     -     Yes   Yes   Yes   -
+    Hungarian   hu      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
+    Icelandic   is      3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Indonesian  id      3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Italian     it      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Japanese    ja      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
     Korean      ko      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
     Latvian     lv      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
-    Macedonian  mk      3  -      │ Yes   Yes   Yes   -     -     -     -     -
+    Lithuanian  lt      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Macedonian  mk      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Malay       ms      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Norwegian   nb [2]  4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
-    Persian     fa      3  -      │ Yes   Yes   -     -     -     Yes   -     -
+    Norwegian   nb [2]  5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
+    Persian     fa      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
     Polish      pl      6  Yes    │ Yes   Yes   Yes   -     Yes   Yes   Yes   -
     Portuguese  pt      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
-    Romanian    ro      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
-    Russian     ru      6  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   -     -
+    Romanian    ro      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Russian     ru      5  Yes    │ Yes   Yes   Yes   Yes   -     Yes   -     -
+    Slovak      sl      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Slovenian   sk      3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Serbian     sr [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Spanish     es      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
-    Swedish     sv      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
-    Turkish     tr      3  -      │ Yes   Yes   -     -     -     Yes   -     -
-    Ukrainian   uk      4  -      │ Yes   Yes   -     -     -     Yes   Yes   -
+    Swedish     sv      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
+    Tagalog     fil     3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Tamil       ta      3  -      │ Yes   -     -     -     Yes   Yes   -     -
+    Turkish     tr      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
+    Ukrainian   uk      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
+    Urdu        ur      3  -      │ Yes   -     -     -     Yes   Yes   -     -
+    Vietnamese  vi      3  -      │ Yes   Yes   -     -     Yes   -     -     -
 
 [1] Bosnian, Croatian, and Serbian use the same underlying word list, because
 they share most of their vocabulary and grammar, they were once considered the
@@ -232,7 +240,7 @@ the list, in descending frequency order.
 
     >>> from wordfreq import top_n_list
     >>> top_n_list('en', 10)
-    ['the', 'of', 'to', 'and', 'a', 'in', 'i', 'is', 'for', 'that']
+    ['the', 'to', 'and', 'of', 'a', 'in', 'i', 'is', 'for', 'that']
 
     >>> top_n_list('es', 10)
     ['de', 'la', 'que', 'el', 'en', 'y', 'a', 'los', 'no', 'un']
@@ -302,16 +310,16 @@ tokenized according to this function.
     >>> tokenize('l@s niñ@s', 'es')
     ['l@s', 'niñ@s']
     >>> zipf_frequency('l@s', 'es')
-    2.82
+    3.03
 
 Because tokenization in the real world is far from consistent, wordfreq will
 also try to deal gracefully when you query it with texts that actually break
 into multiple tokens:
 
     >>> zipf_frequency('New York', 'en')
-    5.3
+    5.32
     >>> zipf_frequency('北京地铁', 'zh')  # "Beijing Subway"
-    3.23
+    3.29
 
 The word frequencies are combined with the half-harmonic-mean function in order
 to provide an estimate of what their combined frequency would be. In Chinese,
@@ -326,7 +334,7 @@ you give it an uncommon combination of tokens, it will hugely over-estimate
 their frequency:
 
     >>> zipf_frequency('owl-flavored', 'en')
-    3.29
+    3.3
 
 
 ## Multi-script languages
@@ -387,7 +395,7 @@ the 'cjk' feature:
     pip install wordfreq[cjk]
 
 Tokenizing Chinese depends on the `jieba` package, tokenizing Japanese depends
-on `mecab-python` and `ipadic`, and tokenizing Korean depends on `mecab-python`
+on `mecab-python3` and `ipadic`, and tokenizing Korean depends on `mecab-python3`
 and `mecab-ko-dic`.
 
 As of version 2.4.2, you no longer have to install dictionaries separately.
@@ -522,6 +530,12 @@ The same citation in BibTex format:
   Parallel Corpora from Movie and TV Subtitles. In Proceedings of the 10th
   International Conference on Language Resources and Evaluation (LREC 2016).
   http://stp.lingfil.uu.se/~joerg/paper/opensubs2016.pdf
+
+- Ortiz Suárez, P. J., Sagot, B., and Romary, L. (2019). Asynchronous pipelines
+  for processing huge corpora on medium to low resource infrastructures. In
+  Proceedings of the Workshop on Challenges in the Management of Large Corpora
+  (CMLC-7) 2019.
+  https://oscar-corpus.com/publication/2019/clmc7/asynchronous/
 
 - ParaCrawl (2018). Provision of Web-Scale Parallel Corpora for Official
   European Languages. https://paracrawl.eu/

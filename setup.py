@@ -35,7 +35,7 @@ setup(
     name="wordfreq",
     version='2.5.0',
     maintainer='Robyn Speer',
-    maintainer_email='rspeer@luminoso.com',
+    maintainer_email='rspeer@arborelia.net',
     url='http://github.com/LuminosoInsight/wordfreq/',
     license="MIT",
     platforms=["any"],

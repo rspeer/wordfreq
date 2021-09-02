@@ -185,6 +185,11 @@ def test_number_smashing():
     assert word_frequency('24601', 'en') == word_frequency('90210', 'en')
 
 
+def test_uncurl_quotes():
+    assert lossy_tokenize("let’s", 'en') == ["let's"]
+    assert word_frequency("let’s", 'en') == word_frequency("let's", 'en')
+
+
 def test_phrase_freq():
     ff = word_frequency("flip-flop", 'en')
     assert ff > 0

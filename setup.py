@@ -28,20 +28,12 @@ README_contents = open(os.path.join(current_dir, 'README.md'),
                        encoding='utf-8').read()
 doclines = README_contents.split("\n")
 dependencies = [
-<<<<<<< HEAD
     'msgpack >= 1.0', 'langcodes >= 3.0', 'regex >= 2020.04.04', 'ftfy >= 3.0'
-=======
-    'msgpack >= 1.0', 'langcodes >= 2.1', 'regex >= 2020.04.04'
->>>>>>> origin/apostrophe-consistency
 ]
 
 setup(
     name="wordfreq",
-<<<<<<< HEAD
     version='2.5.1',
-=======
-    version='2.3.3',
->>>>>>> origin/apostrophe-consistency
     maintainer='Robyn Speer',
     maintainer_email='rspeer@arborelia.net',
     url='http://github.com/LuminosoInsight/wordfreq/',

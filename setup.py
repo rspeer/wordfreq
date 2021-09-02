@@ -28,12 +28,12 @@ README_contents = open(os.path.join(current_dir, 'README.md'),
                        encoding='utf-8').read()
 doclines = README_contents.split("\n")
 dependencies = [
-    'msgpack >= 1.0', 'langcodes >= 3.0', 'regex >= 2020.04.04'
+    'msgpack >= 1.0', 'langcodes >= 3.0', 'regex >= 2020.04.04', 'ftfy >= 3.0'
 ]
 
 setup(
     name="wordfreq",
-    version='2.5.0',
+    version='2.5.1',
     maintainer='Robyn Speer',
     maintainer_email='rspeer@arborelia.net',
     url='http://github.com/LuminosoInsight/wordfreq/',

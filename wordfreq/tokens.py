@@ -2,6 +2,7 @@ import regex
 import unicodedata
 import logging
 import langcodes
+from ftfy.fixes import uncurl_quotes
 
 from .language_info import (
     get_language_info,
@@ -306,6 +307,9 @@ def lossy_tokenize(
 
     - In Chinese, unless Traditional Chinese is specifically requested using
       'zh-Hant', all characters will be converted to Simplified Chinese.
+
+    - Curly quotes will be converted to straight quotes, and in particular ’
+      will be converted to ', in order to match the input data.
     """
     global _simplify_chinese
 
@@ -317,4 +321,4 @@ def lossy_tokenize(
 
         tokens = [_simplify_chinese(token) for token in tokens]
 
-    return [smash_numbers(token) for token in tokens]
+    return [uncurl_quotes(smash_numbers(token)) for token in tokens]

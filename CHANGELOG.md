@@ -1,3 +1,18 @@
+## Version 2.5.1 (2021-09-02)
+
+- Import ftfy and use its `uncurl_quotes` method to turn curly quotes into
+  straight ones, providing consistency with multiple forms of apostrophes.
+
+- Set minimum version requierements on `regex`, `jieba`, and `langcodes`
+  so that tokenization will give consistent results.
+
+- Workaround an inconsistency in the `msgpack` API around
+  `strict_map_key=False`.
+
+## Version 2.5 (2021-04-15)
+
+- Incorporate data from the OSCAR corpus.
+
 ## Version 2.4.2 (2021-02-19)
 
 - When tokenizing Japanese or Korean, MeCab's dictionaries no longer have to

@@ -1,5 +1,5 @@
 from functools import lru_cache
-from langcodes import Language, best_match
+from langcodes import Language, closest_match
 
 
 # Text in scripts written without spaces has to be handled specially in our
@@ -45,7 +45,7 @@ EXTRA_JAPANESE_CHARACTERS = 'ー々〻〆'
 # happens in ConceptNet.
 
 
-def _language_in_list(language, targets, min_score=80):
+def _language_in_list(language, targets, max_distance=10):
     """
     A helper function to determine whether this language matches one of the
     target languages, with a match score above a certain threshold.
@@ -53,8 +53,8 @@ def _language_in_list(language, targets, min_score=80):
     The languages can be given as strings (language tags) or as Language
     objects. `targets` can be any iterable of such languages.
     """
-    matched = best_match(language, targets, min_score=min_score)
-    return matched[1] > 0
+    matched = closest_match(language, targets, max_distance=max_distance)
+    return matched[0] != 'und'
 
 
 @lru_cache(maxsize=None)

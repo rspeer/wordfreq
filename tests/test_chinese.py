@@ -87,3 +87,14 @@ def test_unreasonably_long():
     assert word_frequency(lots_of_ls, 'zh') == 0.
     assert zipf_frequency(lots_of_ls, 'zh') == 0.
 
+
+def test_hyphens():
+    # An edge case of Chinese tokenization that changed sometime around
+    # jieba 0.42.
+
+    tok = tokenize('--------', 'zh', include_punctuation=True)
+    assert tok == ['-'] * 8
+    
+    tok = tokenize('--------', 'zh', include_punctuation=True, external_wordlist=True)
+    assert tok == ['--------']
+

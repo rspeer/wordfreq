@@ -22,17 +22,17 @@ logger = logging.getLogger(__name__)
 
 def _make_spaceless_expr():
     scripts = sorted(SPACELESS_SCRIPTS)
-    pieces = [r'\p{IsIdeo}'] + [
-        r'\p{Script=%s}' % script_code for script_code in scripts
+    pieces = [r"\p{IsIdeo}"] + [
+        r"\p{Script=%s}" % script_code for script_code in scripts
     ]
-    return ''.join(pieces) + EXTRA_JAPANESE_CHARACTERS
+    return "".join(pieces) + EXTRA_JAPANESE_CHARACTERS
 
 
 SPACELESS_EXPR = _make_spaceless_expr()
 
 # All vowels that might appear at the start of a word in French or Catalan,
 # plus 'h' which would be silent and imply a following vowel sound.
-INITIAL_VOWEL_EXPR = '[AEHIOUYÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÅÏÖŒaehiouyáéíóúàèìòùâêîôûåïöœ]'
+INITIAL_VOWEL_EXPR = "[AEHIOUYÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÅÏÖŒaehiouyáéíóúàèìòùâêîôûåïöœ]"
 
 TOKEN_RE = regex.compile(
     r"""
@@ -148,9 +148,9 @@ TOKEN_RE = regex.compile(
 
     \w\w?'
 """.replace(
-        '<SPACELESS>', SPACELESS_EXPR
+        "<SPACELESS>", SPACELESS_EXPR
     ).replace(
-        '<VOWEL>', INITIAL_VOWEL_EXPR
+        "<VOWEL>", INITIAL_VOWEL_EXPR
     ),
     regex.V1 | regex.WORD | regex.VERBOSE,
 )
@@ -167,9 +167,9 @@ TOKEN_RE_WITH_PUNCTUATION = regex.compile(
       \X+? (?: @s? (?!w) | \b) |                            # Case 3
     \w\w?'                                                  # Case 4
 """.replace(
-        '<SPACELESS>', SPACELESS_EXPR
+        "<SPACELESS>", SPACELESS_EXPR
     ).replace(
-        '<VOWEL>', INITIAL_VOWEL_EXPR
+        "<VOWEL>", INITIAL_VOWEL_EXPR
     ),
     regex.V1 | regex.WORD | regex.VERBOSE,
 )
@@ -207,12 +207,9 @@ def simple_tokenize(text, include_punctuation=False):
       tokens that are much too long, but the alternative is that every grapheme
       would end up in its own token, which is worse.
     """
-    text = unicodedata.normalize('NFC', text)
+    text = unicodedata.normalize("NFC", text)
     if include_punctuation:
-        return [
-            token.casefold()
-            for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)
-        ]
+        return [token.casefold() for token in TOKEN_RE_WITH_PUNCTUATION.findall(text)]
     else:
         return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
 
@@ -257,7 +254,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     info = get_language_info(language)
     text = preprocess_text(text, language)
 
-    if info['tokenizer'] == 'mecab':
+    if info["tokenizer"] == "mecab":
         from wordfreq.mecab import mecab_tokenize as _mecab_tokenize
 
         # Get just the language code out of the Language object, so we can
@@ -265,7 +262,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         tokens = _mecab_tokenize(text, language.language)
         if not include_punctuation:
             tokens = [token for token in tokens if not PUNCT_RE.match(token)]
-    elif info['tokenizer'] == 'jieba':
+    elif info["tokenizer"] == "jieba":
         from wordfreq.chinese import jieba_tokenize as _jieba_tokenize
 
         tokens = _jieba_tokenize(text, external_wordlist=external_wordlist)
@@ -275,11 +272,11 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
         # This is the default case where we use the regex tokenizer. First
         # let's complain a bit if we ended up here because we don't have an
         # appropriate tokenizer.
-        if info['tokenizer'] != 'regex' and lang not in _WARNED_LANGUAGES:
+        if info["tokenizer"] != "regex" and lang not in _WARNED_LANGUAGES:
             logger.warning(
                 "The language '{}' is in the '{}' script, which we don't "
                 "have a tokenizer for. The results will be bad.".format(
-                    lang, info['script']
+                    lang, info["script"]
                 )
             )
             _WARNED_LANGUAGES.add(lang)
@@ -288,9 +285,7 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     return tokens
 
 
-def lossy_tokenize(
-    text, lang, include_punctuation=False, external_wordlist=False
-):
+def lossy_tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     """
     Get a list of tokens for this text, with largely the same results and
     options as `tokenize`, but aggressively normalize some text in a lossy way
@@ -316,7 +311,7 @@ def lossy_tokenize(
     info = get_language_info(lang)
     tokens = tokenize(text, lang, include_punctuation, external_wordlist)
 
-    if info['lookup_transliteration'] == 'zh-Hans':
+    if info["lookup_transliteration"] == "zh-Hans":
         from wordfreq.chinese import simplify_chinese as _simplify_chinese
 
         tokens = [_simplify_chinese(token) for token in tokens]

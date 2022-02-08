@@ -4,10 +4,10 @@ import unicodedata
 from .language_info import get_language_info
 from .transliterate import transliterate
 
-MARK_RE = regex.compile(r'[\p{Mn}\N{ARABIC TATWEEL}]', regex.V1)
+MARK_RE = regex.compile(r"[\p{Mn}\N{ARABIC TATWEEL}]", regex.V1)
 
-DIGIT_RE = regex.compile(r'\d')
-MULTI_DIGIT_RE = regex.compile(r'\d[\d.,]+')
+DIGIT_RE = regex.compile(r"\d")
+MULTI_DIGIT_RE = regex.compile(r"\d[\d.,]+")
 
 
 def preprocess_text(text, language):
@@ -171,26 +171,26 @@ def preprocess_text(text, language):
     """
     # NFC or NFKC normalization, as needed for the language
     info = get_language_info(language)
-    text = unicodedata.normalize(info['normal_form'], text)
+    text = unicodedata.normalize(info["normal_form"], text)
 
     # Transliteration of multi-script languages
-    if info['transliteration'] is not None:
-        text = transliterate(info['transliteration'], text)
+    if info["transliteration"] is not None:
+        text = transliterate(info["transliteration"], text)
 
     # Abjad mark removal
-    if info['remove_marks']:
+    if info["remove_marks"]:
         text = remove_marks(text)
 
     # Case folding
-    if info['dotless_i']:
+    if info["dotless_i"]:
         text = casefold_with_i_dots(text)
     else:
         text = text.casefold()
 
     # Fixing of diacritics
-    if info['diacritics_under'] == 'commas':
+    if info["diacritics_under"] == "commas":
         text = cedillas_to_commas(text)
-    elif info['diacritics_under'] == 'cedillas':
+    elif info["diacritics_under"] == "cedillas":
         text = commas_to_cedillas(text)
 
     return text
@@ -205,7 +205,7 @@ def remove_marks(text):
     - Tatweels, horizontal segments that are used to extend or justify an
       Arabic word.
     """
-    return MARK_RE.sub('', text)
+    return MARK_RE.sub("", text)
 
 
 def casefold_with_i_dots(text):
@@ -214,7 +214,7 @@ def casefold_with_i_dots(text):
     that's appropriate for Turkish and related languages, then case-fold
     the rest of the letters.
     """
-    text = unicodedata.normalize('NFC', text).replace('İ', 'i').replace('I', 'ı')
+    text = unicodedata.normalize("NFC", text).replace("İ", "i").replace("I", "ı")
     return text.casefold()
 
 
@@ -227,11 +227,11 @@ def commas_to_cedillas(text):
     text has already been case-folded.
     """
     return text.replace(
-        '\N{LATIN SMALL LETTER S WITH COMMA BELOW}',
-        '\N{LATIN SMALL LETTER S WITH CEDILLA}'
+        "\N{LATIN SMALL LETTER S WITH COMMA BELOW}",
+        "\N{LATIN SMALL LETTER S WITH CEDILLA}",
     ).replace(
-        '\N{LATIN SMALL LETTER T WITH COMMA BELOW}',
-        '\N{LATIN SMALL LETTER T WITH CEDILLA}'
+        "\N{LATIN SMALL LETTER T WITH COMMA BELOW}",
+        "\N{LATIN SMALL LETTER T WITH CEDILLA}",
     )
 
 
@@ -244,11 +244,11 @@ def cedillas_to_commas(text):
     text has already been case-folded.
     """
     return text.replace(
-        '\N{LATIN SMALL LETTER S WITH CEDILLA}',
-        '\N{LATIN SMALL LETTER S WITH COMMA BELOW}'
+        "\N{LATIN SMALL LETTER S WITH CEDILLA}",
+        "\N{LATIN SMALL LETTER S WITH COMMA BELOW}",
     ).replace(
-        '\N{LATIN SMALL LETTER T WITH CEDILLA}',
-        '\N{LATIN SMALL LETTER T WITH COMMA BELOW}'
+        "\N{LATIN SMALL LETTER T WITH CEDILLA}",
+        "\N{LATIN SMALL LETTER T WITH COMMA BELOW}",
     )
 
 
@@ -257,7 +257,7 @@ def _sub_zeroes(match):
     Given a regex match, return what it matched with digits replaced by
     zeroes.
     """
-    return DIGIT_RE.sub('0', match.group(0))
+    return DIGIT_RE.sub("0", match.group(0))
 
 
 def num_generic_digits(text):

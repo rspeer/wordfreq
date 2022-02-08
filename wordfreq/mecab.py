@@ -13,11 +13,13 @@ def make_mecab_analyzer(lang):
     Get a MeCab analyzer object, given the language code of the language to
     analyze.
     """
-    if lang == 'ko':
+    if lang == "ko":
         import mecab_ko_dic
+
         return MeCab.Tagger(mecab_ko_dic.MECAB_ARGS)
-    elif lang == 'ja':
+    elif lang == "ja":
         import ipadic
+
         return MeCab.Tagger(ipadic.MECAB_ARGS)
     else:
         raise ValueError("Can't run MeCab on language {lang}".format(lang))
@@ -40,10 +42,12 @@ def mecab_tokenize(text, lang):
         MECAB_ANALYZERS[lang] = make_mecab_analyzer(lang)
 
     analyzer = MECAB_ANALYZERS[lang]
-    text = unicodedata.normalize('NFKC', text.strip())
+    text = unicodedata.normalize("NFKC", text.strip())
     analyzed = analyzer.parse(text)
     if not analyzed:
         return []
-    return [line.split('\t')[0]
-            for line in analyzed.split('\n')
-            if line != '' and line != 'EOS']
+    return [
+        line.split("\t")[0]
+        for line in analyzed.split("\n")
+        if line != "" and line != "EOS"
+    ]

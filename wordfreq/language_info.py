@@ -12,20 +12,19 @@ SPACELESS_SCRIPTS = [
     # characters, are covered by the \p{IsIdeo} check.  Checking for
     # Script=Hani and IsIdeo slows down our regexes with huge, redundant
     # classes of characters. Instead, we'll list the exceptions below.
-
-    'Hira',  # Hiragana
-    'Kana',  # Katakana
-    'Thai',  # Thai script
-    'Khmr',  # Khmer script
-    'Laoo',  # Lao script
-    'Mymr',  # Burmese script
-    'Tale',  # Tai Le script
-    'Talu',  # Tai Lü script
-    'Lana',  # Lanna script
+    "Hira",  # Hiragana
+    "Kana",  # Katakana
+    "Thai",  # Thai script
+    "Khmr",  # Khmer script
+    "Laoo",  # Lao script
+    "Mymr",  # Burmese script
+    "Tale",  # Tai Le script
+    "Talu",  # Tai Lü script
+    "Lana",  # Lanna script
 ]
 
 
-EXTRA_JAPANESE_CHARACTERS = 'ー々〻〆'
+EXTRA_JAPANESE_CHARACTERS = "ー々〻〆"
 
 # ー is a lengthening mark that's both hiragana and katakana. Unicode
 # segmentation handles it as a special case, but we're overriding standard
@@ -54,7 +53,7 @@ def _language_in_list(language, targets, max_distance=10):
     objects. `targets` can be any iterable of such languages.
     """
     matched = closest_match(language, targets, max_distance=max_distance)
-    return matched[0] != 'und'
+    return matched[0] != "und"
 
 
 @lru_cache(maxsize=None)
@@ -131,42 +130,42 @@ def get_language_info(language):
     # Start the `info` dictionary with default values, including the 'script'
     # value that we now know from `language_full`.
     info = {
-        'script': language_full.script,
-        'tokenizer': 'regex',
-        'normal_form': 'NFKC',
-        'remove_marks': False,
-        'dotless_i': False,
-        'diacritics_under': None,
-        'transliteration': None,
-        'lookup_transliteration': None
+        "script": language_full.script,
+        "tokenizer": "regex",
+        "normal_form": "NFKC",
+        "remove_marks": False,
+        "dotless_i": False,
+        "diacritics_under": None,
+        "transliteration": None,
+        "lookup_transliteration": None,
     }
 
-    if _language_in_list(language, ['ja', 'ko']):
-        info['tokenizer'] = 'mecab'
-    elif _language_in_list(language, ['zh', 'yue']):
-        info['tokenizer'] = 'jieba'
-    elif info['script'] in SPACELESS_SCRIPTS:
-        info['tokenizer'] = None
+    if _language_in_list(language, ["ja", "ko"]):
+        info["tokenizer"] = "mecab"
+    elif _language_in_list(language, ["zh", "yue"]):
+        info["tokenizer"] = "jieba"
+    elif info["script"] in SPACELESS_SCRIPTS:
+        info["tokenizer"] = None
 
     # Cased alphabetic scripts get NFC normal form
-    if info['script'] in ['Latn', 'Grek', 'Cyrl']:
-        info['normal_form'] = 'NFC'
+    if info["script"] in ["Latn", "Grek", "Cyrl"]:
+        info["normal_form"] = "NFC"
 
-    if info['script'] in ['Arab', 'Hebr']:
-        info['remove_marks'] = True
+    if info["script"] in ["Arab", "Hebr"]:
+        info["remove_marks"] = True
 
-    if _language_in_list(language, ['tr', 'az', 'kk']):
-        info['dotless_i'] = True
-        info['diacritics_under'] = 'cedillas'
-    elif _language_in_list(language, ['ro']):
-        info['diacritics_under'] = 'commas'
+    if _language_in_list(language, ["tr", "az", "kk"]):
+        info["dotless_i"] = True
+        info["diacritics_under"] = "cedillas"
+    elif _language_in_list(language, ["ro"]):
+        info["diacritics_under"] = "commas"
 
-    if _language_in_list(language, ['sr']):
-        info['transliteration'] = 'sr-Latn'
-    elif _language_in_list(language, ['az']):
-        info['transliteration'] = 'az-Latn'
+    if _language_in_list(language, ["sr"]):
+        info["transliteration"] = "sr-Latn"
+    elif _language_in_list(language, ["az"]):
+        info["transliteration"] = "az-Latn"
 
-    if language.language == 'zh' and language.script != 'Hant':
-        info['lookup_transliteration'] = 'zh-Hans'
+    if language.language == "zh" and language.script != "Hant":
+        info["lookup_transliteration"] = "zh-Hans"
 
     return info

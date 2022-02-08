@@ -3,11 +3,13 @@ import jieba
 import msgpack
 import gzip
 
-DICT_FILENAME = resource_filename('wordfreq', 'data/jieba_zh.txt')
-ORIG_DICT_FILENAME = resource_filename('wordfreq', 'data/jieba_zh_orig.txt')
-SIMP_MAP_FILENAME = resource_filename('wordfreq', 'data/_chinese_mapping.msgpack.gz')
+DICT_FILENAME = resource_filename("wordfreq", "data/jieba_zh.txt")
+ORIG_DICT_FILENAME = resource_filename("wordfreq", "data/jieba_zh_orig.txt")
+SIMP_MAP_FILENAME = resource_filename("wordfreq", "data/_chinese_mapping.msgpack.gz")
 try:
-    SIMPLIFIED_MAP = msgpack.load(gzip.open(SIMP_MAP_FILENAME), raw=False, strict_map_key=False)
+    SIMPLIFIED_MAP = msgpack.load(
+        gzip.open(SIMP_MAP_FILENAME), raw=False, strict_map_key=False
+    )
 except TypeError:
     # work around incompatibility between pure-Python msgpack and C msgpack
     SIMPLIFIED_MAP = msgpack.load(gzip.open(SIMP_MAP_FILENAME), raw=False)
@@ -58,6 +60,8 @@ def jieba_tokenize(text, external_wordlist=False):
         # those spans from the original text, even if it's in Traditional
         # Chinese
         tokens = []
-        for _token, start, end in jieba_tokenizer.tokenize(simplify_chinese(text), HMM=False):
+        for _token, start, end in jieba_tokenizer.tokenize(
+            simplify_chinese(text), HMM=False
+        ):
             tokens.append(text[start:end])
         return tokens

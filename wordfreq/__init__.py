@@ -12,6 +12,7 @@ import warnings
 
 from .tokens import tokenize, simple_tokenize, lossy_tokenize
 from .language_info import get_language_info
+from .preprocess import num_generic_digits
 
 logger = logging.getLogger(__name__)
 
@@ -242,6 +243,7 @@ _wf_cache = {}
 
 def _word_frequency(word, lang, wordlist, minimum):
     tokens = lossy_tokenize(word, lang)
+    digits = num_generic_digits(word)
     if not tokens:
         return minimum
 
@@ -255,7 +257,9 @@ def _word_frequency(word, lang, wordlist, minimum):
         if token not in freqs:
             # If any word is missing, just return the default value
             return minimum
-        one_over_result += 1.0 / freqs[token]
+        # spread the frequency of digits over all digit combinations
+        freq = freqs[token] / (10. ** digits)
+        one_over_result += 1.0 / freq
 
     freq = 1.0 / one_over_result
 

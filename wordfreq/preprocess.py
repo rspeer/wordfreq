@@ -260,6 +260,14 @@ def _sub_zeroes(match):
     return DIGIT_RE.sub('0', match.group(0))
 
 
+def num_generic_digits(text):
+    """
+    Determine how many "generic digits" are in the text (digits that we
+    replace with 0 to combine numbers of the same length).
+    """
+    return sum([len(match) for match in MULTI_DIGIT_RE.findall(text)])
+
+
 def smash_numbers(text):
     """
     Replace sequences of multiple digits with zeroes, so we don't need to

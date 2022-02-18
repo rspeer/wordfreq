@@ -1,6 +1,6 @@
 from functools import lru_cache
 from langcodes import Language, closest_match
-
+from typing import List, Union
 
 # Text in scripts written without spaces has to be handled specially in our
 # tokenization regex (see TOKEN_RE in tokens.py). Also, when one of these is
@@ -44,7 +44,9 @@ EXTRA_JAPANESE_CHARACTERS = "ー々〻〆"
 # happens in ConceptNet.
 
 
-def _language_in_list(language, targets, max_distance=10):
+def _language_in_list(
+    language: Language, targets: List[str], max_distance: int = 10
+) -> bool:
     """
     A helper function to determine whether this language matches one of the
     target languages, with a match score above a certain threshold.
@@ -57,7 +59,7 @@ def _language_in_list(language, targets, max_distance=10):
 
 
 @lru_cache(maxsize=None)
-def get_language_info(language):
+def get_language_info(language: Union[str, Language]) -> dict:
     """
     Looks up the things we need to know about how to handle text in a given
     language. This will return a dictionary with the following fields:

@@ -10,7 +10,8 @@ python = "^3.7"
 msgpack = ">= 1.0"
 langcodes = ">= 3.0"
 regex = ">= 2020.04.04"
-ftfy = ">= 3.0"
+ftfy = ">= 6.1"
+mypy = "^0.931"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
@@ -20,6 +21,8 @@ ipadic = "^1.0.0"
 mecab-ko-dic = "^1.0.0"
 ipython = ">=7"
 black = "^22.1.0"
+flake8 = "^4.0.1"
+types-setuptools = "^57.4.9"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,4 +1,5 @@
-# This table comes from https://github.com/opendatakosovo/cyrillic-transliteration/blob/master/cyrtranslit/mapping.py,
+# This table comes from
+# https://github.com/opendatakosovo/cyrillic-transliteration/blob/master/cyrtranslit/mapping.py,
 # from the 'cyrtranslit' module. We originally had to reimplement it because
 # 'cyrtranslit' didn't work in Python 3; now it does, but we've made the table
 # more robust than the one in cyrtranslit.

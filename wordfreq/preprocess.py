@@ -3,6 +3,7 @@ import unicodedata
 
 from .language_info import get_language_info
 from .transliterate import transliterate
+from langcodes import Language
 
 MARK_RE = regex.compile(r"[\p{Mn}\N{ARABIC TATWEEL}]", regex.V1)
 
@@ -10,7 +11,7 @@ DIGIT_RE = regex.compile(r"\d")
 MULTI_DIGIT_RE = regex.compile(r"\d[\d.,]+")
 
 
-def preprocess_text(text, language):
+def preprocess_text(text: str, language: Language) -> str:
     """
     This function applies pre-processing steps that convert forms of words
     considered equivalent into one standardized form.
@@ -196,7 +197,7 @@ def preprocess_text(text, language):
     return text
 
 
-def remove_marks(text):
+def remove_marks(text: str) -> str:
     """
     Remove decorations from words in abjad scripts:
 
@@ -208,7 +209,7 @@ def remove_marks(text):
     return MARK_RE.sub("", text)
 
 
-def casefold_with_i_dots(text):
+def casefold_with_i_dots(text: str) -> str:
     """
     Convert capital I's and capital dotted İ's to lowercase in the way
     that's appropriate for Turkish and related languages, then case-fold
@@ -218,7 +219,7 @@ def casefold_with_i_dots(text):
     return text.casefold()
 
 
-def commas_to_cedillas(text):
+def commas_to_cedillas(text: str) -> str:
     """
     Convert s and t with commas (ș and ț) to cedillas (ş and ţ), which is
     preferred in Turkish.
@@ -235,7 +236,7 @@ def commas_to_cedillas(text):
     )
 
 
-def cedillas_to_commas(text):
+def cedillas_to_commas(text: str) -> str:
     """
     Convert s and t with cedillas (ş and ţ) to commas (ș and ț), which is
     preferred in Romanian.
@@ -252,7 +253,7 @@ def cedillas_to_commas(text):
     )
 
 
-def _sub_zeroes(match):
+def _sub_zeroes(match: regex.Match) -> str:
     """
     Given a regex match, return what it matched with digits replaced by
     zeroes.
@@ -260,15 +261,7 @@ def _sub_zeroes(match):
     return DIGIT_RE.sub("0", match.group(0))
 
 
-def num_generic_digits(text):
-    """
-    Determine how many "generic digits" are in the text (digits that we
-    replace with 0 to combine numbers of the same length).
-    """
-    return sum([len(match) for match in MULTI_DIGIT_RE.findall(text)])
-
-
-def smash_numbers(text):
+def smash_numbers(text: str) -> str:
     """
     Replace sequences of multiple digits with zeroes, so we don't need to
     distinguish the frequencies of thousands of numbers.

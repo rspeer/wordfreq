@@ -2,6 +2,7 @@ import regex
 import unicodedata
 import logging
 import langcodes
+from typing import List
 from ftfy.fixes import uncurl_quotes
 
 from .language_info import (
@@ -20,7 +21,7 @@ _WARNED_LANGUAGES = set()
 logger = logging.getLogger(__name__)
 
 
-def _make_spaceless_expr():
+def _make_spaceless_expr() -> str:
     scripts = sorted(SPACELESS_SCRIPTS)
     pieces = [r"\p{IsIdeo}"] + [
         r"\p{Script=%s}" % script_code for script_code in scripts
@@ -179,7 +180,7 @@ TOKEN_RE_WITH_PUNCTUATION = regex.compile(
 PUNCT_RE = regex.compile(r"[\p{punct}]+")
 
 
-def simple_tokenize(text, include_punctuation=False):
+def simple_tokenize(text: str, include_punctuation: bool = False) -> List[str]:
     """
     Tokenize the given text using a straightforward, Unicode-aware token
     expression.
@@ -214,7 +215,12 @@ def simple_tokenize(text, include_punctuation=False):
         return [token.strip("'").casefold() for token in TOKEN_RE.findall(text)]
 
 
-def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
+def tokenize(
+    text: str,
+    lang: str,
+    include_punctuation: bool = False,
+    external_wordlist: bool = False,
+) -> List[str]:
     """
     Tokenize this text in a way that's relatively simple but appropriate for
     the language. Strings that are looked up in wordfreq will be run through
@@ -255,15 +261,20 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     text = preprocess_text(text, language)
 
     if info["tokenizer"] == "mecab":
-        from wordfreq.mecab import mecab_tokenize as _mecab_tokenize
+        from wordfreq.mecab import mecab_tokenize
+
+        _mecab_tokenize = mecab_tokenize
 
         # Get just the language code out of the Language object, so we can
         # use it to select a MeCab dictionary
+        assert language.language is not None
         tokens = _mecab_tokenize(text, language.language)
         if not include_punctuation:
             tokens = [token for token in tokens if not PUNCT_RE.match(token)]
     elif info["tokenizer"] == "jieba":
-        from wordfreq.chinese import jieba_tokenize as _jieba_tokenize
+        from wordfreq.chinese import jieba_tokenize
+
+        _jieba_tokenize = jieba_tokenize
 
         tokens = _jieba_tokenize(text, external_wordlist=external_wordlist)
         if not include_punctuation:
@@ -285,7 +296,12 @@ def tokenize(text, lang, include_punctuation=False, external_wordlist=False):
     return tokens
 
 
-def lossy_tokenize(text, lang, include_punctuation=False, external_wordlist=False):
+def lossy_tokenize(
+    text: str,
+    lang: str,
+    include_punctuation: bool = False,
+    external_wordlist: bool = False,
+) -> List[str]:
     """
     Get a list of tokens for this text, with largely the same results and
     options as `tokenize`, but aggressively normalize some text in a lossy way
@@ -312,7 +328,9 @@ def lossy_tokenize(text, lang, include_punctuation=False, external_wordlist=Fals
     tokens = tokenize(text, lang, include_punctuation, external_wordlist)
 
     if info["lookup_transliteration"] == "zh-Hans":
-        from wordfreq.chinese import simplify_chinese as _simplify_chinese
+        from wordfreq.chinese import simplify_chinese
+
+        _simplify_chinese = simplify_chinese
 
         tokens = [_simplify_chinese(token) for token in tokens]
 

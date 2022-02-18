@@ -1,14 +1,10 @@
-from pkg_resources import resource_filename
 import MeCab
 import unicodedata
-import os
+
+from typing import Dict, List
 
 
-# MeCab has fixed-sized buffers for many things, including the dictionary path
-MAX_PATH_LENGTH = 58
-
-
-def make_mecab_analyzer(lang):
+def make_mecab_analyzer(lang: str) -> MeCab.Tagger:
     """
     Get a MeCab analyzer object, given the language code of the language to
     analyze.
@@ -22,14 +18,14 @@ def make_mecab_analyzer(lang):
 
         return MeCab.Tagger(ipadic.MECAB_ARGS)
     else:
-        raise ValueError("Can't run MeCab on language {lang}".format(lang))
+        raise ValueError(f"Can't run MeCab on language {lang}")
 
 
 # The constructed analyzers will go in this dictionary.
-MECAB_ANALYZERS = {}
+MECAB_ANALYZERS: Dict[str, MeCab.Tagger] = {}
 
 
-def mecab_tokenize(text, lang):
+def mecab_tokenize(text: str, lang: str) -> List[str]:
     """
     Use the mecab-python3 package to tokenize the given text. The `lang`
     must be 'ja' for Japanese or 'ko' for Korean.

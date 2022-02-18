@@ -1,5 +1,6 @@
 from pkg_resources import resource_filename
 from functools import lru_cache
+from typing import List, Dict, Iterator, Tuple
 import langcodes
 import msgpack
 import gzip
@@ -12,7 +13,7 @@ import warnings
 
 from .tokens import tokenize, simple_tokenize, lossy_tokenize
 from .language_info import get_language_info
-from .preprocess import num_generic_digits
+from .numbers import digit_freq
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ tokenize = tokenize
 simple_tokenize = simple_tokenize
 
 
-def read_cBpack(filename):
+def read_cBpack(filename: str) -> List[List[str]]:
     """
     Read a file from an idiosyncratic format that we use for storing
     approximate word frequencies, called "cBpack".
@@ -87,7 +88,7 @@ def read_cBpack(filename):
     return data[1:]
 
 
-def available_languages(wordlist="best"):
+def available_languages(wordlist: str = "best") -> Dict[str, str]:
     """
     Given a wordlist name, return a dictionary of language codes to filenames,
     representing all the languages in which that wordlist is available.
@@ -111,7 +112,9 @@ def available_languages(wordlist="best"):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_list(lang, wordlist="best", match_cutoff=None):
+def get_frequency_list(
+    lang: str, wordlist: str = "best", match_cutoff: None = None
+) -> List[List[str]]:
     """
     Read the raw data from a wordlist file, returning it as a list of
     lists. (See `read_cBpack` for what this represents.)
@@ -125,10 +128,9 @@ def get_frequency_list(lang, wordlist="best", match_cutoff=None):
         warnings.warn("The `match_cutoff` parameter is deprecated", DeprecationWarning)
     available = available_languages(wordlist)
 
-    # TODO: decrease the maximum distance. This distance is so high just
-    # because it allows a test where 'yue' matches 'zh', and maybe the
-    # distance between those is high because they shouldn't match.
-    best, _distance = langcodes.closest_match(lang, list(available), max_distance=70)
+    # the max_distance is high because we unify scripts, such as Traditional
+    # vs. Simplified Chinese, in one wordlist
+    best, _distance = langcodes.closest_match(lang, list(available), max_distance=60)
     if best == "und":
         raise LookupError("No wordlist %r available for language %r" % (wordlist, lang))
 
@@ -141,7 +143,7 @@ def get_frequency_list(lang, wordlist="best", match_cutoff=None):
     return read_cBpack(available[best])
 
 
-def cB_to_freq(cB):
+def cB_to_freq(cB: int) -> float:
     """
     Convert a word frequency from the logarithmic centibel scale that we use
     internally, to a proportion from 0 to 1.
@@ -157,7 +159,7 @@ def cB_to_freq(cB):
     return 10 ** (cB / 100)
 
 
-def cB_to_zipf(cB):
+def cB_to_zipf(cB: int) -> float:
     """
     Convert a word frequency from centibels to the Zipf scale
     (see `zipf_to_freq`).
@@ -169,7 +171,7 @@ def cB_to_zipf(cB):
     return (cB + 900) / 100
 
 
-def zipf_to_freq(zipf):
+def zipf_to_freq(zipf: float) -> float:
     """
     Convert a word frequency from the Zipf scale to a proportion between 0 and
     1.
@@ -185,7 +187,7 @@ def zipf_to_freq(zipf):
     return 10**zipf / 1e9
 
 
-def freq_to_zipf(freq):
+def freq_to_zipf(freq: float) -> float:
     """
     Convert a word frequency from a proportion between 0 and 1 to the
     Zipf scale (see `zipf_to_freq`).
@@ -194,7 +196,9 @@ def freq_to_zipf(freq):
 
 
 @lru_cache(maxsize=None)
-def get_frequency_dict(lang, wordlist="best", match_cutoff=None):
+def get_frequency_dict(
+    lang: str, wordlist: str = "best", match_cutoff: None = None
+) -> Dict[str, float]:
     """
     Get a word frequency list as a dictionary, mapping tokens to
     frequencies as floating-point probabilities.
@@ -210,7 +214,7 @@ def get_frequency_dict(lang, wordlist="best", match_cutoff=None):
     return freqs
 
 
-def iter_wordlist(lang, wordlist="best"):
+def iter_wordlist(lang: str, wordlist: str = "best") -> Iterator[str]:
     """
     Yield the words in a wordlist in approximate descending order of
     frequency.
@@ -225,12 +229,12 @@ def iter_wordlist(lang, wordlist="best"):
 # This dict and inner function are used to implement a "drop everything" cache
 # for word_frequency(); the overheads of lru_cache() are comparable to the time
 # it takes to look up frequencies from scratch, so something faster is needed.
-_wf_cache = {}
+_wf_cache: Dict[Tuple[str, str, str, float], float] = {}
 
 
-def _word_frequency(word, lang, wordlist, minimum):
+def _word_frequency(word: str, lang: str, wordlist: str, minimum: float) -> float:
     tokens = lossy_tokenize(word, lang)
-    digits = num_generic_digits(word)
+    dfreq = digit_freq(word)
     if not tokens:
         return minimum
 
@@ -245,7 +249,7 @@ def _word_frequency(word, lang, wordlist, minimum):
             # If any word is missing, just return the default value
             return minimum
         # spread the frequency of digits over all digit combinations
-        freq = freqs[token] / (10.0**digits)
+        freq = freqs[token]
         one_over_result += 1.0 / freq
 
     freq = 1.0 / one_over_result
@@ -266,7 +270,9 @@ def _word_frequency(word, lang, wordlist, minimum):
         return round(unrounded, leading_zeroes + 3)
 
 
-def word_frequency(word, lang, wordlist="best", minimum=0.0):
+def word_frequency(
+    word: str, lang: str, wordlist: str = "best", minimum: float = 0.0
+) -> float:
     """
     Get the frequency of `word` in the language with code `lang`, from the
     specified `wordlist`.
@@ -293,7 +299,7 @@ def word_frequency(word, lang, wordlist="best", minimum=0.0):
         return _wf_cache[args]
 
 
-def zipf_frequency(word, lang, wordlist="best", minimum=0.0):
+def zipf_frequency(word: str, lang: str, wordlist: str = "best", minimum: float = 0.0):
     """
     Get the frequency of `word`, in the language with code `lang`, on the Zipf
     scale.
@@ -321,7 +327,9 @@ def zipf_frequency(word, lang, wordlist="best", minimum=0.0):
 
 
 @lru_cache(maxsize=100)
-def top_n_list(lang, n, wordlist="best", ascii_only=False):
+def top_n_list(
+    lang: str, n: int, wordlist: str = "best", ascii_only: bool = False
+) -> List[str]:
     """
     Return a frequency list of length `n` in descending order of frequency.
     This list contains words from `wordlist`, of the given language.
@@ -337,8 +345,12 @@ def top_n_list(lang, n, wordlist="best", ascii_only=False):
 
 
 def random_words(
-    lang="en", wordlist="best", nwords=5, bits_per_word=12, ascii_only=False
-):
+    lang: str = "en",
+    wordlist: str = "best",
+    nwords: int = 5,
+    bits_per_word: int = 12,
+    ascii_only: bool = False,
+) -> str:
     """
     Returns a string of random, space separated words.
 
@@ -362,7 +374,9 @@ def random_words(
     return " ".join([random.choice(choices) for i in range(nwords)])
 
 
-def random_ascii_words(lang="en", wordlist="best", nwords=5, bits_per_word=12):
+def random_ascii_words(
+    lang: str = "en", wordlist: str = "best", nwords: int = 5, bits_per_word: int = 12
+) -> str:
     """
     Returns a string of random, space separated, ASCII words.
 

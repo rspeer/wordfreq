@@ -1,4 +1,5 @@
 from pkg_resources import resource_filename
+from typing import List
 import jieba
 import msgpack
 import gzip
@@ -17,7 +18,7 @@ jieba_tokenizer = None
 jieba_orig_tokenizer = None
 
 
-def simplify_chinese(text):
+def simplify_chinese(text: str) -> str:
     """
     Convert Chinese text character-by-character to Simplified Chinese, for the
     purpose of looking up word frequencies.
@@ -31,7 +32,7 @@ def simplify_chinese(text):
     return text.translate(SIMPLIFIED_MAP).casefold()
 
 
-def jieba_tokenize(text, external_wordlist=False):
+def jieba_tokenize(text: str, external_wordlist: bool = False) -> List[str]:
     """
     Tokenize the given text into tokens whose word frequencies can probably
     be looked up. This uses Jieba, a word-frequency-based tokenizer.

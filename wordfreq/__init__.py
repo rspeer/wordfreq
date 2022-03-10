@@ -13,7 +13,7 @@ import warnings
 
 from .tokens import tokenize, simple_tokenize, lossy_tokenize
 from .language_info import get_language_info
-from .numbers import digit_freq
+from .numbers import digit_freq, has_digit_sequence, smash_numbers
 
 logger = logging.getLogger(__name__)
 
@@ -234,7 +234,7 @@ _wf_cache: Dict[Tuple[str, str, str, float], float] = {}
 
 def _word_frequency(word: str, lang: str, wordlist: str, minimum: float) -> float:
     tokens = lossy_tokenize(word, lang)
-    dfreq = digit_freq(word)
+
     if not tokens:
         return minimum
 
@@ -245,13 +245,20 @@ def _word_frequency(word: str, lang: str, wordlist: str, minimum: float) -> floa
     freqs = get_frequency_dict(lang, wordlist)
     one_over_result = 0.0
     for token in tokens:
-        if token not in freqs:
+        smashed = smash_numbers(token)
+        if smashed not in freqs:
             # If any word is missing, just return the default value
             return minimum
-        # spread the frequency of digits over all digit combinations
-        freq = freqs[token]
+        freq = freqs[smashed]
+        if smashed != token:
+            # If there is a digit sequence in the token, the digits are
+            # internally replaced by 0s to aggregate their probabilities
+            # together. We then assign a specific frequency to the digit
+            # sequence using the `digit_freq` distribution.
+            freq *= digit_freq(token)
         one_over_result += 1.0 / freq
 
+    # Combine the frequencies of tokens we looked up.
     freq = 1.0 / one_over_result
 
     if get_language_info(lang)["tokenizer"] == "jieba":
@@ -334,13 +341,18 @@ def top_n_list(
     Return a frequency list of length `n` in descending order of frequency.
     This list contains words from `wordlist`, of the given language.
     If `ascii_only`, then only ascii words are considered.
+
+    The frequency list will not contain multi-digit sequences, because we
+    estimate the frequencies of those using the functions in `numbers.py`,
+    not using a wordlist that contains all of them.
     """
     results = []
     for word in iter_wordlist(lang, wordlist):
         if (not ascii_only) or max(word) <= "~":
-            results.append(word)
-            if len(results) >= n:
-                break
+            if not has_digit_sequence(word):
+                results.append(word)
+                if len(results) >= n:
+                    break
     return results
 
 

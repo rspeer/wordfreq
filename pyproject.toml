@@ -4,6 +4,7 @@ version = "2.6.0"
 description = "Look up the frequencies of words in many languages, based on many sources of data."
 authors = ["Robyn Speer <rspeer@arborelia.net>"]
 license = "MIT"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.7"

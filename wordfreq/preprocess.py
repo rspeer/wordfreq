@@ -7,10 +7,6 @@ from langcodes import Language
 
 MARK_RE = regex.compile(r"[\p{Mn}\N{ARABIC TATWEEL}]", regex.V1)
 
-DIGIT_RE = regex.compile(r"\d")
-MULTI_DIGIT_RE = regex.compile(r"\d[\d.,]+")
-
-
 def preprocess_text(text: str, language: Language) -> str:
     """
     This function applies pre-processing steps that convert forms of words
@@ -251,19 +247,3 @@ def cedillas_to_commas(text: str) -> str:
         "\N{LATIN SMALL LETTER T WITH CEDILLA}",
         "\N{LATIN SMALL LETTER T WITH COMMA BELOW}",
     )
-
-
-def _sub_zeroes(match: regex.Match) -> str:
-    """
-    Given a regex match, return what it matched with digits replaced by
-    zeroes.
-    """
-    return DIGIT_RE.sub("0", match.group(0))
-
-
-def smash_numbers(text: str) -> str:
-    """
-    Replace sequences of multiple digits with zeroes, so we don't need to
-    distinguish the frequencies of thousands of numbers.
-    """
-    return MULTI_DIGIT_RE.sub(_sub_zeroes, text)

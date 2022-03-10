@@ -10,7 +10,7 @@ from .language_info import (
     SPACELESS_SCRIPTS,
     EXTRA_JAPANESE_CHARACTERS,
 )
-from .preprocess import preprocess_text, smash_numbers
+from .preprocess import preprocess_text
 
 # Placeholders for CJK functions that we'll import on demand
 _mecab_tokenize = None
@@ -309,13 +309,6 @@ def lossy_tokenize(
 
     In particular:
 
-    - Any sequence of 2 or more adjacent digits, possibly with intervening
-      punctuation such as a decimal point, will replace each digit with '0'
-      so that frequencies for numbers don't have to be counted separately.
-
-      This is similar to but not quite identical to the word2vec Google News
-      data, which replaces digits with '#' in tokens with more than one digit.
-
     - In Chinese, unless Traditional Chinese is specifically requested using
       'zh-Hant', all characters will be converted to Simplified Chinese.
 
@@ -334,4 +327,4 @@ def lossy_tokenize(
 
         tokens = [_simplify_chinese(token) for token in tokens]
 
-    return [uncurl_quotes(smash_numbers(token)) for token in tokens]
+    return [uncurl_quotes(token) for token in tokens]

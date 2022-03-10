@@ -1,4 +1,4 @@
-from .preprocess import MULTI_DIGIT_RE
+import regex
 
 # Frequencies of leading digits, according to Benford's law, sort of.
 # Benford's law doesn't describe numbers with leading zeroes, because "007"
@@ -11,23 +11,37 @@ DIGIT_FREQS = [0.009, 0.300, 0.175, 0.124, 0.096, 0.078, 0.066, 0.057, 0.050, 0.
 #
 # We do this with a piecewise exponential function whose peak is a plateau covering
 # the years 2019 to 2039.
-#
-# YEAR_LOG_PEAK is chosen by experimentation to make this probability add up to about
-# .994. Here, that represents P(token represents a year) | P(token is 4 digits).
-# The other .006 represents P(token does not represent a year) | P(token is 4 digits).
 
-YEAR_LOG_PEAK = -1.875
-NOT_YEAR_PROB = 0.006
+# Determined by experimentation: makes the probabilities of all years add up to 90%.
+# The other 10% goes to NOT_YEAR_PROB. tests/test_numbers.py confirms that this
+# probability distribution adds up to 1.
+YEAR_LOG_PEAK = -1.9185
+NOT_YEAR_PROB = 0.1
 REFERENCE_YEAR = 2019
 PLATEAU_WIDTH = 20
 
+DIGIT_RE = regex.compile(r"\d")
+MULTI_DIGIT_RE = regex.compile(r"\d[\d.,]+")
+PURE_DIGIT_RE = regex.compile(r"\d+")
 
 def benford_freq(text: str) -> float:
+    """
+    Estimate the frequency of a digit sequence according to Benford's law.
+    """
     first_digit = int(text[0])
     return DIGIT_FREQS[first_digit] / 10 ** (len(text) - 1)
 
 
 def year_freq(text: str) -> float:
+    """
+    Estimate the relative frequency of a particular 4-digit sequence representing
+    a year.
+
+    For example, suppose text == "1985". We're estimating the probability that a
+    randomly-selected token from a large corpus will be "1985" and refer to the
+    year, _given_ that it is 4 digits. Tokens that are not 4 digits are not involved
+    in the probability distribution.
+    """
     year = int(text)
 
     # Fitting a line to the curve seen at
@@ -60,13 +74,38 @@ def year_freq(text: str) -> float:
 
 
 def digit_freq(text: str) -> float:
+    """
+    Get the relative frequency of a string of digits, using our estimates.
+    """
     freq = 1.0
     for match in MULTI_DIGIT_RE.findall(text):
-        if len(match) == 4:
-            freq *= year_freq(match)
-        else:
-            freq *= benford_freq(match)
+        for submatch in PURE_DIGIT_RE.findall(match):
+            if len(submatch) == 4:
+                freq *= year_freq(submatch)
+            else:
+                freq *= benford_freq(submatch)
     return freq
 
 
-print(sum(digit_freq("%04d" % year) for year in range(0, 10000)))
+def has_digit_sequence(text: str) -> bool:
+    """
+    Returns True iff the text has a digit sequence that will be normalized out
+    and handled with `digit_freq`.
+    """
+    return bool(MULTI_DIGIT_RE.match(text))
+
+
+def _sub_zeroes(match: regex.Match) -> str:
+    """
+    Given a regex match, return what it matched with digits replaced by
+    zeroes.
+    """
+    return DIGIT_RE.sub("0", match.group(0))
+
+
+def smash_numbers(text: str) -> str:
+    """
+    Replace sequences of multiple digits with zeroes, so we don't need to
+    distinguish the frequencies of thousands of numbers.
+    """
+    return MULTI_DIGIT_RE.sub(_sub_zeroes, text)

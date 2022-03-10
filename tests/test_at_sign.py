@@ -14,12 +14,12 @@ def test_gender_neutral_at():
         "tod@s",
         "l@s",
         "trabajador@s",
-        "migrantes"
+        "migrantes",
     ]
 
     text = "el distrito 22@ de Barcelona"
-    assert tokenize(text, 'es') == ["el", "distrito", "22@", "de", "barcelona"]
-    assert lossy_tokenize(text, 'es') == ["el", "distrito", "00@", "de", "barcelona"]
+    assert tokenize(text, "es") == ["el", "distrito", "22@", "de", "barcelona"]
+    assert lossy_tokenize(text, "es") == ["el", "distrito", "22@", "de", "barcelona"]
 
     # It also appears in Portuguese
     text = "direitos e deveres para @s membr@s da comunidade virtual"
@@ -32,7 +32,7 @@ def test_gender_neutral_at():
         "membr@s",
         "da",
         "comunidade",
-        "virtual"
+        "virtual",
     ]
 
     # Because this is part of our tokenization, the language code doesn't
@@ -43,10 +43,10 @@ def test_gender_neutral_at():
 
 def test_at_in_corpus():
     # We have a word frequency for "l@s"
-    assert word_frequency('l@s', 'es') > 0
+    assert word_frequency("l@s", "es") > 0
 
     # It's not just treated as a word break
-    assert word_frequency('l@s', 'es') < word_frequency('l s', 'es')
+    assert word_frequency("l@s", "es") < word_frequency("l s", "es")
 
 
 def test_punctuation_at():
@@ -65,7 +65,7 @@ def test_punctuation_at():
         "ao",
         "lado",
         "do",
-        "nick"
+        "nick",
     ]
 
     assert tokenize(text, "pt", include_punctuation=True) == [
@@ -83,7 +83,7 @@ def test_punctuation_at():
         "ao",
         "lado",
         "do",
-        "nick"
+        "nick",
     ]
 
     # If the @ is not at the end of the word or part of the word ending '@s',
@@ -98,12 +98,9 @@ def test_punctuation_at():
         "la",
         "línea",
         "all:all",
-        "all"
+        "all",
     ]
 
     # Make sure not to catch e-mail addresses
     text = "info@something.example"
-    assert tokenize(text, "en") == [
-        "info",
-        "something.example"
-    ]
+    assert tokenize(text, "en") == ["info", "something.example"]

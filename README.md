@@ -11,9 +11,11 @@ in the usual way, either by getting it from pip:
 
     pip3 install wordfreq
 
-or by getting the repository and running its setup.py:
+or by getting the repository and installing it using [poetry][]:
 
-    python3 setup.py install
+    poetry install
+
+[poetry]: https://python-poetry.org/
 
 See [Additional CJK installation](#additional-cjk-installation) for extra
 steps that are necessary to get Chinese, Japanese, and Korean word frequencies.

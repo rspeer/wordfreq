@@ -44,7 +44,7 @@ setup(
     long_description=README_contents,
     long_description_content_type='text/markdown',
     packages=['wordfreq'],
-    python_requires='>=3.5',
+    python_requires='>=3.7',
     include_package_data=True,
     install_requires=dependencies,
 

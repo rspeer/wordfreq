@@ -523,10 +523,15 @@ python-versions = ">=3.7"
 docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
+[extras]
+cjk = []
+jieba = []
+mecab = []
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "8507a13e0c8c79c30e911cc5f32bdc35284304246ae50531917df6197d7dcab8"
+content-hash = "4c478694ae5eb8b3d54b635d9dc6928922ba6315c72c5061674ec0ae1068f359"
 
 [metadata.files]
 appnope = [

@@ -13,7 +13,7 @@ estimated distribution that allows for Benford's law (lower numbers are more
 frequent) and a special frequency distribution for 4-digit numbers that look
 like years (2010 is more frequent than 1020).
 
-Relatedly:
+More changes related to digits:
 
 - Functions such as `iter_wordlist` and `top_n_list` no longer return
   multi-digit numbers (they used to return them in their "smashed" form, such
@@ -22,6 +22,15 @@ Relatedly:
 - `lossy_tokenize` no longer replaces digit sequences with 0s. That happens
   instead in a place that's internal to the `word_frequency` function, so we can
   look at the values of the digits before they're replaced.
+
+Other changes:
+
+- wordfreq is now developed using `poetry` as its package manager, and with
+  `pyproject.toml` as the source of configuration instead of `setup.py`.
+
+- The minimum version of Python supported is 3.7.
+
+- Type information is exported using `py.typed`.
 
 ## Version 2.5.1 (2021-09-02)
 

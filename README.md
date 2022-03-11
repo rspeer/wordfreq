@@ -11,7 +11,7 @@ in the usual way, either by getting it from pip:
 
     pip3 install wordfreq
 
-or by getting the repository and installing it using [poetry][]:
+or by getting the repository and installing it for development, using [poetry][]:
 
     poetry install
 
@@ -23,8 +23,8 @@ steps that are necessary to get Chinese, Japanese, and Korean word frequencies.
 ## Usage
 
 wordfreq provides access to estimates of the frequency with which a word is
-used, in 36 languages (see *Supported languages* below). It uses many different
-data sources, not just one corpus.
+used, in over 40 languages (see *Supported languages* below). It uses many
+different data sources, not just one corpus.
 
 It provides both 'small' and 'large' wordlists:
 
@@ -144,8 +144,8 @@ as `##` or `####` or `#.#####`, with `#` standing in for digits. (For compatibil
 with earlier versions of wordfreq, our stand-in character is actually `0`.) This
 is the same form of aggregation that the word2vec vocabulary does.
 
-Single-digit numbers are unaffected by this "binning" process; "0" through "9" have
-their own entries in each language's wordlist.
+Single-digit numbers are unaffected by this process; "0" through "9" have their own
+entries in each language's wordlist.
 
 When asked for the frequency of a token containing multiple digits, we multiply
 the frequency of that aggregated entry by a distribution estimating the frequency
@@ -158,10 +158,10 @@ The first digits are assigned probabilities by Benford's law, and years are assi
 probabilities from a distribution that peaks at the "present". I explored this in
 a Twitter thread at <https://twitter.com/r_speer/status/1493715982887571456>.
 
-The part of this distribution representing the "present" is not strictly a peak;
-it's a 20-year-long plateau from 2019 to 2039. (2019 is the last time Google Books
-Ngrams was updated, and 2039 is a time by which I will probably have figured out
-a new distribution.)
+The part of this distribution representing the "present" is not strictly a peak and
+doesn't move forward with time as the present does. Instead, it's a 20-year-long
+plateau from 2019 to 2039. (2019 is the last time Google Books Ngrams was updated,
+and 2039 is a time by which I will probably have figured out a new distribution.)
 
 Some examples:
 
@@ -172,7 +172,7 @@ Some examples:
     >>> word_frequency("1022", "en")
     1.28e-07
 
-Aside from years, the distribution does **not** care about the meaning of the numbers:
+Aside from years, the distribution does not care about the meaning of the numbers:
 
     >>> word_frequency("90210", "en")
     3.34e-10
@@ -419,19 +419,16 @@ As much as we would like to give each language its own distinct code and its
 own distinct word list with distinct source data, there aren't actually sharp
 boundaries between languages.
 
-Sometimes, it's convenient to pretend that the boundaries between
-languages coincide with national borders, following the maxim that "a language
-is a dialect with an army and a navy" (Max Weinreich). This gets complicated
-when the linguistic situation and the political situation diverge.
-Moreover, some of our data sources rely on language detection, which of course
-has no idea which country the writer of the text belongs to.
+Sometimes, it's convenient to pretend that the boundaries between languages
+coincide with national borders, following the maxim that "a language is a
+dialect with an army and a navy" (Max Weinreich). This gets complicated when the
+linguistic situation and the political situation diverge. Moreover, some of our
+data sources rely on language detection, which of course has no idea which
+country the writer of the text belongs to.
 
 So we've had to make some arbitrary decisions about how to represent the
 fuzzier language boundaries, such as those within Chinese, Malay, and
-Croatian/Bosnian/Serbian.  See [Language Log][] for some firsthand reports of
-the mutual intelligibility or unintelligibility of languages.
-
-[Language Log]: http://languagelog.ldc.upenn.edu/nll/?p=12633
+Croatian/Bosnian/Serbian.
 
 Smoothing over our arbitrary decisions is the fact that we use the `langcodes`
 module to find the best match for a language code. If you ask for word
@@ -445,6 +442,9 @@ they can be tokenized correctly. They can all be installed at once by requesting
 the 'cjk' feature:
 
     pip install wordfreq[cjk]
+
+You can put `wordfreq[cjk]` in a list of dependencies, such as the
+`[tool.poetry.dependencies]` list of your own project.
 
 Tokenizing Chinese depends on the `jieba` package, tokenizing Japanese depends
 on `mecab-python3` and `ipadic`, and tokenizing Korean depends on `mecab-python3`

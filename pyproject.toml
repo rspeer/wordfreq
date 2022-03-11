@@ -5,6 +5,7 @@ description = "Look up the frequencies of words in many languages, based on many
 authors = ["Robyn Speer <rspeer@arborelia.net>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/rspeer/wordfreq/"
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -24,6 +25,11 @@ ipython = ">=7"
 black = "^22.1.0"
 flake8 = "^4.0.1"
 types-setuptools = "^57.4.9"
+
+[tool.poetry.extras]
+cjk = ["mecab-python3", "ipadic", "mecab-ko-dic", "jieba >= 0.42"]
+mecab = ["mecab-python3", "ipadic", "mecab-ko-dic"]
+jieba = ["jieba >= 0.42"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -16,6 +16,11 @@ def test_decimals():
     assert word_frequency("3,14", "de") == word_frequency("3,15", "de")
 
 
+def test_eastern_arabic():
+    assert word_frequency("٥٤", "ar") == word_frequency("٥٣", "ar")
+    assert word_frequency("٤٣", "ar") > word_frequency("٥٤", "ar")
+
+
 def test_year_distribution():
     assert word_frequency("2010", "en") > word_frequency("1010", "en")
     assert word_frequency("2010", "en") > word_frequency("3010", "en")

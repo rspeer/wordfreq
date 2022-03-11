@@ -33,7 +33,7 @@ dependencies = [
 
 setup(
     name="wordfreq",
-    version='2.6.0',
+    version='3.0.0',
     maintainer='Robyn Speer',
     maintainer_email='rspeer@arborelia.net',
     url='http://github.com/rspeer/wordfreq/',

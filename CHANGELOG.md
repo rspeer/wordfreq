@@ -1,9 +1,34 @@
+# Changelog
+
+## Version 3.0 (2022-03-10)
+
+This is the "handle numbers better" release.
+
+Previously, wordfreq would group all digit sequences of the same 'shape',
+with length 2 or more, into a single token and return the frequency of that
+token, which would be a vast overestimate.
+
+Now it distributes the frequency over all numbers of that shape, with an
+estimated distribution that allows for Benford's law (lower numbers are more
+frequent) and a special frequency distribution for 4-digit numbers that look
+like years (2010 is more frequent than 1020).
+
+Relatedly:
+
+- Functions such as `iter_wordlist` and `top_n_list` no longer return
+  multi-digit numbers (they used to return them in their "smashed" form, such
+  as "0000").
+
+- `lossy_tokenize` no longer replaces digit sequences with 0s. That happens
+  instead in a place that's internal to the `word_frequency` function, so we can
+  look at the values of the digits before they're replaced.
+
 ## Version 2.5.1 (2021-09-02)
 
 - Import ftfy and use its `uncurl_quotes` method to turn curly quotes into
   straight ones, providing consistency with multiple forms of apostrophes.
 
-- Set minimum version requierements on `regex`, `jieba`, and `langcodes`
+- Set minimum version requirements on `regex`, `jieba`, and `langcodes`
   so that tokenization will give consistent results.
 
 - Workaround an inconsistency in the `msgpack` API around
@@ -83,7 +108,6 @@ Library changes:
 
 - Fixed calling `msgpack.load` with a deprecated parameter.
 
-
 ## Version 2.2 (2018-07-24)
 
 Library change:
@@ -104,7 +128,6 @@ Data changes:
 - The input data includes the change to tokenization described above, giving
   us word frequencies for words such as "l@s".
 
-
 ## Version 2.1 (2018-06-18)
 
 Data changes:
@@ -124,7 +147,6 @@ Library changes:
 - The MeCab interface can now look for Korean and Japanese dictionaries
   in `/usr/lib/x86_64-linux-gnu/mecab`, which is where Ubuntu 18.04 puts them
   when they are installed from source.
-
 
 ## Version 2.0.1 (2018-05-01)
 
@@ -147,8 +169,6 @@ use the iteration mark 々.
 
 This change does not affect any word frequencies. (The Japanese word list uses
 `wordfreq.mecab` for tokenization, not `simple_tokenize`.)
-
-
 
 ## Version 2.0 (2018-03-14)
 
@@ -212,7 +232,6 @@ Nitty gritty dependency changes:
 
 [exquisite-corpus]: https://github.com/LuminosoInsight/exquisite-corpus
 
-
 ## Version 1.7.0 (2017-08-25)
 
 - Tokenization will always keep Unicode graphemes together, including
@@ -223,7 +242,6 @@ Nitty gritty dependency changes:
 - Support Bengali and Macedonian, which passed the threshold of having enough
   source data to be included
 
-
 ## Version 1.6.1 (2017-05-10)
 
 - Depend on langcodes 1.4, with a new language-matching system that does not
@@ -232,13 +250,12 @@ Nitty gritty dependency changes:
   This prevents silly conflicts where langcodes' SQLite connection was
   preventing langcodes from being used in threads.
 
-
 ## Version 1.6.0 (2017-01-05)
 
 - Support Czech, Persian, Ukrainian, and Croatian/Bosnian/Serbian
 - Add large lists in Chinese, Finnish, Japanese, and Polish
 - Data is now collected and built using Exquisite Corpus
-  (https://github.com/LuminosoInsight/exquisite-corpus)
+  (<https://github.com/LuminosoInsight/exquisite-corpus>)
 - Add word frequencies from OPUS OpenSubtitles 2016
 - Add word frequencies from the MOKK Hungarian Webcorpus
 - Expand Google Books Ngrams data to cover 8 languages
@@ -255,12 +272,10 @@ Nitty gritty dependency changes:
 - Another new frequency-merging strategy (drop the highest and lowest,
   average the rest)
 
-
 ## Version 1.5.1 (2016-08-19)
 
 - Bug fix: Made it possible to load the Japanese or Korean dictionary when the
   other one is not available
-
 
 ## Version 1.5.0 (2016-08-08)
 
@@ -280,7 +295,6 @@ Nitty gritty dependency changes:
 
 [Announcement blog post](https://blog.conceptnet.io/2016/08/22/wordfreq-1-5-more-data-more-languages-more-accuracy)
 
-
 ## Version 1.4 (2016-06-02)
 
 - Add large lists in English, German, Spanish, French, and Portuguese
@@ -288,11 +302,9 @@ Nitty gritty dependency changes:
 
 [Announcement blog post](https://blog.conceptnet.io/2016/06/02/wordfreq-1-4-more-words-plus-word-frequencies-from-reddit/)
 
-
 ## Version 1.3 (2016-01-14)
 
 - Add Reddit comments as an English source
-
 
 ## Version 1.2 (2015-10-29)
 
@@ -307,13 +319,11 @@ Nitty gritty dependency changes:
 
 [Announcement blog post](https://blog.luminoso.com/2015/10/29/wordfreq-1-2-is-better-at-chinese-english-greek-polish-swedish-and-turkish/)
 
-
 ## Version 1.1 (2015-08-25)
 
 - Use the 'regex' package to implement Unicode tokenization that's mostly
   consistent across languages
 - Use NFKC normalization in Japanese and Arabic
-
 
 ## Version 1.0 (2015-07-28)
 
@@ -322,4 +332,3 @@ Nitty gritty dependency changes:
 - Marginal support for Greek, Korean, Chinese
 - Fresh start, dropping compatibility with wordfreq 0.x and its unreasonably
   large downloads
-

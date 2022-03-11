@@ -3,7 +3,6 @@ languages, based on many sources of data.
 
 Author: Robyn Speer
 
-
 ## Installation
 
 wordfreq requires Python 3 and depends on a few other Python modules
@@ -18,7 +17,6 @@ or by getting the repository and running its setup.py:
 
 See [Additional CJK installation](#additional-cjk-installation) for extra
 steps that are necessary to get Chinese, Japanese, and Korean word frequencies.
-
 
 ## Usage
 
@@ -56,7 +54,6 @@ frequency as a decimal between 0 and 1.
     >>> word_frequency('café', 'fr')
     5.75e-05
 
-
 `zipf_frequency` is a variation on `word_frequency` that aims to return the
 word frequency on a human-friendly logarithmic scale. The Zipf scale was
 proposed by Marc Brysbaert, who created the SUBTLEX lists. The Zipf frequency
@@ -86,7 +83,6 @@ one occurrence per billion words.
     >>> zipf_frequency('zipf', 'en', wordlist='small')
     0.0
 
-
 The parameters to `word_frequency` and `zipf_frequency` are:
 
 - `word`: a Unicode string containing the word to look up. Ideally the word
@@ -102,7 +98,6 @@ The parameters to `word_frequency` and `zipf_frequency` are:
   `minimum`, return `minimum` instead. You may want to set this to the minimum
   value contained in the wordlist, to avoid a discontinuity where the wordlist
   ends.
-
 
 ## Frequency bins
 
@@ -120,11 +115,10 @@ Because the Zipf scale is a logarithmic scale, this preserves the same relative
 precision no matter how far down you are in the word list. The frequency of any
 word is precise to within 1%.
 
-(This is not a claim about _accuracy_, but about _precision_. We believe that
+(This is not a claim about *accuracy*, but about *precision*. We believe that
 the way we use multiple data sources and discard outliers makes wordfreq a
 more accurate measurement of the way these words are really used in written
 language, but it's unclear how one would measure this accuracy.)
-
 
 ## The figure-skating metric
 
@@ -137,6 +131,68 @@ in Olympic figure skating:
 - Average the remaining frequencies.
 - Rescale the resulting frequency list to add up to 1.
 
+## Numbers
+
+These wordlists would be enormous if they stored a separate frequency for every
+number, such as if we separately stored the frequencies of 484977 and 484978
+and 98.371 and every other 6-character sequence that could be considered a number.
+
+Instead, we have a frequency-bin entry for every number of the same "shape", such
+as `##` or `####` or `#.#####`, with `#` standing in for digits. (For compatibility
+with earlier versions of wordfreq, our stand-in character is actually `0`.) This
+is the same form of aggregation that the word2vec vocabulary does.
+
+Single-digit numbers are unaffected by this "binning" process; "0" through "9" have
+their own entries in each language's wordlist.
+
+When asked for the frequency of a token containing multiple digits, we multiply
+the frequency of that aggregated entry by a distribution estimating the frequency
+of those digits. The distribution only looks at two things:
+
+- The value of the first digit
+- Whether it is a 4-digit sequence that's likely to represent a year
+
+The first digits are assigned probabilities by Benford's law, and years are assigned
+probabilities from a distribution that peaks at the "present". I explored this in
+a Twitter thread at <https://twitter.com/r_speer/status/1493715982887571456>.
+
+The part of this distribution representing the "present" is not strictly a peak;
+it's a 20-year-long plateau from 2019 to 2039. (2019 is the last time Google Books
+Ngrams was updated, and 2039 is a time by which I will probably have figured out
+a new distribution.)
+
+Some examples:
+
+    >>> word_frequency("2022", "en")
+    5.15e-05
+    >>> word_frequency("1922", "en")
+    8.19e-06
+    >>> word_frequency("1022", "en")
+    1.28e-07
+
+Aside from years, the distribution does **not** care about the meaning of the numbers:
+
+    >>> word_frequency("90210", "en")
+    3.34e-10
+    >>> word_frequency("92222", "en")
+    3.34e-10
+    >>> word_frequency("802.11n", "en")
+    9.04e-13
+    >>> word_frequency("899.19n", "en")
+    9.04e-13
+
+The digit rule applies to other systems of digits, and only cares about the numeric
+value of the digits:
+
+    >>> word_frequency("٥٤", "ar")
+    6.64e-05
+    >>> word_frequency("54", "ar")
+    6.64e-05
+
+It doesn't know which language uses which writing system for digits:
+
+    >>> word_frequency("٥٤", "en")
+    5.4e-05
 
 ## Sources and supported languages
 
@@ -227,7 +283,6 @@ Some languages provide 'large' wordlists, including words with a Zipf frequency
 between 1.0 and 3.0. These are available in 14 languages that are covered by
 enough data sources.
 
-
 ## Other functions
 
 `tokenize(text, lang)` splits text in the given language into words, in the same
@@ -272,7 +327,6 @@ ASCII. But maybe you should just use [xkpa][].
 
 [xkcd936]: https://xkcd.com/936/
 [xkpa]: https://github.com/beala/xkcd-password
-
 
 ## Tokenization
 
@@ -335,7 +389,6 @@ their frequency:
     >>> zipf_frequency('owl-flavored', 'en')
     3.3
 
-
 ## Multi-script languages
 
 Two of the languages we support, Serbian and Chinese, are written in multiple
@@ -357,7 +410,6 @@ when appropriate, and does not appear to create clashes between unrelated words.
 Enumerating the Chinese wordlist will produce some unfamiliar words, because
 people don't actually write in Oversimplified Chinese, and because in
 practice Traditional and Simplified Chinese also have different word usage.
-
 
 ## Similar, overlapping, and varying languages
 
@@ -384,7 +436,6 @@ module to find the best match for a language code. If you ask for word
 frequencies in `cmn-Hans` (the fully specific language code for Mandarin in
 Simplified Chinese), you will get the `zh` wordlist, for example.
 
-
 ## Additional CJK installation
 
 Chinese, Japanese, and Korean have additional external dependencies so that
@@ -399,17 +450,16 @@ and `mecab-ko-dic`.
 
 As of version 2.4.2, you no longer have to install dictionaries separately.
 
-
 ## License
 
 `wordfreq` is freely redistributable under the MIT license (see
 `MIT-LICENSE.txt`), and it includes data files that may be
 redistributed under a Creative Commons Attribution-ShareAlike 4.0
-license (https://creativecommons.org/licenses/by-sa/4.0/).
+license (<https://creativecommons.org/licenses/by-sa/4.0/>).
 
 `wordfreq` contains data extracted from Google Books Ngrams
-(http://books.google.com/ngrams) and Google Books Syntactic Ngrams
-(http://commondatastorage.googleapis.com/books/syntactic-ngrams/index.html).
+(<http://books.google.com/ngrams>) and Google Books Syntactic Ngrams
+(<http://commondatastorage.googleapis.com/books/syntactic-ngrams/index.html>).
 The terms of use of this data are:
 
     Ngram Viewer graphs and data may be freely used for any purpose, although
@@ -420,21 +470,21 @@ The terms of use of this data are:
 sources:
 
 - The Leeds Internet Corpus, from the University of Leeds Centre for Translation
-  Studies (http://corpus.leeds.ac.uk/list.html)
+  Studies (<http://corpus.leeds.ac.uk/list.html>)
 
-- Wikipedia, the free encyclopedia (http://www.wikipedia.org)
+- Wikipedia, the free encyclopedia (<http://www.wikipedia.org>)
 
-- ParaCrawl, a multilingual Web crawl (https://paracrawl.eu)
+- ParaCrawl, a multilingual Web crawl (<https://paracrawl.eu>)
 
 It contains data from OPUS OpenSubtitles 2018
-(http://opus.nlpl.eu/OpenSubtitles.php), whose data originates from the
-OpenSubtitles project (http://www.opensubtitles.org/) and may be used with
+(<http://opus.nlpl.eu/OpenSubtitles.php>), whose data originates from the
+OpenSubtitles project (<http://www.opensubtitles.org/>) and may be used with
 attribution to OpenSubtitles.
 
 It contains data from various SUBTLEX word lists: SUBTLEX-US, SUBTLEX-UK,
 SUBTLEX-CH, SUBTLEX-DE, and SUBTLEX-NL, created by Marc Brysbaert et al.
 (see citations below) and available at
-http://crr.ugent.be/programs-data/subtitle-frequencies.
+<http://crr.ugent.be/programs-data/subtitle-frequencies>.
 
 I (Robyn Speer) have obtained permission by e-mail from Marc Brysbaert to
 distribute these wordlists in wordfreq, to be used for any purpose, not just
@@ -450,7 +500,6 @@ streaming Twitter API, in accordance with Twitter's Developer Agreement &
 Policy. This software gives statistics about words that are commonly used on
 Twitter; it does not display or republish any Twitter content.
 
-
 ## Citing wordfreq
 
 If you use wordfreq in your research, please cite it! We publish the code
@@ -459,8 +508,7 @@ citation is:
 
 > Robyn Speer, Joshua Chin, Andrew Lin, Sara Jewett, & Lance Nathan.
 > (2018, October 3). LuminosoInsight/wordfreq: v2.2. Zenodo.
-> https://doi.org/10.5281/zenodo.1443582
-
+> <https://doi.org/10.5281/zenodo.1443582>
 
 The same citation in BibTex format:
 
@@ -479,20 +527,19 @@ The same citation in BibTex format:
 }
 ```
 
-
 ## Citations to work that wordfreq is built on
 
 - Bojar, O., Chatterjee, R., Federmann, C., Haddow, B., Huck, M., Hokamp, C.,
   Koehn, P., Logacheva, V., Monz, C., Negri, M., Post, M., Scarton, C.,
   Specia, L., & Turchi, M. (2015). Findings of the 2015 Workshop on Statistical
   Machine Translation.
-  http://www.statmt.org/wmt15/results.html
+  <http://www.statmt.org/wmt15/results.html>
 
 - Brysbaert, M. & New, B. (2009). Moving beyond Kucera and Francis: A Critical
   Evaluation of Current Word Frequency Norms and the Introduction of a New and
   Improved Word Frequency Measure for American English. Behavior Research
   Methods, 41 (4), 977-990.
-  http://sites.google.com/site/borisnew/pub/BrysbaertNew2009.pdf
+  <http://sites.google.com/site/borisnew/pub/BrysbaertNew2009.pdf>
 
 - Brysbaert, M., Buchmeier, M., Conrad, M., Jacobs, A.M., Bölte, J., & Böhl, A.
   (2011). The word frequency effect: A review of recent developments and
@@ -501,45 +548,45 @@ The same citation in BibTex format:
 
 - Cai, Q., & Brysbaert, M. (2010). SUBTLEX-CH: Chinese word and character
   frequencies based on film subtitles. PLoS One, 5(6), e10729.
-  http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0010729
+  <http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0010729>
 
 - Davis, M. (2012). Unicode text segmentation. Unicode Standard Annex, 29.
-  http://unicode.org/reports/tr29/
+  <http://unicode.org/reports/tr29/>
 
 - Halácsy, P., Kornai, A., Németh, L., Rung, A., Szakadát, I., & Trón, V.
   (2004). Creating open language resources for Hungarian. In Proceedings of the
   4th international conference on Language Resources and Evaluation (LREC2004).
-  http://mokk.bme.hu/resources/webcorpus/
+  <http://mokk.bme.hu/resources/webcorpus/>
 
 - Keuleers, E., Brysbaert, M. & New, B. (2010). SUBTLEX-NL: A new frequency
   measure for Dutch words based on film subtitles. Behavior Research Methods,
   42(3), 643-650.
-  http://crr.ugent.be/papers/SUBTLEX-NL_BRM.pdf
+  <http://crr.ugent.be/papers/SUBTLEX-NL_BRM.pdf>
 
 - Kudo, T. (2005). Mecab: Yet another part-of-speech and morphological
   analyzer.
-  http://mecab.sourceforge.net/
+  <http://mecab.sourceforge.net/>
 
 - Lin, Y., Michel, J.-B., Aiden, E. L., Orwant, J., Brockman, W., and Petrov,
   S. (2012). Syntactic annotations for the Google Books Ngram Corpus.
   Proceedings of the ACL 2012 system demonstrations, 169-174.
-  http://aclweb.org/anthology/P12-3029
+  <http://aclweb.org/anthology/P12-3029>
 
 - Lison, P. and Tiedemann, J. (2016). OpenSubtitles2016: Extracting Large
   Parallel Corpora from Movie and TV Subtitles. In Proceedings of the 10th
   International Conference on Language Resources and Evaluation (LREC 2016).
-  http://stp.lingfil.uu.se/~joerg/paper/opensubs2016.pdf
+  <http://stp.lingfil.uu.se/~joerg/paper/opensubs2016.pdf>
 
 - Ortiz Suárez, P. J., Sagot, B., and Romary, L. (2019). Asynchronous pipelines
   for processing huge corpora on medium to low resource infrastructures. In
   Proceedings of the Workshop on Challenges in the Management of Large Corpora
   (CMLC-7) 2019.
-  https://oscar-corpus.com/publication/2019/clmc7/asynchronous/
+  <https://oscar-corpus.com/publication/2019/clmc7/asynchronous/>
 
 - ParaCrawl (2018). Provision of Web-Scale Parallel Corpora for Official
-  European Languages. https://paracrawl.eu/
+  European Languages. <https://paracrawl.eu/>
 
 - van Heuven, W. J., Mandera, P., Keuleers, E., & Brysbaert, M. (2014).
   SUBTLEX-UK: A new and improved word frequency database for British English.
   The Quarterly Journal of Experimental Psychology, 67(6), 1176-1190.
-  http://www.tandfonline.com/doi/pdf/10.1080/17470218.2013.850521
+  <http://www.tandfonline.com/doi/pdf/10.1080/17470218.2013.850521>

@@ -24,6 +24,7 @@ DIGIT_RE = regex.compile(r"\d")
 MULTI_DIGIT_RE = regex.compile(r"\d[\d.,]+")
 PURE_DIGIT_RE = regex.compile(r"\d+")
 
+
 def benford_freq(text: str) -> float:
     """
     Estimate the frequency of a digit sequence according to Benford's law.

@@ -7,6 +7,7 @@ from langcodes import Language
 
 MARK_RE = regex.compile(r"[\p{Mn}\N{ARABIC TATWEEL}]", regex.V1)
 
+
 def preprocess_text(text: str, language: Language) -> str:
     """
     This function applies pre-processing steps that convert forms of words

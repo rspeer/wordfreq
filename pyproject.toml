@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wordfreq"
-version = "3.0.0"
+version = "3.0.1"
 description = "Look up the frequencies of words in many languages, based on many sources of data."
 authors = ["Robyn Speer <rspeer@arborelia.net>"]
 license = "MIT"
@@ -13,7 +13,6 @@ msgpack = ">= 1.0"
 langcodes = ">= 3.0"
 regex = ">= 2020.04.04"
 ftfy = ">= 6.1"
-mypy = "^0.931"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
@@ -25,6 +24,7 @@ ipython = ">=7"
 black = "^22.1.0"
 flake8 = "^4.0.1"
 types-setuptools = "^57.4.9"
+mypy = "^0.931"
 
 [tool.poetry.extras]
 cjk = ["mecab-python3", "ipadic", "mecab-ko-dic", "jieba >= 0.42"]

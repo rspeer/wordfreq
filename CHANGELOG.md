@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 3.0.1 (2022-04-01)
+
+mypy was accidentally listed as a full dependency; moved it to dev
+dependencies.
+
 ## Version 3.0 (2022-03-10)
 
 This is the "handle numbers better" release.

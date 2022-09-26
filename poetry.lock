@@ -1,6 +1,6 @@
 [[package]]
 name = "appnope"
-version = "0.1.2"
+version = "0.1.3"
 description = "Disable App Nap on macOS >= 10.9"
 category = "dev"
 optional = false
@@ -8,7 +8,7 @@ python-versions = "*"
 
 [[package]]
 name = "atomicwrites"
-version = "1.4.0"
+version = "1.4.1"
 description = "Atomic file writes."
 category = "dev"
 optional = false
@@ -16,17 +16,17 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "attrs"
-version = "21.4.0"
+version = "22.1.0"
 description = "Classes Without Boilerplate"
 category = "dev"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = ">=3.5"
 
 [package.extras]
-dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "zope.interface", "furo", "sphinx", "sphinx-notfound-page", "pre-commit", "cloudpickle"]
+dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "mypy (>=0.900,!=0.940)", "pytest-mypy-plugins", "zope.interface", "furo", "sphinx", "sphinx-notfound-page", "pre-commit", "cloudpickle"]
 docs = ["furo", "sphinx", "zope.interface", "sphinx-notfound-page"]
-tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "zope.interface", "cloudpickle"]
-tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "mypy", "pytest-mypy-plugins", "cloudpickle"]
+tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "mypy (>=0.900,!=0.940)", "pytest-mypy-plugins", "zope.interface", "cloudpickle"]
+tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "mypy (>=0.900,!=0.940)", "pytest-mypy-plugins", "cloudpickle"]
 
 [[package]]
 name = "backcall"
@@ -38,7 +38,7 @@ python-versions = "*"
 
 [[package]]
 name = "black"
-version = "22.3.0"
+version = "22.8.0"
 description = "The uncompromising code formatter."
 category = "dev"
 optional = false
@@ -49,7 +49,7 @@ click = ">=8.0.0"
 mypy-extensions = ">=0.4.3"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
-tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
+tomli = {version = ">=1.1.0", markers = "python_full_version < \"3.11.0a7\""}
 typed-ast = {version = ">=1.4.2", markers = "python_version < \"3.8\" and implementation_name == \"cpython\""}
 typing-extensions = {version = ">=3.10.0.0", markers = "python_version < \"3.10\""}
 
@@ -61,7 +61,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "click"
-version = "8.1.1"
+version = "8.1.3"
 description = "Composable command line interface toolkit"
 category = "dev"
 optional = false
@@ -73,7 +73,7 @@ importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
 
 [[package]]
 name = "colorama"
-version = "0.4.4"
+version = "0.4.5"
 description = "Cross-platform colored terminal text."
 category = "dev"
 optional = false
@@ -140,13 +140,13 @@ python-versions = "*"
 name = "ipadic"
 version = "1.0.0"
 description = "IPAdic packaged for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
 [[package]]
 name = "ipython"
-version = "7.32.0"
+version = "7.34.0"
 description = "IPython: Productive Interactive Computing"
 category = "dev"
 optional = false
@@ -195,7 +195,7 @@ testing = ["Django (<3.1)", "colorama", "docopt", "pytest (<7.0.0)"]
 name = "jieba"
 version = "0.42.1"
 description = "Chinese Words Segmentation Utilities"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -212,7 +212,7 @@ data = ["language-data (>=1.1,<2.0)"]
 
 [[package]]
 name = "matplotlib-inline"
-version = "0.1.3"
+version = "0.1.6"
 description = "Inline Matplotlib backend for Jupyter"
 category = "dev"
 optional = false
@@ -233,7 +233,7 @@ python-versions = "*"
 name = "mecab-ko-dic"
 version = "1.0.0"
 description = "mecab-ko-dic packaged for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -241,7 +241,7 @@ python-versions = "*"
 name = "mecab-python3"
 version = "1.0.5"
 description = "Python wrapper for the MeCab morphological analyzer for Japanese"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -251,8 +251,8 @@ unidic-lite = ["unidic-lite"]
 
 [[package]]
 name = "msgpack"
-version = "1.0.3"
-description = "MessagePack (de)serializer."
+version = "1.0.4"
+description = "MessagePack serializer"
 category = "main"
 optional = false
 python-versions = "*"
@@ -308,11 +308,11 @@ testing = ["docopt", "pytest (<6.0.0)"]
 
 [[package]]
 name = "pathspec"
-version = "0.9.0"
+version = "0.10.1"
 description = "Utility library for gitignore style pattern matching of file paths."
 category = "dev"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+python-versions = ">=3.7"
 
 [[package]]
 name = "pexpect"
@@ -335,15 +335,15 @@ python-versions = "*"
 
 [[package]]
 name = "platformdirs"
-version = "2.5.1"
+version = "2.5.2"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.extras]
-docs = ["Sphinx (>=4)", "furo (>=2021.7.5b38)", "proselint (>=0.10.2)", "sphinx-autodoc-typehints (>=1.12)"]
-test = ["appdirs (==1.4.4)", "pytest (>=6)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)"]
+docs = ["furo (>=2021.7.5b38)", "proselint (>=0.10.2)", "sphinx-autodoc-typehints (>=1.12)", "sphinx (>=4)"]
+test = ["appdirs (==1.4.4)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)", "pytest (>=6)"]
 
 [[package]]
 name = "pluggy"
@@ -362,7 +362,7 @@ dev = ["tox", "pre-commit"]
 
 [[package]]
 name = "prompt-toolkit"
-version = "3.0.28"
+version = "3.0.31"
 description = "Library for building powerful interactive command lines in Python"
 category = "dev"
 optional = false
@@ -405,22 +405,25 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pygments"
-version = "2.11.2"
+version = "2.13.0"
 description = "Pygments is a syntax highlighting package written in Python."
-category = "dev"
-optional = false
-python-versions = ">=3.5"
-
-[[package]]
-name = "pyparsing"
-version = "3.0.7"
-description = "Python parsing module"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 
 [package.extras]
-diagrams = ["jinja2", "railroad-diagrams"]
+plugins = ["importlib-metadata"]
+
+[[package]]
+name = "pyparsing"
+version = "3.0.9"
+description = "pyparsing module - Classes and methods to define and execute parsing grammars"
+category = "dev"
+optional = false
+python-versions = ">=3.6.8"
+
+[package.extras]
+diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
 name = "pytest"
@@ -446,7 +449,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 name = "regex"
-version = "2022.3.15"
+version = "2022.9.13"
 description = "Alternative regular expression module, to replace re."
 category = "main"
 optional = false
@@ -470,18 +473,18 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "traitlets"
-version = "5.1.1"
-description = "Traitlets Python configuration system"
+version = "5.4.0"
+description = ""
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.extras]
-test = ["pytest"]
+test = ["pre-commit", "pytest"]
 
 [[package]]
 name = "typed-ast"
-version = "1.5.2"
+version = "1.5.4"
 description = "a fork of Python 2 and 3 ast modules with type comment support"
 category = "dev"
 optional = false
@@ -489,7 +492,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "types-setuptools"
-version = "57.4.11"
+version = "57.4.18"
 description = "Typing stubs for setuptools"
 category = "dev"
 optional = false
@@ -497,11 +500,11 @@ python-versions = "*"
 
 [[package]]
 name = "typing-extensions"
-version = "4.1.1"
-description = "Backported and Experimental Type Hints for Python 3.6+"
+version = "4.3.0"
+description = "Backported and Experimental Type Hints for Python 3.7+"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [[package]]
 name = "wcwidth"
@@ -513,25 +516,25 @@ python-versions = "*"
 
 [[package]]
 name = "zipp"
-version = "3.7.0"
+version = "3.8.1"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 
 [package.extras]
-docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
+docs = ["sphinx", "jaraco.packaging (>=9)", "rst.linker (>=1.9)", "jaraco.tidelift (>=1.4)"]
+testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.3)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
 
 [extras]
-cjk = []
-jieba = []
-mecab = []
+cjk = ["mecab-python3", "ipadic", "mecab-ko-dic", "jieba"]
+jieba = ["jieba"]
+mecab = ["mecab-python3", "ipadic", "mecab-ko-dic"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "6b34d23eba623c9b683647b80983d3640de1e2332a58d62d3c121f628615a524"
+content-hash = "3696519ef6dd938e37966b6c0a29e30de8eaf0c71e50b95797c9d806fe919014"
 
 [metadata.files]
 appnope = []

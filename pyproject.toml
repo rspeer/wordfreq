@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wordfreq"
-version = "3.0.1"
+version = "3.0.2"
 description = "Look up the frequencies of words in many languages, based on many sources of data."
 authors = ["Robyn Speer <rspeer@arborelia.net>"]
 license = "MIT"
@@ -11,7 +11,7 @@ homepage = "https://github.com/rspeer/wordfreq/"
 python = "^3.7"
 msgpack = ">= 1.0"
 langcodes = ">= 3.0"
-regex = ">= 2020.04.04"
+regex = ">= 2021.7.6"
 ftfy = ">= 6.1"
 
 [tool.poetry.dev-dependencies]

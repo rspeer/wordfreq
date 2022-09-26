@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 3.0.2 (2022-09-26)
+
+- Updated the range of allowable versions of `regex`. Versions before 2021.7.6
+  don't have the `regex.Match` class.
+
+- Added the `extras` dependencies as optional dependencies in pyproject.toml.
+
 ## Version 3.0.1 (2022-04-01)
 
 mypy was accidentally listed as a full dependency; moved it to dev

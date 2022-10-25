@@ -11,9 +11,9 @@ import logging
 import math
 import warnings
 
-from .tokens import tokenize, simple_tokenize, lossy_tokenize
-from .language_info import get_language_info
-from .numbers import digit_freq, has_digit_sequence, smash_numbers
+from wordfreq.tokens import tokenize, simple_tokenize, lossy_tokenize
+from wordfreq.language_info import get_language_info
+from wordfreq.numbers import digit_freq, has_digit_sequence, smash_numbers
 
 logger = logging.getLogger(__name__)
 

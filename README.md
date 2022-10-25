@@ -454,8 +454,8 @@ As of version 2.4.2, you no longer have to install dictionaries separately.
 
 ## License
 
-`wordfreq` is freely redistributable under the MIT license (see
-`MIT-LICENSE.txt`), and it includes data files that may be
+`wordfreq` is freely redistributable under the Apache license (see
+`LICENSE.txt`), and it includes data files that may be
 redistributed under a Creative Commons Attribution-ShareAlike 4.0
 license (<https://creativecommons.org/licenses/by-sa/4.0/>).
 
@@ -508,24 +508,20 @@ If you use wordfreq in your research, please cite it! We publish the code
 through Zenodo so that it can be reliably cited using a DOI. The current
 citation is:
 
-> Robyn Speer, Joshua Chin, Andrew Lin, Sara Jewett, & Lance Nathan.
-> (2018, October 3). LuminosoInsight/wordfreq: v2.2. Zenodo.
-> <https://doi.org/10.5281/zenodo.1443582>
+> Robyn Speer. (2022). rspeer/wordfreq: v3.0 (v3.0.2). Zenodo. https://doi.org/10.5281/zenodo.7199437
 
 The same citation in BibTex format:
 
 ```
-@misc{robyn_speer_2018_1443582,
-  author       = {Robyn Speer and
-                  Joshua Chin and
-                  Andrew Lin and
-                  Sara Jewett and
-                  Lance Nathan},
-  title        = {LuminosoInsight/wordfreq: v2.2},
-  month        = oct,
-  year         = 2018,
-  doi          = {10.5281/zenodo.1443582},
-  url          = {https://doi.org/10.5281/zenodo.1443582}
+@software{robyn_speer_2022_7199437,
+  author       = {Robyn Speer},
+  title        = {rspeer/wordfreq: v3.0},
+  month        = sep,
+  year         = 2022,
+  publisher    = {Zenodo},
+  version      = {v3.0.2},
+  doi          = {10.5281/zenodo.7199437},
+  url          = {https://doi.org/10.5281/zenodo.7199437}
 }
 ```
 

@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "wordfreq"
-version = "3.0.2"
+version = "3.0.3"
 description = "Look up the frequencies of words in many languages, based on many sources of data."
 authors = ["Robyn Speer <rspeer@arborelia.net>"]
-license = "MIT"
+license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://github.com/rspeer/wordfreq/"
 

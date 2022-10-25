@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 3.0.3 (2022-10-25)
+
+- wordfreq has changed from the MIT license to the Apache License 2.0.
+
+  The Apache license is equally permissive, but clarifies requirements about
+  attributing the author (Robyn Speer), making this attribution readable, and
+  maintaining credit for the included data resources.
+
+- Minor packaging changes to make sure that tox can test the library on Python
+  3.7 through 3.11.
+
 ## Version 3.0.2 (2022-09-26)
 
 - Updated the range of allowable versions of `regex`. Versions before 2021.7.6

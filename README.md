@@ -261,7 +261,7 @@ least 3 different sources of word frequencies:
     Serbian     sr [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Spanish     es      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Swedish     sv      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -
-    Tagalog     fil     3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Tagalog     tl     3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Tamil       ta      3  -      │ Yes   -     -     -     Yes   Yes   -     -
     Turkish     tr      4  -      │ Yes   Yes   -     -     Yes   Yes   -     -
     Ukrainian   uk      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -

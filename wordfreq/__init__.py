@@ -1,4 +1,3 @@
-from pkg_resources import resource_filename
 from functools import lru_cache
 from typing import List, Dict, Iterator, Tuple
 import langcodes
@@ -9,7 +8,13 @@ import pathlib
 import random
 import logging
 import math
+import sys
 import warnings
+
+if sys.version_info < (3, 10):
+    from importlib_resources import files
+else:
+    from importlib.resources import files
 
 from wordfreq.tokens import tokenize, simple_tokenize, lossy_tokenize
 from wordfreq.language_info import get_language_info
@@ -19,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 CACHE_SIZE = 100000
-DATA_PATH = pathlib.Path(resource_filename("wordfreq", "data"))
+DATA_PATH = files("wordfreq") / "data"
 
 # We'll divide the frequency by 10 for each token boundary that was inferred.
 # (We determined the factor of 10 empirically by looking at words in the

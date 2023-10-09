@@ -13,6 +13,7 @@ msgpack = ">= 1.0"
 langcodes = ">= 3.0"
 regex = ">= 2021.7.6"
 ftfy = ">= 6.1"
+importlib_resources = {version = "^6.1.0", python = "<3.10"}
 mecab-python3 = {version = "^1.0.5", optional = true}
 ipadic = {version = "^1.0.0", optional = true}
 mecab-ko-dic = {version = "^1.0.0", optional = true}

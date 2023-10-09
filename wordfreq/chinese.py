@@ -1,12 +1,17 @@
-from pkg_resources import resource_filename
 from typing import List
 import jieba
 import msgpack
 import gzip
+import sys
 
-DICT_FILENAME = resource_filename("wordfreq", "data/jieba_zh.txt")
-ORIG_DICT_FILENAME = resource_filename("wordfreq", "data/jieba_zh_orig.txt")
-SIMP_MAP_FILENAME = resource_filename("wordfreq", "data/_chinese_mapping.msgpack.gz")
+if sys.version_info < (3, 10):
+    from importlib_resources import files
+else:
+    from importlib.resources import files
+
+DICT_FILENAME = files("wordfreq") / "data" / "jieba_zh.txt"
+ORIG_DICT_FILENAME = files("wordfreq") / "data" / "jieba_zh_orig.txt"
+SIMP_MAP_FILENAME = files("wordfreq") / "data" / "_chinese_mapping.msgpack.gz"
 try:
     SIMPLIFIED_MAP = msgpack.load(
         gzip.open(SIMP_MAP_FILENAME), raw=False, strict_map_key=False

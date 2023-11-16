@@ -256,8 +256,8 @@ least 3 different sources of word frequencies:
     Portuguese  pt      5  Yes    │ Yes   Yes   Yes   -     Yes   Yes   -     -
     Romanian    ro      3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Russian     ru      5  Yes    │ Yes   Yes   Yes   Yes   -     Yes   -     -
-    Slovak      sl      3  -      │ Yes   Yes   -     -     Yes   -     -     -
-    Slovenian   sk      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Slovak      sk      3  -      │ Yes   Yes   -     -     Yes   -     -     -
+    Slovenian   sl      3  -      │ Yes   Yes   -     -     Yes   -     -     -
     Serbian     sr [1]  3  -      │ Yes   Yes   -     -     -     Yes   -     -
     Spanish     es      7  Yes    │ Yes   Yes   Yes   Yes   Yes   Yes   Yes   -
     Swedish     sv      5  Yes    │ Yes   Yes   -     -     Yes   Yes   Yes   -

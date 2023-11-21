@@ -1,21 +1,22 @@
-from pkg_resources import resource_filename
-from typing import List
-import jieba
-import msgpack
+from __future__ import annotations
+
 import gzip
 
-DICT_FILENAME = resource_filename("wordfreq", "data/jieba_zh.txt")
-ORIG_DICT_FILENAME = resource_filename("wordfreq", "data/jieba_zh_orig.txt")
-SIMP_MAP_FILENAME = resource_filename("wordfreq", "data/_chinese_mapping.msgpack.gz")
+import jieba
+import msgpack
+
+from .util import data_path
+
+DICT_FILENAME = data_path("jieba_zh.txt")
+ORIG_DICT_FILENAME = data_path("jieba_zh_orig.txt")
+SIMP_MAP_FILENAME = data_path("_chinese_mapping.msgpack.gz")
 try:
-    SIMPLIFIED_MAP = msgpack.load(
-        gzip.open(SIMP_MAP_FILENAME), raw=False, strict_map_key=False
-    )
+    SIMPLIFIED_MAP = msgpack.load(gzip.open(SIMP_MAP_FILENAME), raw=False, strict_map_key=False)
 except TypeError:
     # work around incompatibility between pure-Python msgpack and C msgpack
     SIMPLIFIED_MAP = msgpack.load(gzip.open(SIMP_MAP_FILENAME), raw=False)
-jieba_tokenizer = None
-jieba_orig_tokenizer = None
+jieba_tokenizer: jieba.Tokenizer | None = None
+jieba_orig_tokenizer: jieba.Tokenizer | None = None
 
 
 def simplify_chinese(text: str) -> str:
@@ -32,7 +33,7 @@ def simplify_chinese(text: str) -> str:
     return text.translate(SIMPLIFIED_MAP).casefold()
 
 
-def jieba_tokenize(text: str, external_wordlist: bool = False) -> List[str]:
+def jieba_tokenize(text: str, external_wordlist: bool = False) -> list[str]:
     """
     Tokenize the given text into tokens whose word frequencies can probably
     be looked up. This uses Jieba, a word-frequency-based tokenizer.
@@ -61,8 +62,6 @@ def jieba_tokenize(text: str, external_wordlist: bool = False) -> List[str]:
         # those spans from the original text, even if it's in Traditional
         # Chinese
         tokens = []
-        for _token, start, end in jieba_tokenizer.tokenize(
-            simplify_chinese(text), HMM=False
-        ):
+        for _token, start, end in jieba_tokenizer.tokenize(simplify_chinese(text), HMM=False):
             tokens.append(text[start:end])
         return tokens

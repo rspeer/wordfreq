@@ -1,6 +1,6 @@
+from pytest import approx
 from wordfreq import word_frequency
 from wordfreq.numbers import digit_freq, smash_numbers
-from pytest import approx
 
 
 def test_number_smashing():

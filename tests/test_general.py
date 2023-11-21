@@ -1,14 +1,14 @@
+import pytest
 from wordfreq import (
-    word_frequency,
     available_languages,
     cB_to_freq,
-    top_n_list,
-    random_words,
-    random_ascii_words,
-    tokenize,
     lossy_tokenize,
+    random_ascii_words,
+    random_words,
+    tokenize,
+    top_n_list,
+    word_frequency,
 )
-import pytest
 
 
 def test_freq_examples():
@@ -142,9 +142,17 @@ def test_tokenization():
         "see",
     ]
 
-    assert tokenize(
-        "I don't split at apostrophes, you see.", "en", include_punctuation=True
-    ) == ["i", "don't", "split", "at", "apostrophes", ",", "you", "see", "."]
+    assert tokenize("I don't split at apostrophes, you see.", "en", include_punctuation=True) == [
+        "i",
+        "don't",
+        "split",
+        "at",
+        "apostrophes",
+        ",",
+        "you",
+        "see",
+        ".",
+    ]
 
     # Certain punctuation does not inherently split a word.
     assert tokenize("Anything is possible at zombo.com", "en") == [
@@ -158,17 +166,20 @@ def test_tokenization():
     # Splits occur after symbols, and at splitting punctuation such as hyphens.
     assert tokenize("😂test", "en") == ["😂", "test"]
     assert tokenize("flip-flop", "en") == ["flip", "flop"]
-    assert tokenize(
-        "this text has... punctuation :)", "en", include_punctuation=True
-    ) == ["this", "text", "has", "...", "punctuation", ":)"]
+    assert tokenize("this text has... punctuation :)", "en", include_punctuation=True) == [
+        "this",
+        "text",
+        "has",
+        "...",
+        "punctuation",
+        ":)",
+    ]
 
     # Multi-codepoint emoji sequences such as 'medium-skinned woman with headscarf'
     # and 'David Bowie' stay together, because our Unicode segmentation algorithm
     # is up to date
     assert tokenize("emoji test 🧕🏽", "en") == ["emoji", "test", "🧕🏽"]
-    assert tokenize(
-        "👨‍🎤 Planet Earth is blue, and there's nothing I can do 🌎🚀", "en"
-    ) == [
+    assert tokenize("👨‍🎤 Planet Earth is blue, and there's nothing I can do 🌎🚀", "en") == [
         "👨‍🎤",
         "planet",
         "earth",
@@ -221,9 +232,7 @@ def test_uncurl_quotes():
 def test_phrase_freq():
     ff = word_frequency("flip-flop", "en")
     assert ff > 0
-    phrase_freq = 1.0 / word_frequency("flip", "en") + 1.0 / word_frequency(
-        "flop", "en"
-    )
+    phrase_freq = 1.0 / word_frequency("flip", "en") + 1.0 / word_frequency("flop", "en")
     assert 1.0 / ff == pytest.approx(phrase_freq, rel=0.01)
 
 

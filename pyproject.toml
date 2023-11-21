@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "wordfreq"
-version = "3.0.3"
+version = "3.1.0"
 description = "Look up the frequencies of words in many languages, based on many sources of data."
 authors = ["Robyn Speer <rspeer@arborelia.net>"]
 license = "Apache-2.0"
@@ -8,32 +8,74 @@ readme = "README.md"
 homepage = "https://github.com/rspeer/wordfreq/"
 
 [tool.poetry.dependencies]
-python = "^3.7"
-msgpack = ">= 1.0"
+python = ">= 3.8, < 4"
+msgpack = "^1.0.7"
 langcodes = ">= 3.0"
-regex = ">= 2021.7.6"
+regex = ">= 2023.10.3"
 ftfy = ">= 6.1"
-mecab-python3 = {version = "^1.0.5", optional = true}
-ipadic = {version = "^1.0.0", optional = true}
-mecab-ko-dic = {version = "^1.0.0", optional = true}
-jieba = {version = ">=0.42", optional = true}
+mecab-python3 = { version = "^1.0.5", optional = true }
+ipadic = { version = "^1.0.0", optional = true }
+mecab-ko-dic = { version = "^1.0.0", optional = true }
+jieba = { version = ">=0.42", optional = true }
+locate = "^1.1.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
-mecab-python3 = "^1.0.4"
-jieba = ">= 0.42"
+mecab-python3 = "^1.0.5"
+jieba = "^0.42.1"
 ipadic = "^1.0.0"
 mecab-ko-dic = "^1.0.0"
 ipython = ">=7"
-black = "^22.1.0"
-flake8 = "^4.0.1"
-types-setuptools = "^57.4.9"
-mypy = "^0.931"
+mypy = "^1.7.0"
+ruff = "^0.1.6"
+setuptools = "^69.0.2"   # implicit dependency in jieba
+pytest-profiling = "^1.7.0"
 
 [tool.poetry.extras]
 cjk = ["mecab-python3", "ipadic", "mecab-ko-dic", "jieba"]
 mecab = ["mecab-python3", "ipadic", "mecab-ko-dic"]
 jieba = ["jieba"]
+
+[tool.ruff]
+# ruff is a Python linter and formatter, which reimplements black, flake8, pylint, and more
+line-length = 99
+show-fixes = true
+src = ["src"]
+target-version = "py38"
+
+[tool.ruff.lint]
+extend-select = [
+    "D",     # docstring style
+    "I",     # isort
+    "UP",    # pyupgrade -- catches obsolete code patterns
+    "ANN",   # type annotations
+    "ASYNC", # async code checks
+    "B",     # flake8-bugbear -- catches bug-prone usage
+    "C4",    # list comprehensions
+    "FA",    # correct use of `from __future__ import annotations`
+    "INP",   # checks for presence of __init__.py
+    "T20",   # print statements
+    "TID",   # tidy imports
+    "PTH",   # use pathlib instead of os.path
+    "PLE",   # pylint errors
+]
+ignore = [
+    "D100",   # modules without top-of-module docstrings are okay
+    "D104",   # __init__.py doesn't need a docstring
+    "D107",   # __init__ method doesn't need a docstring
+    "D2",     # don't check whitespace in docstrings
+    "D4",     # don't check grammar and style in docstrings
+    "E501",   # long lines after auto-formatting, such as long strings, are okay
+    "ANN002", # we don't demand a type on *args, particularly because it's difficult to specify
+    "ANN003", # we don't demand a type on **kwargs, particularly because it's difficult to specify
+    "ANN101", # self does not need a type
+    "ANN102", # `cls` in classmethod does not need a type
+    "PTH123", # we don't need to construct a Path just to open a file by filename
+]
+
+[tool.ruff.lint.per-file-ignores]
+# We are less strict about test code
+"tests/**" = ["D", "ANN", "T20", "INP"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

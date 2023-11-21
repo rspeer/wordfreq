@@ -1,4 +1,4 @@
-from wordfreq import tokenize, lossy_tokenize, word_frequency
+from wordfreq import lossy_tokenize, tokenize, word_frequency
 
 
 def test_gender_neutral_at():

@@ -1,5 +1,5 @@
-from wordfreq import tokenize, simple_tokenize, word_frequency
 import pytest
+from wordfreq import simple_tokenize, tokenize, word_frequency
 
 
 def test_tokens():

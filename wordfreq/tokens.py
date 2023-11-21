@@ -1,31 +1,31 @@
-import regex
-import unicodedata
+from __future__ import annotations
+
 import logging
+import unicodedata
+
 import langcodes
-from typing import List
+import regex
 from ftfy.fixes import uncurl_quotes
 
 from .language_info import (
-    get_language_info,
-    SPACELESS_SCRIPTS,
     EXTRA_JAPANESE_CHARACTERS,
+    SPACELESS_SCRIPTS,
+    get_language_info,
 )
 from .preprocess import preprocess_text
 
 # Placeholders for CJK functions that we'll import on demand
-_mecab_tokenize = None
-_jieba_tokenize = None
-_simplify_chinese = None
+_mecab_tokenize = None  # type: ignore
+_jieba_tokenize = None  # type: ignore
+_simplify_chinese = None  # type: ignore
 
-_WARNED_LANGUAGES = set()
+_WARNED_LANGUAGES: set[str] = set()
 logger = logging.getLogger(__name__)
 
 
 def _make_spaceless_expr() -> str:
     scripts = sorted(SPACELESS_SCRIPTS)
-    pieces = [r"\p{IsIdeo}"] + [
-        r"\p{Script=%s}" % script_code for script_code in scripts
-    ]
+    pieces = [r"\p{IsIdeo}"] + [r"\p{Script=%s}" % script_code for script_code in scripts]
     return "".join(pieces) + EXTRA_JAPANESE_CHARACTERS
 
 
@@ -148,11 +148,7 @@ TOKEN_RE = regex.compile(
     # part of the token in Case 3.
 
     \w\w?'
-""".replace(
-        "<SPACELESS>", SPACELESS_EXPR
-    ).replace(
-        "<VOWEL>", INITIAL_VOWEL_EXPR
-    ),
+""".replace("<SPACELESS>", SPACELESS_EXPR).replace("<VOWEL>", INITIAL_VOWEL_EXPR),
     regex.V1 | regex.WORD | regex.VERBOSE,
 )
 
@@ -167,11 +163,7 @@ TOKEN_RE_WITH_PUNCTUATION = regex.compile(
     (?=[\w\p{So}]) (?!\w\w?'<VOWEL>)
       \X+? (?: @s? (?!w) | \b) |                            # Case 3
     \w\w?'                                                  # Case 4
-""".replace(
-        "<SPACELESS>", SPACELESS_EXPR
-    ).replace(
-        "<VOWEL>", INITIAL_VOWEL_EXPR
-    ),
+""".replace("<SPACELESS>", SPACELESS_EXPR).replace("<VOWEL>", INITIAL_VOWEL_EXPR),
     regex.V1 | regex.WORD | regex.VERBOSE,
 )
 
@@ -180,7 +172,7 @@ TOKEN_RE_WITH_PUNCTUATION = regex.compile(
 PUNCT_RE = regex.compile(r"[\p{punct}]+")
 
 
-def simple_tokenize(text: str, include_punctuation: bool = False) -> List[str]:
+def simple_tokenize(text: str, include_punctuation: bool = False) -> list[str]:
     """
     Tokenize the given text using a straightforward, Unicode-aware token
     expression.
@@ -220,7 +212,7 @@ def tokenize(
     lang: str,
     include_punctuation: bool = False,
     external_wordlist: bool = False,
-) -> List[str]:
+) -> list[str]:
     """
     Tokenize this text in a way that's relatively simple but appropriate for
     the language. Strings that are looked up in wordfreq will be run through
@@ -286,9 +278,7 @@ def tokenize(
         if info["tokenizer"] != "regex" and lang not in _WARNED_LANGUAGES:
             logger.warning(
                 "The language '{}' is in the '{}' script, which we don't "
-                "have a tokenizer for. The results will be bad.".format(
-                    lang, info["script"]
-                )
+                "have a tokenizer for. The results will be bad.".format(lang, info["script"])
             )
             _WARNED_LANGUAGES.add(lang)
         tokens = simple_tokenize(text, include_punctuation=include_punctuation)
@@ -301,7 +291,7 @@ def lossy_tokenize(
     lang: str,
     include_punctuation: bool = False,
     external_wordlist: bool = False,
-) -> List[str]:
+) -> list[str]:
     """
     Get a list of tokens for this text, with largely the same results and
     options as `tokenize`, but aggressively normalize some text in a lossy way

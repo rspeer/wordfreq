@@ -1,9 +1,10 @@
-import regex
 import unicodedata
+
+import regex
+from langcodes import Language
 
 from .language_info import get_language_info
 from .transliterate import transliterate
-from langcodes import Language
 
 MARK_RE = regex.compile(r"[\p{Mn}\N{ARABIC TATWEEL}]", regex.V1)
 

@@ -11,3 +11,5 @@ wordfreq-data.tar.gz
 build.dot
 .pytest_cache
 .tox
+.vscode
+prof

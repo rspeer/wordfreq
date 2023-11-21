@@ -1,4 +1,4 @@
-from wordfreq import tokenize, word_frequency
+from wordfreq import tokenize
 
 
 def test_apostrophes():

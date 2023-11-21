@@ -1,7 +1,8 @@
-import MeCab
+from __future__ import annotations
+
 import unicodedata
 
-from typing import Dict, List
+import MeCab
 
 
 def make_mecab_analyzer(lang: str) -> MeCab.Tagger:
@@ -22,10 +23,10 @@ def make_mecab_analyzer(lang: str) -> MeCab.Tagger:
 
 
 # The constructed analyzers will go in this dictionary.
-MECAB_ANALYZERS: Dict[str, MeCab.Tagger] = {}
+MECAB_ANALYZERS: dict[str, MeCab.Tagger] = {}
 
 
-def mecab_tokenize(text: str, lang: str) -> List[str]:
+def mecab_tokenize(text: str, lang: str) -> list[str]:
     """
     Use the mecab-python3 package to tokenize the given text. The `lang`
     must be 'ja' for Japanese or 'ko' for Korean.
@@ -42,8 +43,4 @@ def mecab_tokenize(text: str, lang: str) -> List[str]:
     analyzed = analyzer.parse(text)
     if not analyzed:
         return []
-    return [
-        line.split("\t")[0]
-        for line in analyzed.split("\n")
-        if line != "" and line != "EOS"
-    ]
+    return [line.split("\t")[0] for line in analyzed.split("\n") if line != "" and line != "EOS"]

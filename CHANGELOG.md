@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 3.1.1 (2023-11-21)
+
+- Supports Python 3.8 through 3.12.
+- Stopped using the deprecated `pkg_resources` and implicitly depending on
+  setuptools. We now use the `locate` package instead.
+
 ## Version 3.0.3 (2022-10-25)
 
 - wordfreq has changed from the MIT license to the Apache License 2.0.

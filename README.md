@@ -1,6 +1,11 @@
 wordfreq is a Python library for looking up the frequencies of words in many
 languages, based on many sources of data.
 
+The word frequencies are a snapshot of language usage through about 2021. I may
+continue to make packaging updates, but the data is unlikely to be updated again.
+The world where I had a reasonable way to collect reliable word frequencies is
+not the world we live in now. See [SUNSET.md](./SUNSET.md) for more information.
+
 Author: Robyn Speer
 
 ## Installation
@@ -501,6 +506,22 @@ Some additional data was collected by a custom application that watches the
 streaming Twitter API, in accordance with Twitter's Developer Agreement &
 Policy. This software gives statistics about words that are commonly used on
 Twitter; it does not display or republish any Twitter content.
+
+## Can I convert wordfreq to a more convenient form for my purposes, like a CSV file?
+
+No. The CSV format does not have any space for attribution or license
+information, and therefore does not follow the CC-By-SA license. Even if you
+tried to include the proper attribution in a header or in another file, someone
+would likely just strip it out.
+
+wordfreq isn't particularly separable from its code, anyway. It depends on its
+normalization and word segmentation process, which is implemented in Python
+code, to give appropriate results.
+
+A reasonable way to transform wordfreq would be to port the library to another
+programming language, with all credits included and packaged in the usual way
+for that language.
+
 
 ## Citing wordfreq
 

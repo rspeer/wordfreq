@@ -22,9 +22,9 @@ output crops up everywhere.
 
 As one example, [Philip Shapira
 reports](https://pshapira.net/2024/03/31/delving-into-delve/) that ChatGPT
-(OpenAI's popular brand of language model circa 2024) is obsessed with the word
-"delve" in a way that people never have been, and caused its overall frequency
-to increase by an order of magnitude.
+(OpenAI's popular brand of generative language model circa 2024) is obsessed
+with the word "delve" in a way that people never have been, and caused its
+overall frequency to increase by an order of magnitude.
 
 
 ## Information that used to be free became expensive
@@ -61,7 +61,15 @@ generative AI sucks up all the air in the room and gets all the money. It's
 rare to see NLP research that doesn't have a dependency on closed data
 controlled by OpenAI and Google, two companies that I already despise.
 
-I don't want to work on anything that could be confused with generative AI,
+wordfreq was built by collecting a whole lot of text in a lot of languages.
+That used to be a pretty reasonable thing to do, and not the kind of thing
+someone would be likely to object to. Now, the text-slurping tools are mostly
+used for training generative AI, and people are quite rightly on the defensive.
+If someone is collecting all the text from your books, articles, Web site, or
+public posts, it's very likely because they are creating a plagiarism machine
+that will claim your words as its own.
+
+So I don't want to work on anything that could be confused with generative AI,
 or that could benefit generative AI.
 
 OpenAI and Google can collect their own damn data. I hope they have to pay a

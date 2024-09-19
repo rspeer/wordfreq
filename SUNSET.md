@@ -47,8 +47,6 @@ would be no valuable information to be found there.
 Reddit also stopped providing public data archives, and now they sell their
 archives at a price that only OpenAI will pay.
 
-And given what's happening to the field, I don't blame them.
-
 
 ## I don't want to be part of this scene anymore
 

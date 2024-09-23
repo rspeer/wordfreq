@@ -1,9 +1,25 @@
+# Note from September 2024
+
+This documentation page has gotten a lot of attention recently! I
+think most of the people who find it understand where I'm coming from. I'd
+like to highlight a couple of things, now that people are linking to this
+page from all sorts of contexts.
+
+- I still work on open-source libraries. Here's [ftfy](https://github.com/rspeer/python-ftfy),
+  the popular multi-purpose Unicode fixer.
+
+- You could see this freezing of wordfreq data as a good thing. Many people
+  have found wordfreq useful, and the latest version isn't going away. The
+  conclusion that I'm documenting here is that _updating it would make it
+  worse_, so instead, I'm not updating it. It'll become outdated over time,
+  but it won't get actively worse. That's a pretty okay fate for something
+  on the Internet!
+
 # Why wordfreq will not be updated
 
 The wordfreq data is a snapshot of language that could be found in various
 online sources up through 2021. There are several reasons why it will not be
 updated anymore.
-
 
 ## Generative AI has polluted the data
 
@@ -28,6 +44,9 @@ overall frequency to increase by an order of magnitude.
 
 
 ## Information that used to be free became expensive
+
+Before I wrote this page, I'd been looking at how I would run the tool that
+updates wordfreq's data sources.
 
 wordfreq is not just concerned with formal printed words. It collected more
 conversational language usage from two sources in particular: Twitter and
@@ -70,9 +89,7 @@ that will claim your words as its own.
 So I don't want to work on anything that could be confused with generative AI,
 or that could benefit generative AI.
 
-OpenAI and Google can collect their own damn data. I hope they have to pay a
-very high price for it, and I hope they're constantly cursing the mess that
-they made themselves.
+OpenAI and Google can collect their own damn data, and I hope they have to pay a
+very high price for it. They made this mess themselves.
 
 — Robyn Speer
-

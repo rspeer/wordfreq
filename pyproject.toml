@@ -8,11 +8,11 @@ readme = "README.md"
 homepage = "https://github.com/rspeer/wordfreq/"
 
 [tool.poetry.dependencies]
-python = ">= 3.8, < 4"
+python = ">= 3.9, < 4"
 msgpack = "^1.0.7"
 langcodes = ">= 3.0"
 regex = ">= 2023.10.3"
-ftfy = ">= 6.1"
+ftfy = ">= 6.3"
 mecab-python3 = { version = "^1.0.5", optional = true }
 ipadic = { version = "^1.0.0", optional = true }
 mecab-ko-dic = { version = "^1.0.0", optional = true }

@@ -28,7 +28,7 @@ mecab-ko-dic = "^1.0.0"
 ipython = ">=7"
 mypy = "^1.7.0"
 ruff = "^0.1.6"
-setuptools = "^69.0.2"   # implicit dependency in jieba
+setuptools = "^75"   # implicit dependency in jieba
 pytest-profiling = "^1.7.0"
 
 [tool.poetry.extras]

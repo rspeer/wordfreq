@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 3.2.0 (2025-01-04)
+
+- Supports Python 3.9 through 3.12.
+- Updated dependency on ftfy.
+- Updated the setuptools dev dependency (which I wish wasn't there).
+
 ## Version 3.1.1 (2023-11-21)
 
 - Supports Python 3.8 through 3.12.
